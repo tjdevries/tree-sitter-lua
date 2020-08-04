@@ -1,0 +1,12 @@
+==================
+Return statements
+==================
+
+return 1
+
+---
+
+(program
+  (return_statement (number)))
+
+
