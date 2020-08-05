@@ -1,0 +1,196 @@
+;;; Simple assignment
+; x = 1
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (number)))
+
+;;; Simple assignment from variable
+; x = y
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (identifier)))
+
+
+;;; Accepts addition
+; x = 1 + 2
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (operation (number) (number))))
+
+;;; Accepts addition of variables
+; x = y + z
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (operation (identifier) (identifier))))
+
+;;; Can make local variables
+; local x = 2
+(program
+  (variable_declaration
+    (local)
+    (variable_declarator (identifier))
+    (number)))
+
+;;; Can do multiple sets
+; x, y, z = 1, 2, 3
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (variable_declarator (identifier))
+    (variable_declarator (identifier))
+    (number)
+    (number)
+    (number)))
+
+;;; Can make an empty table
+; t = {}
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (tableconstructor)))
+
+;;; Can make a table with a number
+; t = { 1 }
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (tableconstructor
+      (fieldlist (field value: (number))))))
+
+;;; Can make a table with a list of numbers
+; t = { 1, 2, 3 }
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (tableconstructor
+      (fieldlist
+        (field value: (number))
+        (field value: (number))
+        (field value: (number))))))
+
+;;; Can make a table with keys
+; t = { x = 1, y = 2 }
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (tableconstructor
+      (fieldlist
+        (field
+          name: (identifier)
+          value: (number))
+        (field
+          name: (identifier)
+          value: (number))))))
+
+
+;;; Can make a table with expression keys
+; t = { [x] = 1, ["y"] = 2 }
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (tableconstructor
+      (fieldlist
+        (field
+          field_left_bracket: (field_left_bracket)
+          key: (identifier)
+          field_right_bracket: (field_right_bracket)
+          value: (number))
+        (field
+          field_left_bracket: (field_left_bracket)
+          key: (string)
+          field_right_bracket: (field_right_bracket)
+          value: (number))
+        ))))
+
+;;; Can make a table with some expressions, some nothing and some keys
+; t = { 1, 2, x = 1, ["y"] = 2 }
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (tableconstructor
+      (fieldlist
+        (field value: (number))
+        (field value: (number))
+        (field
+          name: (identifier)
+          value: (number))
+        (field
+          field_left_bracket: (field_left_bracket)
+          key: (string)
+          field_right_bracket: (field_right_bracket)
+          value: (number))
+        ))))
+
+;;; Can assign a function result
+; foo = my_func()
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (function_call
+      prefix: (prefix (identifier))
+      (function_call_paren)
+      (function_call_paren)
+      )))
+
+;;; Can assign a function with params
+; foo = my_func(x, 2, "3")
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (function_call
+      prefix: (prefix (identifier))
+      (function_call_paren)
+      args: (function_arguments
+              (identifier)
+              (number)
+              (string))
+      (function_call_paren)
+
+      )))
+
+;;; Can call a function with a string value
+; foo = my_func "hello world"
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (function_call
+      prefix: (prefix (identifier))
+      args: (string_argument))))
+
+;;; Can call a function with a table value
+; foo = my_func {}
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (function_call
+      prefix: (prefix (identifier))
+      args: (table_argument))))
+
+;;; Can call a function returned by a function
+; foo = my_func()()
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (function_call
+      prefix: (prefix (function_call
+        prefix: (prefix (identifier))
+        (function_call_paren)
+        (function_call_paren)))
+
+      (function_call_paren)
+      (function_call_paren))))
+
+;;; Can call a table function
+; foo = my_table.func()
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (function_call
+      prefix: (prefix (identifier) (identifier))
+      (function_call_paren)
+      (function_call_paren)
+      )))
