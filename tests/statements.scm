@@ -1,3 +1,24 @@
+;;; Nil is handled
+; x = nil
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (nil)))
+
+;;; true is handled
+; x = true
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (boolean)))
+
+;;; false is handled
+; x = false
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (boolean)))
+
 ;;; Simple assignment
 ; x = 1
 (program
@@ -18,14 +39,14 @@
 (program
   (variable_declaration
     (variable_declarator (identifier))
-    (operation (number) (number))))
+    (binary_operation (number) (number))))
 
 ;;; Accepts addition of variables
 ; x = y + z
 (program
   (variable_declaration
     (variable_declarator (identifier))
-    (operation (identifier) (identifier))))
+    (binary_operation (identifier) (identifier))))
 
 ;;; Can make local variables
 ; local x = 2
@@ -131,7 +152,7 @@
   (variable_declaration
     (variable_declarator (identifier))
     (function_call
-      prefix: (prefix (identifier))
+      prefix: (identifier)
       (function_call_paren)
       (function_call_paren)
       )))
@@ -142,7 +163,7 @@
   (variable_declaration
     (variable_declarator (identifier))
     (function_call
-      prefix: (prefix (identifier))
+      prefix: (identifier)
       (function_call_paren)
       args: (function_arguments
               (identifier)
@@ -158,7 +179,7 @@
   (variable_declaration
     (variable_declarator (identifier))
     (function_call
-      prefix: (prefix (identifier))
+      prefix: (identifier)
       args: (string_argument))))
 
 ;;; Can call a function with a table value
@@ -167,7 +188,7 @@
   (variable_declaration
     (variable_declarator (identifier))
     (function_call
-      prefix: (prefix (identifier))
+      prefix: (identifier)
       args: (table_argument))))
 
 ;;; Can call a function returned by a function
@@ -176,21 +197,57 @@
   (variable_declaration
     (variable_declarator (identifier))
     (function_call
-      prefix: (prefix (function_call
-        prefix: (prefix (identifier))
-        (function_call_paren)
-        (function_call_paren)))
+      prefix: (function_call
+                prefix: (identifier)
+                (function_call_paren)
+                (function_call_paren))
 
       (function_call_paren)
       (function_call_paren))))
 
-;;; Can call a table function
+;;; Can call a table function // TODO: Decide if it makes sense with identifiers
 ; foo = my_table.func()
 (program
   (variable_declaration
     (variable_declarator (identifier))
     (function_call
-      prefix: (prefix (identifier) (identifier))
+      (identifier) (identifier)
       (function_call_paren)
       (function_call_paren)
       )))
+
+
+;;; Can set namelist
+; local x, y, z = 1, 2, 3
+(program
+  (variable_declaration
+    (local)
+    (variable_declarator (identifier))
+    (variable_declarator (identifier))
+    (variable_declarator (identifier))
+    (number)
+    (number)
+    (number)))
+
+
+;;; Can do comments
+; -- Comment
+; 
+(program
+  (comment))
+
+;;; Multi lines
+; x = 1
+; y = 2
+(program
+  (variable_declaration (variable_declarator (identifier)) (number))
+  (variable_declaration (variable_declarator (identifier)) (number))
+  )
+
+;;; Can do comments at the end of a line
+; x = nil -- Comment
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (nil))
+  (comment))
