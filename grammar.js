@@ -462,15 +462,24 @@ module.exports = grammar({
     // Documentation {{
     emmy_comment: _ => /---[^@].*\n/,
 
-    parameter_documentation: $ =>
-      // seq('--@param ', $.identifier, ':', /[^\n]*\n/),
-      // seq('--@param p:', /[^\n]*\n/),
+    emmy_type: $ => $.identifier,
+
+    // Definition:
+    // ---@param param_name MY_TYPE[|other_type] [@comment]
+    //
+    // I don't think this is needed (read this as: I hate it)
+    // ---@param example table @this is my comment hello
+    //
+    // ---@param example table hello
+    // ---@param example (table): hello
+    emmy_parameter: $ =>
       seq(
-        /---@param.*/,
-        // field('name', $.identifier),
-        // /\s*:/,
-        // field('description', $.parameter_description),
-        // '\n',
+        /---@param\s*/,
+        field('name', $.identifier),
+        field('type', list_of($.emmy_type, "|")),
+        /\s*:\s*/,
+        field('description', $.parameter_description),
+        /\n/,
       ),
 
     parameter_description: _ => /[^\n]*/,
@@ -482,29 +491,24 @@ module.exports = grammar({
         PREC.STATEMENT,
         repeat1(
           choice(
-            prec.left(7, $.emmy_comment),
-            prec.left(1, $.parameter_documentation),
-            prec.left(1, $.return_description),
+            $.emmy_comment,
+            $.emmy_parameter,
+            $.return_description,
           ),
         ),
       ),
     // }}}
     // Comments {{{
-
-    comment: _ =>
-      prec.left(
-        PREC.PRIORITY,
-        token(
-          choice(
-            seq('--', /.*\r?\n/),
-            // comment_level_regex(0),
-            // comment_level_regex(1),
-            // comment_level_regex(2),
-            // comment_level_regex(3),
-            // comment_level_regex(4),
-          ),
-        ),
+    comment: _ => token(
+      choice(
+        seq('--', /[^-].*\r?\n/),
+        // comment_level_regex(0),
+        // comment_level_regex(1),
+        // comment_level_regex(2),
+        // comment_level_regex(3),
+        // comment_level_regex(4),
       ),
+    ),
     // }}}
   },
 });
