@@ -488,7 +488,7 @@ module.exports = grammar({
     parameter_description: _ => /[^\n]*/,
 
     return_description: $ => seq(
-      /---@returns/,
+      /---@return/,
       field('type', list_of($.emmy_type, "|")),
       /\n/,
     ),

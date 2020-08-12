@@ -45,7 +45,7 @@
 ; --- A function description
 ; ---@param p string: param value
 ; ---@param x table: another value
-; ---@returns true
+; ---@return true
 ; function cool_function(p, x)
 ;   return true
 ; end

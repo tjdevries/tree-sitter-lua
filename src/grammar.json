@@ -2149,7 +2149,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "---@returns"
+          "value": "---@return"
         },
         {
           "type": "FIELD",
