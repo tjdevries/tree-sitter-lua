@@ -64,7 +64,8 @@
         type: (emmy_type (identifier))
         description: (parameter_description))
 
-      (return_description))
+      (return_description
+        type: (emmy_type (identifier))))
 
     name: (function_name (identifier))
 

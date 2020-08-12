@@ -1492,7 +1492,22 @@
   {
     "type": "return_description",
     "named": true,
-    "fields": {}
+    "fields": {
+      "type": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "emmy_type",
+            "named": true
+          },
+          {
+            "type": "|",
+            "named": false
+          }
+        ]
+      }
+    }
   },
   {
     "type": "return_statement",

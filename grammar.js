@@ -477,14 +477,21 @@ module.exports = grammar({
         /---@param\s*/,
         field('name', $.identifier),
         field('type', list_of($.emmy_type, "|")),
+
+        // TODO: We should not require this `:` here. It should be optional.
         /\s*:\s*/,
+
         field('description', $.parameter_description),
         /\n/,
       ),
 
     parameter_description: _ => /[^\n]*/,
 
-    return_description: _ => seq(/---@returns[^\n]*\n/),
+    return_description: $ => seq(
+      /---@returns/,
+      field('type', list_of($.emmy_type, "|")),
+      /\n/,
+    ),
 
     emmy_documentation: $ =>
       prec.left(
