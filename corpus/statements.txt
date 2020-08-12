@@ -3,7 +3,7 @@
 Nil is handled
 ==================
 
- x = nil
+x = nil
 
 ---
 
@@ -16,7 +16,7 @@ Nil is handled
 true is handled
 ==================
 
- x = true
+x = true
 
 ---
 
@@ -29,7 +29,7 @@ true is handled
 false is handled
 ==================
 
- x = false
+x = false
 
 ---
 
@@ -42,7 +42,7 @@ false is handled
 Simple assignment
 ==================
 
- x = 1
+x = 1
 
 ---
 
@@ -55,7 +55,7 @@ Simple assignment
 Simple assignment from variable
 ==================
 
- x = y
+x = y
 
 ---
 
@@ -68,7 +68,7 @@ Simple assignment from variable
 Accepts addition
 ==================
 
- x = 1 + 2
+x = 1 + 2
 
 ---
 
@@ -81,7 +81,7 @@ Accepts addition
 Accepts addition of variables
 ==================
 
- x = y + z
+x = y + z
 
 ---
 
@@ -94,7 +94,7 @@ Accepts addition of variables
 Can make local variables
 ==================
 
- local x = 2
+local x = 2
 
 ---
 
@@ -108,7 +108,7 @@ Can make local variables
 Can do multiple sets
 ==================
 
- x, y, z = 1, 2, 3
+x, y, z = 1, 2, 3
 
 ---
 
@@ -125,7 +125,7 @@ Can do multiple sets
 Can make an empty table
 ==================
 
- t = {}
+t = {}
 
 ---
 
@@ -138,7 +138,7 @@ Can make an empty table
 Can make a table with a number
 ==================
 
- t = { 1 }
+t = { 1 }
 
 ---
 
@@ -152,7 +152,7 @@ Can make a table with a number
 Can make a table with a list of numbers
 ==================
 
- t = { 1, 2, 3 }
+t = { 1, 2, 3 }
 
 ---
 
@@ -169,7 +169,7 @@ Can make a table with a list of numbers
 Can make a table with keys
 ==================
 
- t = { x = 1, y = 2 }
+t = { x = 1, y = 2 }
 
 ---
 
@@ -189,7 +189,7 @@ Can make a table with keys
 Can make a table with expression keys
 ==================
 
- t = { [x] = 1, ["y"] = 2 }
+t = { [x] = 1, ["y"] = 2 }
 
 ---
 
@@ -214,7 +214,7 @@ Can make a table with expression keys
 Can make a table with some expressions, some nothing and some keys
 ==================
 
- t = { 1, 2, x = 1, ["y"] = 2 }
+t = { 1, 2, x = 1, ["y"] = 2 }
 
 ---
 
@@ -239,7 +239,7 @@ Can make a table with some expressions, some nothing and some keys
 Can assign a function result
 ==================
 
- foo = my_func()
+foo = my_func()
 
 ---
 
@@ -256,7 +256,7 @@ Can assign a function result
 Can assign a function with params
 ==================
 
- foo = my_func(x, 2, "3")
+foo = my_func(x, 2, "3")
 
 ---
 
@@ -277,7 +277,7 @@ Can assign a function with params
 Can call a function with a string value
 ==================
 
- foo = my_func "hello world"
+foo = my_func "hello world"
 
 ---
 
@@ -292,7 +292,7 @@ Can call a function with a string value
 Can call a function with a table value
 ==================
 
- foo = my_func {}
+foo = my_func {}
 
 ---
 
@@ -307,7 +307,7 @@ Can call a function with a table value
 Can call a function returned by a function
 ==================
 
- foo = my_func()()
+foo = my_func()()
 
 ---
 
@@ -326,7 +326,7 @@ Can call a function returned by a function
 Can call a table function // TODO: Decide if it makes sense with identifiers
 ==================
 
- foo = my_table.func()
+foo = my_table.func()
 
 ---
 
@@ -343,7 +343,7 @@ Can call a table function // TODO: Decide if it makes sense with identifiers
 Can set namelist
 ==================
 
- local x, y, z = 1, 2, 3
+local x, y, z = 1, 2, 3
 
 ---
 
@@ -361,8 +361,8 @@ Can set namelist
 Can do comments
 ==================
 
- -- Comment
- 
+-- Comment
+
 
 ---
 
@@ -373,8 +373,8 @@ Can do comments
 Multi lines
 ==================
 
- x = 1
- y = 2
+x = 1
+y = 2
 
 ---
 
@@ -387,7 +387,7 @@ Multi lines
 Can do comments at the end of a line
 ==================
 
- x = nil -- Comment
+x = nil -- Comment
 
 ---
 

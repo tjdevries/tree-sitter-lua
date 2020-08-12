@@ -20,7 +20,7 @@ for _, filename in ipairs(vim.split(vim.fn.glob("./tests/*.scm"), "\n")) do
       outfile:write("\n")
     elseif string.sub(line, 1, 1) == ';' then
       in_code = true
-      outfile:write(string.sub(line, 2) .. "\n")
+      outfile:write(string.sub(line, 3) .. "\n")
     elseif #line > 0 then
       if in_code then
         outfile:write("\n---\n\n")

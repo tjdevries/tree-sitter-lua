@@ -142,20 +142,17 @@ module.exports = grammar({
       alias($.left_paren, $.function_body_paren),
       optional($.parameter_list),
       alias($.right_paren, $.function_body_paren),
-      field("body", $._block),
+      field("body", optional($._block)),
       alias("end", $.function_body_end),
     ),
 
     parameter_list: $ => choice(
-      prec.left(
-        PREC.PRIORITY,
-        seq(
-          $.identifier_list,
-          optional(seq(
-            ",",
-            $.ellipsis
-          ))
-        ),
+      seq(
+        $.identifier_list,
+        optional(seq(
+          ",",
+          $.ellipsis
+        ))
       ),
       $.ellipsis
     ),
@@ -244,7 +241,10 @@ module.exports = grammar({
 
     var_list: $ => list_of($._var, ",", false),
 
-    identifier_list: $ => prec.left(PREC.PRIORITY, list_of($.identifier, ",", false),),
+    identifier_list: $ => prec.right(
+        PREC.COMMA,
+        list_of($.identifier, ",", false),
+    ),
 
     return_statement: $ => prec(PREC.PRIORITY, seq(
       "return",
@@ -322,6 +322,7 @@ module.exports = grammar({
     ),
 
     function_statement: $ => seq(
+      optional($.emmy_documentation),
       choice(
         seq(
           alias("local", $.local),
@@ -458,12 +459,41 @@ module.exports = grammar({
     right_bracket: _ => "]",
     // }}}
 
+    // Documentation {{
+    emmy_comment: _ => /---[^@].*\n/,
+
+    parameter_documentation: $ =>
+      // seq('--@param ', $.identifier, ':', /[^\n]*\n/),
+      // seq('--@param p:', /[^\n]*\n/),
+      seq(
+        /---@param.*/,
+        // field('name', $.identifier),
+        // /\s*:/,
+        // field('description', $.parameter_description),
+        // '\n',
+      ),
+
+    parameter_description: _ => /[^\n]*/,
+
+    return_description: _ => seq(/---@returns[^\n]*\n/),
+
+    emmy_documentation: $ =>
+      prec.left(
+        PREC.STATEMENT,
+        repeat1(
+          choice(
+            prec.left(7, $.emmy_comment),
+            prec.left(1, $.parameter_documentation),
+            prec.left(1, $.return_description),
+          ),
+        ),
+      ),
+    // }}}
     // Comments {{{
-    line_comment: $ => prec.left(10, choice(seq(/--[^@].*\n/), seq(/---.*\n/))),
 
     comment: _ =>
-      prec.right(
-        PREC.PROGRAM,
+      prec.left(
+        PREC.PRIORITY,
         token(
           choice(
             seq('--', /.*\r?\n/),
