@@ -166,12 +166,20 @@
         "required": true,
         "types": [
           {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": ";",
+            "named": false
+          },
+          {
             "type": "emmy_type",
             "named": true
           },
           {
-            "type": "|",
-            "named": false
+            "type": "field",
+            "named": true
           }
         ]
       }
@@ -1677,6 +1685,10 @@
         },
         {
           "type": "ellipsis",
+          "named": true
+        },
+        {
+          "type": "emmy_documentation",
           "named": true
         },
         {

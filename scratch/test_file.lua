@@ -1,11 +1,13 @@
 local M = {}
 
-M.my_func = function()
+--- Example of my_func
+---@param y string: Y description
+M.my_func = function(y)
 end
 
 --- This is a description of the function
 ---@param x table: X description
----@returns nil
+---@return nil
 function M.other_func(x)
   print(x)
 end

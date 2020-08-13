@@ -981,7 +981,7 @@
       "type": "STRING",
       "value": "local"
     },
-    "base_variable_declaration": {
+    "variable_declaration": {
       "type": "SEQ",
       "members": [
         {
@@ -989,62 +989,13 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "local"
+              "name": "emmy_documentation"
             },
             {
               "type": "BLANK"
             }
           ]
         },
-        {
-          "type": "SYMBOL",
-          "name": "variable_declarator"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "STRING",
-                "value": ","
-              },
-              {
-                "type": "SYMBOL",
-                "name": "variable_declarator"
-              }
-            ]
-          }
-        },
-        {
-          "type": "STRING",
-          "value": "="
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_expression"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "STRING",
-                "value": ","
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_expression"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "variable_declaration": {
-      "type": "SEQ",
-      "members": [
         {
           "type": "CHOICE",
           "members": [
@@ -2082,6 +2033,10 @@
           }
         },
         {
+          "type": "PATTERN",
+          "value": "\\s*"
+        },
+        {
           "type": "FIELD",
           "name": "type",
           "content": {
@@ -2097,8 +2052,8 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "STRING",
-                      "value": "|"
+                      "type": "PATTERN",
+                      "value": "\\s*\\|\\s*"
                     },
                     {
                       "type": "SYMBOL",
@@ -2111,8 +2066,8 @@
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "STRING",
-                    "value": "|"
+                    "type": "PATTERN",
+                    "value": "\\s*\\|\\s*"
                   },
                   {
                     "type": "BLANK"

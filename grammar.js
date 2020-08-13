@@ -44,12 +44,7 @@ module.exports = grammar({
     //$.variable_declarator
   ],
 
-  conflicts: $ => [
-    // [$._expression, $.variable_declarator],
-    // [$._expression, $.function_call_statement],
-    // [$.function_name, $.function_name_field],
-    // [$._var, $.function_arguments],
-  ],
+  conflicts: $ => [],
 
   rules: {
 
@@ -198,18 +193,9 @@ module.exports = grammar({
 
     local: _ => "local",
 
-    base_variable_declaration: $ => seq(
-      // TODO: Is this the best way of marking something local
-      optional($.local),
-      $.variable_declarator,
-      any_amount_of(",", $.variable_declarator),
-      "=",
-      $._expression,
-      any_amount_of(",", $._expression),
-    ),
-
     variable_declaration: $ => seq(
       // TODO: Is this the best way of marking something local
+      optional($.emmy_documentation),
       optional($.local),
       $.variable_declarator,
       any_amount_of(",", $.variable_declarator),
@@ -476,7 +462,8 @@ module.exports = grammar({
       seq(
         /---@param\s*/,
         field('name', $.identifier),
-        field('type', list_of($.emmy_type, "|")),
+        /\s*/,
+        field('type', list_of($.emmy_type, /\s*\|\s*/)),
 
         // TODO: We should not require this `:` here. It should be optional.
         /\s*:\s*/,

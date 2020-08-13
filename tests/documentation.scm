@@ -5,10 +5,10 @@
 (program
   (comment)
   (function_statement
-   (function_name (identifier))
-   (function_body_paren)
-   (function_body_paren)
-   (function_body_end)))
+    (function_name (identifier))
+    (function_body_paren)
+    (function_body_paren)
+    (function_body_end)))
 
 ;;; Simple documentation
 ; --- hello world
@@ -71,17 +71,17 @@
 
     (function_body_paren)
     (parameter_list (identifier_list
-      (identifier)
-      (identifier)))
+                      (identifier)
+                      (identifier)))
     (function_body_paren)
 
     body: (return_statement (boolean))
     (function_body_end)))
 
 
-;;; Full documentation
+;;; Multiple types with spaces
 ; --- A function description
-; ---@param p string|number: param value
+; ---@param p string |  number : param value
 ; function cool_function(p) end
 (program
   (function_statement
@@ -101,3 +101,24 @@
     (function_body_paren)
     (function_body_end)))
 
+
+;;; Should work for variables as well
+; --- Example of my_func
+; ---@param y string: Y description
+; M.my_func = function(y)
+; end
+(program
+  (variable_declaration
+    (emmy_documentation
+      (emmy_comment)
+      (emmy_parameter
+        name: (identifier)
+        type: (emmy_type (identifier))
+        description: (parameter_description)))
+
+    (variable_declarator (identifier) (identifier))
+    (function 
+     (function_body_paren)
+     (parameter_list (identifier_list (identifier)))
+     (function_body_paren)
+     (function_body_end))))
