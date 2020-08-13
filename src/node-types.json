@@ -166,19 +166,7 @@
         "required": true,
         "types": [
           {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": ";",
-            "named": false
-          },
-          {
             "type": "emmy_type",
-            "named": true
-          },
-          {
-            "type": "field",
             "named": true
           }
         ]

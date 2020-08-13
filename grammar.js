@@ -24,6 +24,8 @@ const PREC = {
   PROGRAM: 16,
 };
 
+EQUALS_LEVELS = 5
+
 module.exports = grammar({
   name: 'lua',
 
@@ -112,13 +114,10 @@ module.exports = grammar({
 
     _inner_string: _ => /[a-zA-Z0-9_ ]+/,
 
-    string: $ => choice(
-      seq(
-        '"', $._inner_string, '"',
-      ),
-      seq(
-        "'", $._inner_string, "'",
-      )
+    string: _ => choice(
+      basic_string_style("'"),
+      basic_string_style('"'),
+      ...[...Array(EQUALS_LEVELS).keys()].map((level) => lua_string_level(level))
     ),
 
     ellipsis: _ => "...",
@@ -496,11 +495,7 @@ module.exports = grammar({
     comment: _ => token(
       choice(
         seq('--', /[^-].*\r?\n/),
-        // comment_level_regex(0),
-        // comment_level_regex(1),
-        // comment_level_regex(2),
-        // comment_level_regex(3),
-        // comment_level_regex(4),
+        ...[...Array(EQUALS_LEVELS).keys()].map((level) => comment_level_regex(level))
       ),
     ),
     // }}}
@@ -519,6 +514,57 @@ function list_of(match, sep, trailing) {
   return trailing ?
     seq(match, any_amount_of(sep, match))
     : seq(match, any_amount_of(sep, match), optional(sep));
+}
+
+function anything_but(tok) {
+  return new RegExp('[^' + tok + ']*');
+}
+
+function basic_string_style(tok) {
+  return seq(
+    tok,
+    anything_but(tok),
+    tok
+  );
+}
+
+function lua_string_level(level) {
+  if (level >= 0) {
+    return token(seq(
+      ''.concat('[', '='.repeat(level), '['),
+      /.*/,
+      ''.concat(']', '='.repeat(level), ']'),
+    ));
+  }
+
+  // TODO: I'd really like to get the [[ out as fields / nodes.
+  //        It's probably do able with external scanner... :'(
+  //        I didn't want to add one though. Oh well, it may be that's what we have to do.
+  //if (level >= 0) {
+  //  return (seq(
+  //    alias(''.concat('[', '='.repeat(level), '['), $.string_bracket),
+  //    // /[^\]]*/,
+  //    // new RegExp('(' + ''.concat('\\]', '='.repeat(level), '\\]') + ')', "g"),
+  //    // new RegExp('([^\]]' + '='.repeat(level) + '[^\]])*', "g"),
+  //    // new RegExp('([^\]]' + '='.repeat(level) + '[^\]])*', "g"),
+  //    // /.*(?=\]\])/,
+  //    alias(''.concat(']', '='.repeat(level), ']'), $.string_bracket),
+  //  ))
+  //}
+  ////
+  //return new RegExp(
+  //  // Opening brackets
+  //  ''.concat('\\[', '='.repeat(level), '\\[')
+
+  //  // Match "Non-Endy" type stuff.
+  //  // + '([^\\]][^=]|\\r?\\n)*' 
+  //  + '.*'
+
+  //  // Start on ending
+  //  + '\\]+' + ''.concat('='.repeat(level), '\\]'),
+
+  //  'g',
+  //);
 }
 
 function comment_level_regex(level) {
