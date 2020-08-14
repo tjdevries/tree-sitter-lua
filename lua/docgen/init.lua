@@ -46,7 +46,7 @@ local PARAMETER_NAME_CAPTURE = 'parameter_name'
 local PARAMETER_DESC_CAPTURE = 'parameter_description'
 local PARAMETER_TYPE_CAPTURE = 'parameter_type'
 
-local docs = {}
+local docgen = {}
 
 -- TODO: Figure out how you can document this with no actual code for it.
 --          This would let you stub things out very nicely.
@@ -55,7 +55,7 @@ local docs = {}
 --- Gather the results of a query
 ---@param bufnr string|number
 ---@param tree Parser: Already parseed tree
-function docs.gather_query_results(bufnr, tree, query_string)
+function docgen.gather_query_results(bufnr, tree, query_string)
   local root = tree:root()
 
   local query = vim.treesitter.parse_query("lua", query_string)
@@ -77,15 +77,15 @@ function docs.gather_query_results(bufnr, tree, query_string)
   return gathered_results
 end
 
-function docs.get_query_results(bufnr, query_string)
+function docgen.get_query_results(bufnr, query_string)
   local parser = vim.treesitter.get_parser(bufnr, "lua")
 
-  return docs.gather_query_results(bufnr, parser:parse(), query_string)
+  return docgen.gather_query_results(bufnr, parser:parse(), query_string)
 end
 
-function docs.get_documentation(bufnr)
+function docgen.get_documentation(bufnr)
   local query_string = read("./query/lua/documentation.scm")
-  local gathered_results = docs.get_query_results(bufnr, query_string)
+  local gathered_results = docgen.get_query_results(bufnr, query_string)
   print("GATHERED: ", vim.inspect(gathered_results))
 
   local results = {}
@@ -132,14 +132,14 @@ function docs.get_documentation(bufnr)
   return results
 end
 
-docs.get_exports = function(bufnr)
+docgen.get_exports = function(bufnr)
   local return_string = read("./query/lua/module_returns.scm")
-  return docs.get_query_results(bufnr, return_string)
+  return docgen.get_query_results(bufnr, return_string)
 end
 
-docs.get_exported_documentation = function(lua_string)
-  local documented_items = docs.get_documentation(lua_string)
-  local exported_items = docs.get_exports(lua_string)
+docgen.get_exported_documentation = function(lua_string)
+  local documented_items = docgen.get_documentation(lua_string)
+  local exported_items = docgen.get_exports(lua_string)
 
   local transformed_items = {}
   for _, transform in ipairs(exported_items) do
@@ -191,7 +191,10 @@ transformers.variable_declaration = function(accumulator, bufnr, node)
 
   local name = ts_utils.get_node_text(name_node, bufnr)[1]
 
-  accumulator[name] = {}
+  accumulator[name] = {
+    name = name,
+    format = "function",
+  }
   call_transformer(accumulator[name], bufnr, documentation_node)
 end
 
@@ -229,8 +232,9 @@ end
 transformers.emmy_return = function(accumulator, bufnr, node)
 end
 
-function docs.test()
-  local bufnr = vim.api.nvim_get_current_buf()
+function docgen.test()
+  -- local bufnr = vim.api.nvim_get_current_buf()
+  local bufnr = 33
 
   local parser = vim.treesitter.get_parser(bufnr, "lua")
   local return_string = read("./query/lua/_test.scm")
@@ -244,15 +248,22 @@ function docs.test()
     end
   end
 
-  print(vim.inspect(t))
+  -- print(vim.inspect(t))
+  for _, v in pairs(t) do
+    docgen.transform_function(v)
+  end
 end
 
 local text_width = 78
-function docs.transform_function(name, metadata)
+function docgen.transform_function(metadata)
+  local help = require('docgen.help')
+
+  help.format_function_metadata(metadata)
 end
 
 --[[
  ["M.example"] = {
+     name = "M.example",
     description = "--- Example function",
     parameters = {
       a = {
@@ -270,6 +281,6 @@ end
 --]]
 
 
-vim.cmd [[nnoremap asdf :lua package.loaded['docs'] = nil; require('docs').test()<CR>]]
+vim.cmd [[nnoremap asdf :lua require('plenary.reload').reload_module('docgen'); require('docgen').test()<CR>]]
 
-return docs
+return docgen
