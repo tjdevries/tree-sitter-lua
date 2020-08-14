@@ -14,7 +14,21 @@ M.cool = function(longer_name, ...)
   print(longer_name, ...)
 end
 
+--- Cooler function
+---@param cool_name string: This is a string
+---@return nil
+M.even_cooler = function(cool_name, ...)
+  print(longer_name, ...)
+end
+
 M.not_documented = function()
+end
+
+local NotExported = {}
+
+--- Should not get exported
+---@param wow string: Yup
+function NotExported.not_exported()
 end
 
 return M

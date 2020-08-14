@@ -2,6 +2,15 @@
 -- TODO: Check if this changes within one session?...
 vim.treesitter.require_language("lua", "./build/parser.so", true)
 
+local log = require('docgen.log')
+
+local ts_utils = require('nvim-treesitter.ts_utils')
+local get_text = function(bufnr, node, single)
+  local res = ts_utils.get_node_text(node, bufnr)
+
+  if single then return res[1] else return res end
+end
+
 local read = function(f)
   local fp = assert(io.open(f))
   local contents = fp:read("all")
@@ -31,9 +40,6 @@ local get_parent_from_var = function(name)
 
   return parent, name
 end
-
-
-local ts_utils = require('nvim-treesitter.ts_utils')
 
 local VAR_NAME_CAPTURE = 'var'
 local PARAMETER_NAME_CAPTURE = 'parameter_name'
@@ -162,49 +168,61 @@ end
 
 local transformers = {}
 
-local call_transformer = function(bufnr, node)
+local call_transformer = function(accumulator, bufnr, node)
   if transformers[node:type()] then
-    return transformers[node:type()](bufnr, node)
+    return transformers[node:type()](accumulator, bufnr, node)
   end
 end
-
-local set_transformer = function(t, bufnr, node)
-  local result = call_transformer(bufnr, node)
-
-  if result then
-    t[node:type()] = result
-  end
-end
-
 
 transformers.variable_declaration = function(accumulator, bufnr, node)
-  local documentation = node:named_child("documentation")
+  local documentation_node, name_node
 
-  assert(documentation, "Documentation must exist for this variable")
-end
-
-transformers.emmy_documentation = function(accumulator, bufnr, node)
+  -- TODO: Get a field API merged upstream for tree sitter.
   for_each_child(node, function(child_node)
-    set_transformer(accumulator, bufnr, child_node)
+    if child_node:type() == "variable_declarator" then
+      name_node = child_node
+    elseif child_node:type() == "emmy_documentation" then
+      documentation_node = child_node
+    end
   end)
 
-  return current_doc
-end
-
-transformers.emmy_comment = function(accumulator, bufnr, node)
-  return table.concat(ts_utils.get_node_text(node, bufnr), "\n")
-end
-
-transformers.emmy_parameter = function(accumulator, bufnr, node)
-  local name_node = node:named_child("name")
-  assert(name_node, "Parameters must have a name")
+  assert(documentation_node, "Documentation must exist for this variable")
+  assert(name_node, "Variable must have a name")
 
   local name = ts_utils.get_node_text(name_node, bufnr)[1]
 
-  return {
-    [name] = {
-      name = name,
-    }
+  accumulator[name] = {}
+  call_transformer(accumulator[name], bufnr, documentation_node)
+end
+
+transformers.emmy_documentation = function(accumulator, bufnr, node)
+  accumulator.parameters = {}
+  log.trace("Accumulator:", accumulator)
+
+  for_each_child(node, function(child_node)
+    call_transformer(accumulator, bufnr, child_node)
+  end)
+end
+
+transformers.emmy_comment = function(accumulator, bufnr, node)
+  -- TODO: Make this not ugly
+  -- It should strip out the --- at the begging of the comment
+  accumulator.description = vim.trim(table.concat(ts_utils.get_node_text(node, bufnr), "\n"))
+end
+
+transformers.emmy_parameter = function(accumulator, bufnr, node)
+  local name_node = node:named_child(0)
+  assert(name_node, "Parameters must have a name")
+
+  local type_node = node:named_child(1)
+  local desc_node = node:named_child(2)
+
+  local name = ts_utils.get_node_text(name_node, bufnr)[1]
+
+  accumulator.parameters[name] = {
+    name = name,
+    type = get_text(bufnr, type_node, true),
+    description = get_text(bufnr, desc_node),
   }
 end
 
@@ -214,41 +232,19 @@ end
 function docs.test()
   local bufnr = vim.api.nvim_get_current_buf()
 
-  -- print(vim.inspect(docs.get_exports(bufnr)))
-
   local parser = vim.treesitter.get_parser(bufnr, "lua")
   local return_string = read("./query/lua/_test.scm")
   local query = vim.treesitter.parse_query("lua", return_string)
 
+  local t = {}
   for id, node in query:iter_captures(parser:parse():root(), bufnr, 0, -1) do
-    print("=================")
-    print(id, node, query.captures[id])
-
     if transformers[node:type()] then
       -- TODO: Return and accumulate something...
-      local t = {}
-      transformers[node:type()](t, bufnr, node)
-
-      print(vim.inspect(t))
+      call_transformer(t, bufnr, node)
     end
-
-    -- {
-    --  M = {
-    --    example = {
-    --      comment = "Example function",
-    --      params = {
-    --        a = true,
-    --        b = true,
-    --      },
-  --      ...
-    --  }
-    --
   end
 
-  -- print(vim.inspect(docs.get_query_results(bufnr, return_string)))
-  -- print(vim.inspect(docs.get_documentation(bufnr)))
-
-  -- print(vim.inspect(ts_utils.get_node_text(parser:parse():root())))
+  print(vim.inspect(t))
 end
 
 
