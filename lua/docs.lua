@@ -38,6 +38,7 @@ local ts_utils = require('nvim-treesitter.ts_utils')
 local VAR_NAME_CAPTURE = 'var'
 local PARAMETER_NAME_CAPTURE = 'parameter_name'
 local PARAMETER_DESC_CAPTURE = 'parameter_description'
+local PARAMETER_TYPE_CAPTURE = 'parameter_type'
 
 local docs = {}
 
@@ -87,6 +88,7 @@ function docs.get_documentation(bufnr)
     local raw_name = match[VAR_NAME_CAPTURE]
     local paramater_name = match[PARAMETER_NAME_CAPTURE]
     local parameter_description = match[PARAMETER_DESC_CAPTURE]
+    local parameter_type = match[PARAMETER_TYPE_CAPTURE]
 
     local parent, name = get_parent_from_var(raw_name)
 
@@ -116,7 +118,8 @@ function docs.get_documentation(bufnr)
     table.insert(res.params, {
       original_parent = parent,
       name = paramater_name,
-      desc = parameter_description
+      desc = parameter_description,
+      type = parameter_type,
     })
   end
 
@@ -148,35 +151,106 @@ docs.get_exported_documentation = function(lua_string)
   return transformed_items
 end
 
+
+local for_each_child = function(node, cb)
+  local named_children_count = node:named_child_count()
+  for child = 0, named_children_count - 1 do
+    local child_node = node:named_child(child)
+    cb(child_node)
+  end
+end
+
+local transformers = {}
+
+local call_transformer = function(bufnr, node)
+  if transformers[node:type()] then
+    return transformers[node:type()](bufnr, node)
+  end
+end
+
+local set_transformer = function(t, bufnr, node)
+  local result = call_transformer(bufnr, node)
+
+  if result then
+    t[node:type()] = result
+  end
+end
+
+
+transformers.variable_declaration = function(accumulator, bufnr, node)
+  local documentation = node:named_child("documentation")
+
+  assert(documentation, "Documentation must exist for this variable")
+end
+
+transformers.emmy_documentation = function(accumulator, bufnr, node)
+  for_each_child(node, function(child_node)
+    set_transformer(accumulator, bufnr, child_node)
+  end)
+
+  return current_doc
+end
+
+transformers.emmy_comment = function(accumulator, bufnr, node)
+  return table.concat(ts_utils.get_node_text(node, bufnr), "\n")
+end
+
+transformers.emmy_parameter = function(accumulator, bufnr, node)
+  local name_node = node:named_child("name")
+  assert(name_node, "Parameters must have a name")
+
+  local name = ts_utils.get_node_text(name_node, bufnr)[1]
+
+  return {
+    [name] = {
+      name = name,
+    }
+  }
+end
+
+transformers.emmy_return = function(accumulator, bufnr, node)
+end
+
 function docs.test()
   local bufnr = vim.api.nvim_get_current_buf()
 
-  -- local parser = vim.treesitter.get_parser(bufnr, "lua")
   -- print(vim.inspect(docs.get_exports(bufnr)))
 
+  local parser = vim.treesitter.get_parser(bufnr, "lua")
   local return_string = read("./query/lua/_test.scm")
+  local query = vim.treesitter.parse_query("lua", return_string)
+
+  for id, node in query:iter_captures(parser:parse():root(), bufnr, 0, -1) do
+    print("=================")
+    print(id, node, query.captures[id])
+
+    if transformers[node:type()] then
+      -- TODO: Return and accumulate something...
+      local t = {}
+      transformers[node:type()](t, bufnr, node)
+
+      print(vim.inspect(t))
+    end
+
+    -- {
+    --  M = {
+    --    example = {
+    --      comment = "Example function",
+    --      params = {
+    --        a = true,
+    --        b = true,
+    --      },
+  --      ...
+    --  }
+    --
+  end
+
   -- print(vim.inspect(docs.get_query_results(bufnr, return_string)))
-  print(vim.inspect(docs.get_documentation(bufnr)))
+  -- print(vim.inspect(docs.get_documentation(bufnr)))
 
   -- print(vim.inspect(ts_utils.get_node_text(parser:parse():root())))
 end
 
---[[
-
-local contents = read("/home/tj/tmp/small.lua")
-print(vim.inspect({docs.get_exported_documentation(contents)}))
-
--- TODO: Would be nice to be able to use the lua string thing we had before
-docs.get_query_results = function(lua_string, query_string)
-  local lua_lines = vim.split(lua_string, "\n")
-  local parser = vim.treesitter.create_str_parser('lua')
-
-  local tree = parser:parse_str(lua_string)
-
-  return docs.gather_query_results(tree, query_string)
-end
-
---]]
 
 vim.cmd [[nnoremap asdf :lua package.loaded['docs'] = nil; require('docs').test()<CR>]]
 

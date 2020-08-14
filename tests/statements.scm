@@ -78,16 +78,16 @@
 ; t = { 1 }
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (tableconstructor
+    name: (variable_declarator (identifier))
+    value: (tableconstructor
       (fieldlist (field value: (number))))))
 
 ;;; Can make a table with a list of numbers
 ; t = { 1, 2, 3 }
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (tableconstructor
+    name: (variable_declarator (identifier))
+    value: (tableconstructor
       (fieldlist
         (field value: (number))
         (field value: (number))
@@ -97,8 +97,8 @@
 ; t = { x = 1, y = 2 }
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (tableconstructor
+    name: (variable_declarator (identifier))
+    value: (tableconstructor
       (fieldlist
         (field
           name: (identifier)
@@ -112,8 +112,8 @@
 ; t = { [x] = 1, ["y"] = 2 }
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (tableconstructor
+    name: (variable_declarator (identifier))
+    value: (tableconstructor
       (fieldlist
         (field
           field_left_bracket: (field_left_bracket)
@@ -131,8 +131,8 @@
 ; t = { 1, 2, x = 1, ["y"] = 2 }
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (tableconstructor
+    name: (variable_declarator (identifier))
+    value: (tableconstructor
       (fieldlist
         (field value: (number))
         (field value: (number))
@@ -150,8 +150,8 @@
 ; foo = my_func()
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (function_call
+    name: (variable_declarator (identifier))
+    value: (function_call
       prefix: (identifier)
       (function_call_paren)
       (function_call_paren)
@@ -161,8 +161,8 @@
 ; foo = my_func(x, 2, "3")
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (function_call
+    name: (variable_declarator (identifier))
+    value: (function_call
       prefix: (identifier)
       (function_call_paren)
       args: (function_arguments
@@ -177,8 +177,8 @@
 ; foo = my_func "hello world"
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (function_call
+    name: (variable_declarator (identifier))
+    value: (function_call
       prefix: (identifier)
       args: (string_argument))))
 
@@ -186,8 +186,8 @@
 ; foo = my_func {}
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (function_call
+    name: (variable_declarator (identifier))
+    value: (function_call
       prefix: (identifier)
       args: (table_argument))))
 
@@ -195,8 +195,8 @@
 ; foo = my_func()()
 (program
   (variable_declaration
-    (variable_declarator (identifier))
-    (function_call
+    name: (variable_declarator (identifier))
+    value: (function_call
       prefix: (function_call
                 prefix: (identifier)
                 (function_call_paren)
@@ -222,12 +222,12 @@
 (program
   (variable_declaration
     (local)
-    (variable_declarator (identifier))
-    (variable_declarator (identifier))
-    (variable_declarator (identifier))
-    (number)
-    (number)
-    (number)))
+    name: (variable_declarator (identifier))
+    name: (variable_declarator (identifier))
+    name: (variable_declarator (identifier))
+    value: (number)
+    value: (number)
+    value: (number)))
 
 
 ;;; Can do comments

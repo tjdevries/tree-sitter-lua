@@ -131,7 +131,7 @@
           "named": true
         },
         {
-          "type": "return_description",
+          "type": "emmy_return",
           "named": true
         }
       ]
@@ -168,6 +168,26 @@
           {
             "type": "emmy_type",
             "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "emmy_return",
+    "named": true,
+    "fields": {
+      "type": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "emmy_type",
+            "named": true
+          },
+          {
+            "type": "|",
+            "named": false
           }
         ]
       }
@@ -1100,6 +1120,16 @@
           }
         ]
       },
+      "documentation": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "emmy_documentation",
+            "named": true
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
@@ -1119,10 +1149,6 @@
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "emmy_documentation",
-          "named": true
-        },
         {
           "type": "function_body_end",
           "named": true
@@ -1337,7 +1363,7 @@
           "named": true
         },
         {
-          "type": "identifier_list",
+          "type": "identifier",
           "named": true
         }
       ]
@@ -1483,26 +1509,6 @@
           "named": true
         }
       ]
-    }
-  },
-  {
-    "type": "return_description",
-    "named": true,
-    "fields": {
-      "type": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "emmy_type",
-            "named": true
-          },
-          {
-            "type": "|",
-            "named": false
-          }
-        ]
-      }
     }
   },
   {
@@ -1658,65 +1664,104 @@
   {
     "type": "variable_declaration",
     "named": true,
-    "fields": {},
+    "fields": {
+      "documentation": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "emmy_documentation",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "variable_declarator",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": ".",
+            "named": false
+          },
+          {
+            "type": "[",
+            "named": false
+          },
+          {
+            "type": "]",
+            "named": false
+          },
+          {
+            "type": "binary_operation",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "ellipsis",
+            "named": true
+          },
+          {
+            "type": "function",
+            "named": true
+          },
+          {
+            "type": "function_call",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "nil",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tableconstructor",
+            "named": true
+          },
+          {
+            "type": "unary_operation",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
-      "multiple": true,
-      "required": true,
+      "multiple": false,
+      "required": false,
       "types": [
         {
-          "type": "binary_operation",
-          "named": true
-        },
-        {
-          "type": "boolean",
-          "named": true
-        },
-        {
-          "type": "ellipsis",
-          "named": true
-        },
-        {
-          "type": "emmy_documentation",
-          "named": true
-        },
-        {
-          "type": "function",
-          "named": true
-        },
-        {
-          "type": "function_call",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
           "type": "local",
-          "named": true
-        },
-        {
-          "type": "nil",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tableconstructor",
-          "named": true
-        },
-        {
-          "type": "unary_operation",
-          "named": true
-        },
-        {
-          "type": "variable_declarator",
           "named": true
         }
       ]

@@ -17,7 +17,7 @@
 ; end
 (program
   (function_statement
-    (emmy_documentation (emmy_comment))
+    documentation: (emmy_documentation (emmy_comment))
 
     name: (function_name (identifier))
     (function_body_paren)
@@ -33,7 +33,7 @@
 ; end
 (program
   (function_statement
-    (emmy_documentation (emmy_comment) (emmy_comment))
+    documentation: (emmy_documentation (emmy_comment) (emmy_comment))
 
     name: (function_name (identifier))
     (function_body_paren)
@@ -51,7 +51,7 @@
 ; end
 (program
   (function_statement
-    (emmy_documentation
+    documentation: (emmy_documentation
       (emmy_comment)
 
       (emmy_parameter
@@ -64,15 +64,13 @@
         type: (emmy_type (identifier))
         description: (parameter_description))
 
-      (return_description
+      (emmy_return
         type: (emmy_type (identifier))))
 
     name: (function_name (identifier))
 
     (function_body_paren)
-    (parameter_list (identifier_list
-                      (identifier)
-                      (identifier)))
+    (parameter_list (identifier) (identifier))
     (function_body_paren)
 
     body: (return_statement (boolean))
@@ -85,7 +83,7 @@
 ; function cool_function(p) end
 (program
   (function_statement
-    (emmy_documentation
+    documentation: (emmy_documentation
       (emmy_comment)
 
       (emmy_parameter
@@ -97,7 +95,7 @@
     name: (function_name (identifier))
 
     (function_body_paren)
-    (parameter_list (identifier_list (identifier)))
+    (parameter_list (identifier))
     (function_body_paren)
     (function_body_end)))
 
@@ -109,16 +107,16 @@
 ; end
 (program
   (variable_declaration
-    (emmy_documentation
+    documentation: (emmy_documentation
       (emmy_comment)
       (emmy_parameter
         name: (identifier)
         type: (emmy_type (identifier))
         description: (parameter_description)))
 
-    (variable_declarator (identifier) (identifier))
-    (function 
+    name: (variable_declarator (identifier) (identifier))
+    value: (function 
      (function_body_paren)
-     (parameter_list (identifier_list (identifier)))
+     (parameter_list (identifier))
      (function_body_paren)
      (function_body_end))))

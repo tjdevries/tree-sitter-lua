@@ -54,7 +54,18 @@
  (function_statement
   (function_name (identifier))
   (function_body_paren)
-  (parameter_list (identifier_list (identifier)))
+  (parameter_list (identifier))
+  (function_body_paren)
+  (function_body_end)))
+
+;;; No trailing commas in function declaration
+; function f(x,) end
+(program
+ (function_statement
+  (function_name (identifier))
+  (function_body_paren)
+  (parameter_list (identifier))
+  (ERROR)
   (function_body_paren)
   (function_body_end)))
 
@@ -64,6 +75,26 @@
  (function_statement
   (function_name (identifier))
   (function_body_paren)
-  (parameter_list (identifier_list (identifier) (identifier)))
+  (parameter_list (identifier) (identifier))
+  (function_body_paren)
+  (function_body_end)))
+
+;;; Declare function with ellipsis
+; function f(...) end
+(program
+ (function_statement
+  (function_name (identifier))
+  (function_body_paren)
+  (parameter_list (ellipsis))
+  (function_body_paren)
+  (function_body_end)))
+
+;;; Declare function with args and ellipsis
+; function f(x, ...) end
+(program
+ (function_statement
+  (function_name (identifier))
+  (function_body_paren)
+  (parameter_list (identifier) (ellipsis))
   (function_body_paren)
   (function_body_end)))

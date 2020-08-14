@@ -1,7 +1,7 @@
---- Description of x
----@param a string: Hello x
-function x(a) end
+--- Description of X
+---@param a string: Hello X
+function X(a) return a end
 
 return {
-  y = x
+  y = X
 }

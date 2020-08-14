@@ -31,6 +31,7 @@ module.exports = grammar({
 
   extras: $ => [
     /[\s\n]/,
+    /\s/,
     $.comment,
   ],
 
@@ -129,6 +130,8 @@ module.exports = grammar({
 
     function: $ => seq(
       "function",
+      // TODO: It's weird that we're capturing this white space in the name of functions.
+      /\s*/,
       $.function_body
     ),
 
@@ -141,12 +144,12 @@ module.exports = grammar({
     ),
 
     parameter_list: $ => choice(
-      seq(
-        $.identifier_list,
-        optional(seq(
-          ",",
-          $.ellipsis
-        ))
+     seq(
+        $._identifier_list,
+        // TODO: Why does the regex work here,
+        // but when we use the literal string and ellipsis,
+        // it just gives us an error?
+        alias(optional(/\s*,\s*\.\.\./), $.ellipsis)
       ),
       $.ellipsis
     ),
@@ -194,13 +197,13 @@ module.exports = grammar({
 
     variable_declaration: $ => seq(
       // TODO: Is this the best way of marking something local
-      optional($.emmy_documentation),
+      field("documentation", optional($.emmy_documentation)),
       optional($.local),
-      $.variable_declarator,
-      any_amount_of(",", $.variable_declarator),
+      field("name", $.variable_declarator),
+      any_amount_of(",", field("name", $.variable_declarator)),
       "=",
-      $._expression,
-      any_amount_of(",", $._expression),
+      field("value", $._expression),
+      any_amount_of(",", field("value", $._expression)),
     ),
 
     variable_declarator: $ => $._var,
@@ -226,7 +229,7 @@ module.exports = grammar({
 
     var_list: $ => list_of($._var, ",", false),
 
-    identifier_list: $ => prec.right(
+    _identifier_list: $ => prec.right(
         PREC.COMMA,
         list_of($.identifier, ",", false),
     ),
@@ -300,22 +303,24 @@ module.exports = grammar({
     ),
 
     for_generic: $ => seq(
-      field("identifier_list", $.identifier_list),
+      field("identifier_list", alias($._identifier_list, $.identifier_list)),
       // alias("in", $.for_in),
       "in",
       field("expression_list", $._expression_list),
     ),
 
     function_statement: $ => seq(
-      optional($.emmy_documentation),
+      field("documentation", optional($.emmy_documentation)),
       choice(
         seq(
           alias("local", $.local),
           "function",
+          /\s*/,
           field("name", $.identifier),
         ),
         seq(
           "function",
+          /\s*/,
           field("name", $.function_name),
         ),
       ),
@@ -442,6 +447,8 @@ module.exports = grammar({
 
     left_bracket: _ => "[",
     right_bracket: _ => "]",
+
+    _comma: _ => ",",
     // }}}
 
     // Documentation {{
@@ -473,7 +480,7 @@ module.exports = grammar({
 
     parameter_description: _ => /[^\n]*/,
 
-    return_description: $ => seq(
+    emmy_return: $ => seq(
       /---@return/,
       field('type', list_of($.emmy_type, "|")),
       /\n/,
@@ -486,11 +493,12 @@ module.exports = grammar({
           choice(
             $.emmy_comment,
             $.emmy_parameter,
-            $.return_description,
+            $.emmy_return,
           ),
         ),
       ),
     // }}}
+
     // Comments {{{
     comment: _ => token(
       choice(
@@ -512,8 +520,8 @@ function one_or_more() {
 
 function list_of(match, sep, trailing) {
   return trailing ?
-    seq(match, any_amount_of(sep, match))
-    : seq(match, any_amount_of(sep, match), optional(sep));
+    seq(match, any_amount_of(sep, match), optional(sep))
+    : seq(match, any_amount_of(sep, match));
 }
 
 function anything_but(tok) {
