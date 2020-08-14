@@ -24,11 +24,12 @@ end
 M.not_documented = function()
 end
 
-local NotExported = {}
+-- TODO: Figure out how to exclude the not exported stuff.
+--local NotExported = {}
 
---- Should not get exported
----@param wow string: Yup
-function NotExported.not_exported()
-end
+----- Should not get exported
+-----@param wow string: Yup
+--NotExported.not_exported = function()
+--end
 
 return M

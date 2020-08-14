@@ -247,6 +247,28 @@ function docs.test()
   print(vim.inspect(t))
 end
 
+local text_width = 78
+function docs.transform_function(name, metadata)
+end
+
+--[[
+ ["M.example"] = {
+    description = "--- Example function",
+    parameters = {
+      a = {
+        description = { "This is a number" },
+        name = "a",
+        type = "number"
+      },
+      b = {
+        description = { "Also a number" },
+        name = "b",
+        type = "number"
+      }
+    }
+  }
+--]]
+
 
 vim.cmd [[nnoremap asdf :lua package.loaded['docs'] = nil; require('docs').test()<CR>]]
 

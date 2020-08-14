@@ -1,2 +1,5 @@
-(function_statement (emmy_documentation)) @func
-(variable_declaration (emmy_documentation)) @var
+(function_statement
+  documentation: (emmy_documentation)) @func
+
+(variable_declaration
+  documentation: (emmy_documentation)) @var
