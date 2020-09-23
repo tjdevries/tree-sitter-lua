@@ -60,7 +60,7 @@ help.format_function_metadata = function(metadata)
   doc = doc .. parameter_header .. "\n"
   doc = doc .. parameter_docs .. "\n"
 
-  print(doc)
+  return doc
 end
 
 return help

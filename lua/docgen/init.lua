@@ -234,31 +234,34 @@ end
 
 function docgen.test()
   -- local bufnr = vim.api.nvim_get_current_buf()
-  local bufnr = 33
+  local bufnr = 42
+  print(bufnr)
 
   local parser = vim.treesitter.get_parser(bufnr, "lua")
   local return_string = read("./query/lua/_test.scm")
   local query = vim.treesitter.parse_query("lua", return_string)
 
+  print(parser, return_string, query)
+
   local t = {}
   for id, node in query:iter_captures(parser:parse():root(), bufnr, 0, -1) do
+    print(id, node:type())
     if transformers[node:type()] then
       -- TODO: Return and accumulate something...
       call_transformer(t, bufnr, node)
     end
   end
 
-  -- print(vim.inspect(t))
+  print(vim.inspect(t))
   for _, v in pairs(t) do
-    docgen.transform_function(v)
+    vim.api.nvim_buf_set_lines(44, 0, -1, false, vim.split(docgen.transform_function(v), "\n"))
   end
 end
 
-local text_width = 78
 function docgen.transform_function(metadata)
   local help = require('docgen.help')
 
-  help.format_function_metadata(metadata)
+  return help.format_function_metadata(metadata)
 end
 
 --[[
