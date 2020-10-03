@@ -1,15 +1,22 @@
 
+local treesitter = vim.treesitter
+
 local storage = {}
 
---- Map<string, TextDocumentItem>
-storage.textDocumentItems = {}
 
 local state = {}
 
 state._clear = function()
   storage = {}
+
+  --- Map<string, TextDocumentItem>
   storage.textDocumentItems = {}
+
+  --- Map<string, TSParser>
+  storage.parsers = {}
 end
+
+state._clear()
 
 --[[ TextDocumentItem
 interface TextDocumentItem {
@@ -43,6 +50,7 @@ state.textDocumentItem.open = function(textDocumentItem)
   storage.textDocumentItems[textDocumentItem.uri] = textDocumentItem
 
   -- TODO: Should probably do something with this...
+  storage.parsers[textDocumentItem.uri] = treesitter.get_string_parser(textDocumentItem.text, "lua")
 end
 
 state.textDocument = {}
@@ -74,6 +82,10 @@ end
 
 function state.get_text_document_item(uri)
   return storage.textDocumentItems[uri]
+end
+
+function state.get_ts_parser(uri)
+  return storage.parsers[uri]
 end
 
 return state

@@ -4,6 +4,8 @@ local methods = require('nlsp.methods')
 local state = require('nlsp.state')
 -- local structures = require('nlsp.structures')
 
+local query = require('vim.treesitter.query')
+
 describe('text_document_sync', function()
   before_each(function()
     -- Clear the state between executions.
@@ -125,5 +127,27 @@ describe('text_document_sync', function()
 
     local saved_item = state.get_text_document_item(uri)
     assert(saved_item == nil)
+  end)
+
+  describe('parser:parse()', function()
+    it('should create a parser on open', function()
+      local uri = vim.uri_from_fname("/home/fake.lua")
+      local item = {
+        uri = uri,
+        text = "local hello = 'world'",
+      }
+
+
+      methods["textDocument/didOpen"] {
+        textDocument = item
+      }
+
+      local parser = state.get_ts_parser(uri)
+      assert.are_not.same(parser, nil)
+
+      local root = parser:parse():root()
+      assert.are.same(query.get_node_text(root, item.text), item.text)
+      assert.are.same(root:type(), 'program')
+    end)
   end)
 end)
