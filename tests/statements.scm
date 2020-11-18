@@ -216,6 +216,17 @@
       (function_call_paren)
       )))
 
+;;; Can call a table function with lots of ids
+; foo = my_table.func.x.y()
+(program
+  (variable_declaration
+    (variable_declarator (identifier))
+    (function_call
+      (identifier) (identifier) (identifier) (identifier)
+      (function_call_paren)
+      (function_call_paren)
+      )))
+
 
 ;;; Can set namelist
 ; local x, y, z = 1, 2, 3
@@ -251,3 +262,8 @@
     (variable_declarator (identifier))
     (nil))
   (comment))
+
+;;; Can handle parens around an expression
+; x = (1)
+(program
+  (variable_declaration (variable_declarator (identifier)) (left_paren) (number) (right_paren)))

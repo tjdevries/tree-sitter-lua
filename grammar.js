@@ -3,593 +3,537 @@
 //
 
 const PREC = {
-  COMMA: -1,
-  FUNCTION: 1,
-  PRIORITY: 2,
+    COMMA: -1,
+    FUNCTION: 1,
+    PRIORITY: 2,
 
-  OR: 3,      // => or
-  AND: 4,     // => and
-  COMPARE: 5, // => < <= == ~= >= >
-  BIT_OR: 6,  // => |
-  BIT_NOT: 7, // => ~
-  BIT_AND: 8, // => &
-  SHIFT: 9,   // => << >>
-  CONCAT: 10, // => ..
-  PLUS: 11,   // => + -
-  MULTI: 12,  // => * /             // %
-  UNARY: 13,  // => not # - ~
-  POWER: 14,  // => ^
+    OR: 3, // => or
+    AND: 4, // => and
+    COMPARE: 5, // => < <= == ~= >= >
+    BIT_OR: 6, // => |
+    BIT_NOT: 7, // => ~
+    BIT_AND: 8, // => &
+    SHIFT: 9, // => << >>
+    CONCAT: 10, // => ..
+    PLUS: 11, // => + -
+    MULTI: 12, // => * /             // %
+    UNARY: 13, // => not # - ~
+    POWER: 14, // => ^
 
-  STATEMENT: 15,
-  PROGRAM: 16,
+    STATEMENT: 15,
+    PROGRAM: 16,
 };
 
-EQUALS_LEVELS = 5
+EQUALS_LEVELS = 5;
 
 module.exports = grammar({
-  name: 'lua',
+    name: "lua",
 
-  extras: $ => [
-    /[\s\n]/,
-    /\s/,
-    $.comment,
-  ],
+    externals: ($) => [$._multi_comment, $.string],
 
-  inline: $ => [
-    $._expression,
-    $._field_expression,
-    $.field_separator,
-    $.prefix_exp,
+    extras: ($) => [/[\s\n]/, /\s/, $.comment],
 
-    $.function_body,
-    //
-    // TODO: Decide if we want to show these or not.
-    //$.variable_declarator
-  ],
-
-  conflicts: $ => [],
-
-  rules: {
-
-    program: $ => prec(
-      PREC.PROGRAM,
-      seq(
-        any_amount_of($._statement),
-        optional(alias($.return_statement, $.module_return_statement))
-      ),
-    ),
-
-    _statement: $ => prec(
-      PREC.STATEMENT,
-      seq(
-        choice(
-          $.variable_declaration,
-          $.function_call,
-          $.do_statement,
-          $.while_statement,
-          $.repeat_statement,
-          $.if_statement,
-          $.for_statement,
-          $.function_statement,
-        ),
-        optional(';')
-      ),
-    ),
-
-    _last_statement: $ => choice(
-      $.return_statement,
-      "break"
-    ),
-
-    _chunk: $ => choice(
-      seq(
-        one_or_more($._statement),
-        optional($._last_statement),
-      ),
-      $._last_statement,
-    ),
-
-    _block: $ => $._chunk,
-
-    _expression: $ => seq(
-      choice(
-        $.nil,
-        $.boolean,
-        $.number,
-        $.string,
-        $.ellipsis,
-        $.function,
+    inline: ($) => [
+        $._expression,
+        $._field_expression,
+        $.field_separator,
         $.prefix_exp,
-        $.tableconstructor,
-        $.binary_operation,
-        $.unary_operation,
-      ),
-    ),
 
-    // Primitives {{{
-    nil: _ => "nil",
+        $.function_body,
+        $._multi_comment,
+        //
+        // TODO: Decide if we want to show these or not.
+        //$.variable_declarator
+    ],
 
-    boolean: _ => choice("true", "false"),
+    conflicts: ($) => [],
 
-    number: _ => /[0-9]+/,
+    rules: {
+        program: ($) =>
+            prec(
+                PREC.PROGRAM,
+                seq(
+                    any_amount_of($._statement),
+                    optional(
+                        alias($.return_statement, $.module_return_statement)
+                    )
+                )
+            ),
 
-    _inner_string: _ => /[a-zA-Z0-9_ ]+/,
+        _statement: ($) =>
+            prec(
+                PREC.STATEMENT,
+                seq(
+                    choice(
+                        $.variable_declaration,
+                        $.function_call,
+                        $.do_statement,
+                        $.while_statement,
+                        $.repeat_statement,
+                        $.if_statement,
+                        $.for_statement,
+                        $.function_statement
+                    ),
+                    optional(";")
+                )
+            ),
 
-    string: _ => choice(
-      basic_string_style("'"),
-      basic_string_style('"'),
-      ...[...Array(EQUALS_LEVELS).keys()].map((level) => lua_string_level(level))
-    ),
+        _last_statement: ($) => choice($.return_statement, $.break_statement),
 
-    ellipsis: _ => "...",
+        _chunk: ($) =>
+            choice(
+                seq(one_or_more($._statement), optional($._last_statement)),
+                $._last_statement
+            ),
 
-    function_name: $ => seq(
-      list_of($.identifier, alias(".", $.table_dot), false),
-      optional(seq(alias(":", $.table_colon), $.identifier))
-    ),
+        _block: ($) => $._chunk,
 
-    function: $ => seq(
-      "function",
-      // TODO: It's weird that we're capturing this white space in the name of functions.
-      /\s*/,
-      $.function_body
-    ),
+        _expression: ($) =>
+            choice(
+                $.nil,
+                $.boolean,
+                $.number,
+                $.string,
+                $.ellipsis,
+                $.function,
+                $.prefix_exp,
+                $.tableconstructor,
+                $.binary_operation,
+                $.unary_operation
+            ),
 
-    function_body: $ => seq(
-      alias($.left_paren, $.function_body_paren),
-      optional($.parameter_list),
-      alias($.right_paren, $.function_body_paren),
-      field("body", optional($._block)),
-      alias("end", $.function_body_end),
-    ),
+        // Primitives {{{
+        nil: (_) => "nil",
 
-    parameter_list: $ => choice(
-     seq(
-        $._identifier_list,
-        // TODO: Why does the regex work here,
-        // but when we use the literal string and ellipsis,
-        // it just gives us an error?
-        alias(optional(/\s*,\s*\.\.\./), $.ellipsis)
-      ),
-      $.ellipsis
-    ),
+        boolean: (_) => choice("true", "false"),
 
-    // }}}
+        number: (_) => /[0-9]+/,
 
-    _expression_list: $ => list_of($._expression, ","),
+        _inner_string: (_) => /[a-zA-Z0-9_ ]+/,
 
-    binary_operation: $ =>
-      choice(...[
-        ['or', PREC.OR],
-        ['and', PREC.AND],
-        ['<', PREC.COMPARE],
-        ['<=', PREC.COMPARE],
-        ['==', PREC.COMPARE],
-        ['~=', PREC.COMPARE],
-        ['>=', PREC.COMPARE],
-        ['>', PREC.COMPARE],
-        ['|', PREC.BIT_OR],
-        ['~', PREC.BIT_NOT],
-        ['&', PREC.BIT_AND],
-        ['<<', PREC.SHIFT],
-        ['>>', PREC.SHIFT],
-        ['+', PREC.PLUS],
-        ['-', PREC.PLUS],
-        ['*', PREC.MULTI],
-        ['/', PREC.MULTI],
-        ['//', PREC.MULTI],
-        ['%', PREC.MULTI],
-      ].map(([operator, precedence]) =>
-        prec.left(precedence, seq($._expression, operator, $._expression)),
-      ),
-      ...[
-        ['..', PREC.CONCAT],
-        ['^', PREC.POWER],
-      ].map(([operator, precedence]) =>
-        prec.right(precedence, seq($._expression, operator, $._expression)),
-      ),
-    ),
+        // string: ($) => prec.left($.multi_string),
+        // basic_string_style("'"),
+        // basic_string_style('"'),
 
-    unary_operation: $ => 
-      prec.left(PREC.UNARY, seq(choice('not', '#', '-', '~'), $._expression)),
+        // ...[...Array(EQUALS_LEVELS).keys()].map((level) =>
+        //     lua_string_level(level)
+        // )
 
-    local: _ => "local",
+        ellipsis: (_) => "...",
 
-    variable_declaration: $ => seq(
-      // TODO: Is this the best way of marking something local
-      field("documentation", optional($.emmy_documentation)),
-      optional($.local),
-      field("name", $.variable_declarator),
-      any_amount_of(",", field("name", $.variable_declarator)),
-      "=",
-      field("value", $._expression),
-      any_amount_of(",", field("value", $._expression)),
-    ),
+        function_name: ($) =>
+            seq(
+                list_of($.identifier, alias(".", $.table_dot), false),
+                optional(seq(alias(":", $.table_colon), $.identifier))
+            ),
 
-    variable_declarator: $ => $._var,
+        function: ($) =>
+            seq(
+                $.function_start,
+                // TODO: It's weird that we're capturing this white space in the name of functions.
+                /\s*/,
+                $.function_body
+            ),
 
-    // var ::=  identifier | prefixexp `[´ exp `]´ | prefixexp `.´ identifier 
-    _var: $ => prec(
-      PREC.PRIORITY,
-      choice(
-        $.identifier,
-        seq(
-          $.prefix_exp,
-          '[',
-          $._expression,
-          ']',
-        ),
-        seq(
-          $.prefix_exp,
-          '.',
-          $.identifier,
-        ),
-      ),
-    ),
+        function_body: ($) =>
+            seq(
+                alias($.left_paren, $.function_body_paren),
+                optional($.parameter_list),
+                alias($.right_paren, $.function_body_paren),
+                field("body", optional($._block)),
+                alias("end", $.function_end)
+            ),
 
-    var_list: $ => list_of($._var, ",", false),
+        parameter_list: ($) =>
+            choice(
+                seq(
+                    $._identifier_list,
+                    // TODO: Why does the regex work here,
+                    // but when we use the literal string and ellipsis,
+                    // it just gives us an error?
+                    alias(optional(/\s*,\s*\.\.\./), $.ellipsis)
+                ),
+                $.ellipsis
+            ),
 
-    _identifier_list: $ => prec.right(
-        PREC.COMMA,
-        list_of($.identifier, ",", false),
-    ),
+        // }}}
 
-    return_statement: $ => prec(PREC.PRIORITY, seq(
-      "return",
-      $._expression
-    ),),
+        _expression_list: ($) => list_of($._expression, ","),
 
-    // Blocks {{{
-    do_statement: $ => seq(
-      alias("do", $.do_start),
-      $._block,
-      alias("end", $.do_end),
-    ),
+        binary_operation: ($) =>
+            choice(
+                ...[
+                    ["or", PREC.OR],
+                    ["and", PREC.AND],
+                    ["<", PREC.COMPARE],
+                    ["<=", PREC.COMPARE],
+                    ["==", PREC.COMPARE],
+                    ["~=", PREC.COMPARE],
+                    [">=", PREC.COMPARE],
+                    [">", PREC.COMPARE],
+                    ["|", PREC.BIT_OR],
+                    ["~", PREC.BIT_NOT],
+                    ["&", PREC.BIT_AND],
+                    ["<<", PREC.SHIFT],
+                    [">>", PREC.SHIFT],
+                    ["+", PREC.PLUS],
+                    ["-", PREC.PLUS],
+                    ["*", PREC.MULTI],
+                    ["/", PREC.MULTI],
+                    ["//", PREC.MULTI],
+                    ["%", PREC.MULTI],
+                ].map(([operator, precedence]) =>
+                    prec.left(
+                        precedence,
+                        seq($._expression, operator, $._expression)
+                    )
+                ),
+                ...[
+                    ["..", PREC.CONCAT],
+                    ["^", PREC.POWER],
+                ].map(([operator, precedence]) =>
+                    prec.right(
+                        precedence,
+                        seq($._expression, operator, $._expression)
+                    )
+                )
+            ),
 
-    while_statement: $ => seq(
-      alias("while", $.while_start),
-      $._expression,
-      alias("do", $.while_do),
-      $._block,
-      alias("end", $.while_end),
-    ),
+        unary_operation: ($) =>
+            prec.left(
+                PREC.UNARY,
+                seq(choice("not", "#", "-", "~"), $._expression)
+            ),
 
-    repeat_statement: $ => seq(
-      alias("repeat", $.repeat_start),
-      $._block,
-      alias("until", $.repeat_until),
-      $._expression,
-    ),
+        local: (_) => "local",
 
-    if_statement: $ => seq(
-      alias("if", $.if_start),
-      $._expression,
-      alias("then", $.if_then),
-      $._block,
-      any_amount_of(seq(
-        alias("elseif", $.if_elseif),
-        $._expression,
-        alias("then", $.if_then),
-        $._block
-      )),
-      optional(seq(
-        alias("else", $.if_else),
-        $._block,
-      )),
-      alias("end", $.if_end),
-    ),
+        variable_declaration: ($) =>
+            seq(
+                // TODO: Is this the best way of marking something local
+                field("documentation", optional($.emmy_documentation)),
+                optional($.local),
+                field("name", $.variable_declarator),
+                any_amount_of(",", field("name", $.variable_declarator)),
+                "=",
+                field("value", $._expression),
+                any_amount_of(",", field("value", $._expression))
+            ),
 
-    for_statement: $ => seq(
-      alias("for", $.for_start),
-      choice(
-        $.for_numeric,
-        $.for_generic,
-      ),
-      alias("do", $.for_do),
-      $._block,
-      alias("end", $.for_end),
-    ),
+        variable_declarator: ($) => $._var,
 
-    for_numeric: $ => seq(
-      field("var", $.identifier),
-      "=",
-      field("start", $._expression),
-      ",",
-      field("finish", $._expression),
-      optional(seq(
-        ",",
-        field("step", $._expression)
-      )),
-    ),
+        // var ::=  identifier | prefixexp `[´ exp `]´ | prefixexp `.´ identifier
+        _var: ($) =>
+            prec(
+                PREC.PRIORITY,
+                choice(
+                    $.identifier,
+                    seq($.prefix_exp, "[", $._expression, "]"),
+                    seq($.prefix_exp, ".", $.identifier)
+                )
+            ),
 
-    for_generic: $ => seq(
-      field("identifier_list", alias($._identifier_list, $.identifier_list)),
-      // alias("in", $.for_in),
-      "in",
-      field("expression_list", $._expression_list),
-    ),
+        var_list: ($) => list_of($._var, ",", false),
 
-    function_statement: $ => seq(
-      field("documentation", optional($.emmy_documentation)),
-      choice(
-        seq(
-          alias("local", $.local),
-          "function",
-          /\s*/,
-          field("name", $.identifier),
-        ),
-        seq(
-          "function",
-          /\s*/,
-          field("name", $.function_name),
-        ),
-      ),
-      $.function_body
-    ),
+        _identifier_list: ($) =>
+            prec.right(PREC.COMMA, list_of($.identifier, ",", false)),
 
-    // }}}
+        return_statement: ($) =>
+            prec(PREC.PRIORITY, seq("return", optional($._expression))),
 
-    // Table {{{
-    tableconstructor: $ => seq(
-      "{",
-      optional($.fieldlist),
-      "}",
-    ),
+        break_statement: (_) => "break",
 
-    fieldlist: $ => prec(PREC.COMMA, list_of($.field, $.field_separator, true),),
+        // Blocks {{{
+        do_statement: ($) =>
+            seq(alias("do", $.do_start), $._block, alias("end", $.do_end)),
 
-    field: $ => $._field_expression,
+        while_statement: ($) =>
+            seq(
+                alias("while", $.while_start),
+                $._expression,
+                alias("do", $.while_do),
+                $._block,
+                alias("end", $.while_end)
+            ),
 
-    // `[´ exp `]´ `=´ exp | identifier `=´ exp | exp
-    _named_field_expression: $ => prec(
-      PREC.PRIORITY,
-      seq(
-        field("name", $.identifier),
-        "=",
-        field("value", $._expression),
-      )
-    ),
+        repeat_statement: ($) =>
+            seq(
+                alias("repeat", $.repeat_start),
+                $._block,
+                alias("until", $.repeat_until),
+                $._expression
+            ),
 
-    _expression_field_expression: $ => prec(
-      PREC.PRIORITY,
-      seq(
-        // TODO: Decide if we really want to keep these...
-        //          It will be useful when we want to highlight them
-        //          in a particular color for people :)
-        field("field_left_bracket", alias($.left_bracket, $.field_left_bracket)),
-        field("key", $._expression),
-        field("field_right_bracket", alias($.right_bracket, $.field_right_bracket)),
-        "=",
-        field("value", $._expression),
-      )
-    ),
+        if_statement: ($) =>
+            seq(
+                alias("if", $.if_start),
+                $._expression,
+                alias("then", $.if_then),
+                $._block,
+                any_amount_of(
+                    seq(
+                        alias("elseif", $.if_elseif),
+                        $._expression,
+                        alias("then", $.if_then),
+                        $._block
+                    )
+                ),
+                optional(seq(alias("else", $.if_else), $._block)),
+                alias("end", $.if_end)
+            ),
 
-    _field_expression: $ => choice(
-      $._expression_field_expression,
-      $._named_field_expression,
-      field("value", $._expression),
-    ),
+        for_statement: ($) =>
+            seq(
+                alias("for", $.for_start),
+                choice($.for_numeric, $.for_generic),
+                alias("do", $.for_do),
+                $._block,
+                alias("end", $.for_end)
+            ),
 
-    field_separator: _ => choice(",", ";"),
-    // }}}
+        for_numeric: ($) =>
+            seq(
+                field("var", $.identifier),
+                "=",
+                field("start", $._expression),
+                ",",
+                field("finish", $._expression),
+                optional(seq(",", field("step", $._expression)))
+            ),
 
-    // Function {{{
-    _prefix_exp: $ => choice(
-      $._var,
-      $.function_call,
-      seq(
-        '(',
-        $._expression,
-        ')',
-      )
-    ),
+        for_generic: ($) =>
+            seq(
+                field(
+                    "identifier_list",
+                    alias($._identifier_list, $.identifier_list)
+                ),
+                alias("in", $.for_in),
+                field("expression_list", $._expression_list)
+            ),
 
-    prefix_exp: $ => $._prefix_exp,
+        function_start: () => "function",
 
-    function_call: $ => prec.left(
-      PREC.FUNCTION,
-      seq(
-        field("prefix", $.prefix_exp),
-        choice(
-          $._args,
-          $._self_call,
-        )
-      ),
-    ),
+        function_statement: ($) =>
+            seq(
+                field("documentation", optional($.emmy_documentation)),
+                choice(
+                    seq(
+                        alias("local", $.local),
+                        $.function_start,
+                        /\s*/,
+                        field("name", $.identifier)
+                    ),
+                    seq($.function_start, /\s*/, field("name", $.function_name))
+                ),
+                $.function_body
+            ),
 
-    _args: $ => choice(
-      $._parentheses_call,
-      $._table_call,
-      $._string_call,
-    ),
+        // }}}
 
-    _parentheses_call: $ => seq(
-      alias($.left_paren, $.function_call_paren),
-      field(
-        "args",
-        optional($.function_arguments)
-      ),
-      alias($.right_paren, $.function_call_paren),
-    ),
+        // Table {{{
+        tableconstructor: ($) => seq("{", optional($.fieldlist), "}"),
 
-    _string_call: $ => field(
-      "args",
-      // TODO: Decide if this is really the name we want to use.
-      alias($.string, $.string_argument),
-    ),
+        fieldlist: ($) =>
+            prec(PREC.COMMA, list_of($.field, $.field_separator, true)),
 
-    _table_call: $ => field(
-      "args",
-      alias($.tableconstructor, $.table_argument)
-    ),
+        field: ($) => $._field_expression,
 
-    _self_call: $ => seq(
-      alias(":", $.self_call_colon),
-      $.identifier,
-      $._args
-    ),
+        // `[´ exp `]´ `=´ exp | identifier `=´ exp | exp
+        _named_field_expression: ($) =>
+            prec(
+                PREC.PRIORITY,
+                seq(
+                    field("name", $.identifier),
+                    "=",
+                    field("value", $._expression)
+                )
+            ),
 
-    function_arguments: $ => seq(
-      $._expression,
-      optional(repeat(seq(
-        ",",
-        $._expression
-      )))
-    ),
+        _expression_field_expression: ($) =>
+            prec(
+                PREC.PRIORITY,
+                seq(
+                    // TODO: Decide if we really want to keep these...
+                    //          It will be useful when we want to highlight them
+                    //          in a particular color for people :)
+                    field(
+                        "field_left_bracket",
+                        alias($.left_bracket, $.field_left_bracket)
+                    ),
+                    field("key", $._expression),
+                    field(
+                        "field_right_bracket",
+                        alias($.right_bracket, $.field_right_bracket)
+                    ),
+                    "=",
+                    field("value", $._expression)
+                )
+            ),
 
-    // }}}
+        _field_expression: ($) =>
+            choice(
+                $._expression_field_expression,
+                $._named_field_expression,
+                field("value", $._expression)
+            ),
 
-    identifier: _ => /[a-zA-Z_][a-zA-Z0-9_]*/,
+        field_separator: (_) => choice(",", ";"),
+        // }}}
 
-    // Dummy Fields {{{
-    left_paren: _ => "(",
-    right_paren: _ => ")",
+        // Function {{{
+        _prefix_exp: ($) =>
+            choice(
+                $._var,
+                $.function_call,
+                seq($.left_paren, $._expression, $.right_paren)
+            ),
 
-    left_bracket: _ => "[",
-    right_bracket: _ => "]",
+        prefix_exp: ($) => $._prefix_exp,
 
-    _comma: _ => ",",
-    // }}}
+        function_call: ($) =>
+            prec.left(
+                PREC.FUNCTION,
+                seq(
+                    field("prefix", $.prefix_exp),
+                    choice($._args, $._self_call)
+                )
+            ),
 
-    // Documentation {{
-    emmy_comment: _ => /---[^@].*\n/,
+        _args: ($) =>
+            choice($._parentheses_call, $._table_call, $._string_call),
 
-    emmy_type: $ => $.identifier,
+        _parentheses_call: ($) =>
+            seq(
+                alias($.left_paren, $.function_call_paren),
+                field("args", optional($.function_arguments)),
+                alias($.right_paren, $.function_call_paren)
+            ),
 
-    // Definition:
-    // ---@param param_name MY_TYPE[|other_type] [@comment]
-    //
-    // I don't think this is needed (read this as: I hate it)
-    // ---@param example table @this is my comment hello
-    //
-    // ---@param example table hello
-    // ---@param example (table): hello
-    emmy_parameter: $ =>
-      seq(
-        /---@param\s*/,
-        field('name', $.identifier),
-        /\s*/,
-        field('type', list_of($.emmy_type, /\s*\|\s*/)),
+        _string_call: ($) =>
+            field(
+                "args",
+                // TODO: Decide if this is really the name we want to use.
+                alias($.string, $.string_argument)
+            ),
 
-        // TODO: We should not require this `:` here. It should be optional.
-        /\s*:\s*/,
+        _table_call: ($) =>
+            field("args", alias($.tableconstructor, $.table_argument)),
 
-        field('description', $.parameter_description),
-        /\n/,
-      ),
+        _self_call: ($) =>
+            seq(alias(":", $.self_call_colon), $.identifier, $._args),
 
-    parameter_description: _ => /[^\n]*/,
+        function_arguments: ($) =>
+            seq($._expression, optional(repeat(seq(",", $._expression)))),
 
-    emmy_return: $ => seq(
-      /---@return/,
-      field('type', list_of($.emmy_type, "|")),
-      /\n/,
-    ),
+        // }}}
 
-    emmy_documentation: $ =>
-      prec.left(
-        PREC.STATEMENT,
-        repeat1(
-          choice(
-            $.emmy_comment,
-            $.emmy_parameter,
-            $.emmy_return,
-          ),
-        ),
-      ),
-    // }}}
+        identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
 
-    // Comments {{{
-    comment: _ => token(
-      choice(
-        seq('--', /[^-].*\r?\n/),
-        ...[...Array(EQUALS_LEVELS).keys()].map((level) => comment_level_regex(level))
-      ),
-    ),
-    // }}}
-  },
+        // Dummy Fields {{{
+        left_paren: (_) => "(",
+        right_paren: (_) => ")",
+
+        left_bracket: (_) => "[",
+        right_bracket: (_) => "]",
+
+        _comma: (_) => ",",
+        // }}}
+
+        // Documentation {{
+        emmy_ignore: () => /---\n/,
+        emmy_comment: () => /---[^@][^\n]+\n/,
+
+        emmy_type_list: ($) => seq(field("type", $.emmy_type), "[]"),
+        emmy_type_map: ($) =>
+            seq(
+                "table<",
+                field("key", $.emmy_type),
+                ",",
+                field("value", $.emmy_type),
+                ">"
+            ),
+
+        emmy_type: ($) =>
+            choice($.emmy_type_map, $.emmy_type_list, $.identifier),
+
+        // Definition:
+        // ---@param param_name MY_TYPE[|other_type] [@comment]
+        //
+        // I don't think this is needed (read this as: I hate it)
+        // ---@param example table @this is my comment hello
+        //
+        // ---@param example table hello
+        // ---@param example (table): hello
+        emmy_parameter: ($) =>
+            seq(
+                "---@param",
+                field("name", $.identifier),
+                field("type", list_of($.emmy_type, "|")),
+
+                // TODO: How closely should we be to emmy...
+                optional(":"),
+
+                field("description", optional($.parameter_description)),
+                "\n"
+            ),
+
+        parameter_description: ($) =>
+            prec.left(
+                seq(
+                    /[^\n]+/
+                    // optional(seq("\n", list_of($.emmy_comment, "\n", false)))
+                    // optional(seq("\n", /\s*---[^@][^\n]*/))
+                )
+            ),
+
+        emmy_return: ($) =>
+            seq(/---@return/, field("type", list_of($.emmy_type, "|")), /\n/),
+
+        emmy_documentation: ($) =>
+            prec.left(
+                PREC.STATEMENT,
+                seq(
+                    one_or_more($.emmy_comment),
+                    any_amount_of(
+                        choice($.emmy_ignore, $.emmy_parameter, $.emmy_return)
+                    )
+                )
+            ),
+        // }}}
+
+        // Comments {{{
+        comment: ($) => choice(seq("--", /[^-].*\r?\n/), $._multi_comment),
+        // }}}
+    },
 });
 
 function any_amount_of() {
-  return repeat(seq(...arguments));
+    return repeat(seq(...arguments));
 }
 
 function one_or_more() {
-  return repeat1(seq(...arguments));
+    return repeat1(seq(...arguments));
 }
 
 function list_of(match, sep, trailing) {
-  return trailing ?
-    seq(match, any_amount_of(sep, match), optional(sep))
-    : seq(match, any_amount_of(sep, match));
+    return trailing
+        ? seq(match, any_amount_of(sep, match), optional(sep))
+        : seq(match, any_amount_of(sep, match));
 }
 
-function anything_but(tok) {
-  return new RegExp('[^' + tok + ']*');
-}
+/*
+   ambient_declaration: $ => seq(
+        'declare',
+        choice(
+          $._declaration,
+          seq('global', $.statement_block),
+          seq('module', '.', alias($.identifier, $.property_identifier), ':', $._type)
+        )
+      ),
 
-function basic_string_style(tok) {
-  return seq(
-    tok,
-    anything_but(tok),
-    tok
-  );
-}
+    member_expression: $ => prec(PREC.MEMBER, seq(
+      field('object', choice($._expression, $._primary_expression)),
+      choice('.', '?.'),
+      field('property', alias($.identifier, $.property_identifier))
+    )),
 
-function lua_string_level(level) {
-  if (level >= 0) {
-    return token(seq(
-      ''.concat('[', '='.repeat(level), '['),
-      /.*/,
-      ''.concat(']', '='.repeat(level), ']'),
-    ));
-  }
-
-  // TODO: I'd really like to get the [[ out as fields / nodes.
-  //        It's probably do able with external scanner... :'(
-  //        I didn't want to add one though. Oh well, it may be that's what we have to do.
-  //if (level >= 0) {
-  //  return (seq(
-  //    alias(''.concat('[', '='.repeat(level), '['), $.string_bracket),
-  //    // /[^\]]*/,
-  //    // new RegExp('(' + ''.concat('\\]', '='.repeat(level), '\\]') + ')', "g"),
-  //    // new RegExp('([^\]]' + '='.repeat(level) + '[^\]])*', "g"),
-  //    // new RegExp('([^\]]' + '='.repeat(level) + '[^\]])*', "g"),
-  //    // /.*(?=\]\])/,
-  //    alias(''.concat(']', '='.repeat(level), ']'), $.string_bracket),
-  //  ))
-  //}
-  ////
-  //return new RegExp(
-  //  // Opening brackets
-  //  ''.concat('\\[', '='.repeat(level), '\\[')
-
-  //  // Match "Non-Endy" type stuff.
-  //  // + '([^\\]][^=]|\\r?\\n)*' 
-  //  + '.*'
-
-  //  // Start on ending
-  //  + '\\]+' + ''.concat('='.repeat(level), '\\]'),
-
-  //  'g',
-  //);
-}
-
-function comment_level_regex(level) {
-  // prettier-ignore
-  return new RegExp(
-    // Starts a comment
-    '--' + '\\s*'
-
-    // Opening brackets
-    + ''.concat('\\[', '='.repeat(level), '\\[')
-
-    // Match "Non-Endy" type stuff.
-    + '([^\\]][^=]|\\r?\\n)*' 
-
-    // Start on ending
-    + '\\]+' + ''.concat('='.repeat(level), '\\]'),
-
-    'g',
-  );
-}
+    */

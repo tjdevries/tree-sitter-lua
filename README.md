@@ -36,3 +36,18 @@ we can re-use vim.lsp in our implementation
 - [ ] Grammar
     - [ ]
 
+
+
+## How did I get this to be da one for nvim-treesitter
+
+1. It helps if you made @vigoux the person he is today.
+    - (Not a firm requirement, but it's very helpful)
+2. Make a grammar.js and then be able to generate a parser.so
+3. Write a bunch of tests for the language and provide somethjing the other parser doesnt.
+    - Mine is mostly that it parses docs
+    - It also parses more specifically many aspects of the language for smarter highlighting (hopefully)
+    - I also like the names more
+4. To test with nvim-treesitter, you need to make a `lua.so` (or whatever your filetype is) available somewhere in rtp in a folder called `parser`.
+    - Then you need to write the `.scm` files, like highlight and all that good stuff.
+5. ???
+1. Profit!

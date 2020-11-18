@@ -116,6 +116,7 @@
   (for_start)
   (for_generic
     identifier_list: (identifier_list (identifier) (identifier))
+    (for_in)
     expression_list: (function_call
       prefix: (identifier)
       (function_call_paren)
@@ -128,3 +129,13 @@
     args: (function_arguments (identifier) (identifier))
     (function_call_paren))
   (for_end)))
+
+;;; Returns from if statement with no values
+; if not diagnostics then return end
+(program
+  (if_statement
+   (if_start)
+   (unary_operation (identifier))
+   (if_then)
+   (return_statement)
+   (if_end)))
