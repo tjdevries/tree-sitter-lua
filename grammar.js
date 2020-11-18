@@ -484,6 +484,7 @@ module.exports = grammar({
             prec.right(
                 PREC.STATEMENT,
                 seq(/[^\n]*/, any_amount_of(/\s*---[^\n]*/))
+                // seq(/[^\n]*/, any_amount_of(/\n\s*---[^\n]*/))
             ),
 
         emmy_return: ($) =>
