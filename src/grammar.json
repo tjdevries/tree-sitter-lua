@@ -2065,8 +2065,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "---@param"
+          "type": "PATTERN",
+          "value": "---@param\\s+"
         },
         {
           "type": "FIELD",
@@ -2075,6 +2075,10 @@
             "type": "SYMBOL",
             "name": "identifier"
           }
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\s*"
         },
         {
           "type": "FIELD",
@@ -2092,8 +2096,8 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "STRING",
-                      "value": "|"
+                      "type": "PATTERN",
+                      "value": "\\s*\\|\\s*"
                     },
                     {
                       "type": "SYMBOL",
@@ -2109,29 +2113,34 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "STRING",
-              "value": ":"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "\\s*:\\s*"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "description",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "parameter_description"
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  }
+                }
+              ]
             },
             {
               "type": "BLANK"
             }
           ]
-        },
-        {
-          "type": "FIELD",
-          "name": "description",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "parameter_description"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          }
         },
         {
           "type": "STRING",
@@ -2144,7 +2153,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[^\\n]+"
+          "value": "[^\\n]*"
         }
       ]
     },

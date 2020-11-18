@@ -5,6 +5,7 @@
 const PREC = {
     COMMA: -1,
     FUNCTION: 1,
+    DEFAULT: 1,
     PRIORITY: 2,
 
     OR: 3, // => or
@@ -465,24 +466,24 @@ module.exports = grammar({
         // ---@param example (table): hello
         emmy_parameter: ($) =>
             seq(
-                "---@param",
+                /---@param\s+/,
                 field("name", $.identifier),
-                field("type", list_of($.emmy_type, "|")),
+                /\s*/,
+                field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
                 // TODO: How closely should we be to emmy...
-                optional(":"),
-
-                field("description", optional($.parameter_description)),
+                optional(seq(
+                    /\s*:\s*/,
+                    field("description", optional($.parameter_description)),
+                )),
                 "\n"
             ),
 
         parameter_description: ($) =>
-            prec.left(
-                seq(
-                    /[^\n]+/
-                    // optional(seq("\n", list_of($.emmy_comment, "\n", false)))
-                    // optional(seq("\n", /\s*---[^@][^\n]*/))
-                )
+            seq(
+                /[^\n]*/
+                // optional(seq("\n", list_of($.emmy_comment, "\n", false)))
+                // optional(seq("\n", /\s*---[^@][^\n]*/))
             ),
 
         emmy_return: ($) =>

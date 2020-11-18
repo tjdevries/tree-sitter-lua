@@ -184,10 +184,6 @@
           {
             "type": "emmy_type",
             "named": true
-          },
-          {
-            "type": "|",
-            "named": false
           }
         ]
       }
@@ -2111,10 +2107,6 @@
     "named": false
   },
   {
-    "type": "---@param",
-    "named": false
-  },
-  {
     "type": ".",
     "named": false
   },
@@ -2128,10 +2120,6 @@
   },
   {
     "type": "//",
-    "named": false
-  },
-  {
-    "type": ":",
     "named": false
   },
   {

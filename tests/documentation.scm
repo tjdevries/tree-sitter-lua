@@ -83,7 +83,7 @@
 
 ;;; Multiple types with spaces
 ; --- A function description
-; ---@param p string|number : param value
+; ---@param p string| number : param value
 ; function cool_function(p) end
 (program
   (function_statement
@@ -129,7 +129,7 @@
 
 ;;; Real life example from neovim
 ; --- Store Diagnostic[] by line
-; ---@param diagnostics Diagnostic[] hello
+; ---@param diagnostics Diagnostic[]: hello
 ; ---@return table<number, Diagnostic[]>
 ; local _diagnostic_lines = function(diagnostics)
 ; end
@@ -225,7 +225,7 @@
 
 ;;; Multiline params
 ; --- Get the diagnostics by line
-; ---@param opts table|nil Configuration keys
+; ---@param opts table|nil: Configuration keys
 ; ---         - severity: (DiagnosticSeverity, default nil)
 ; function M.get_line_diagnostics(bufnr, line_nr, opts, client_id)
 ; end
