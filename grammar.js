@@ -466,16 +466,15 @@ module.exports = grammar({
         // ---@param example (table): hello
         emmy_parameter: ($) =>
             seq(
-                /---@param\s+/,
+                /---@param/,
                 field("name", $.identifier),
-                /\s*/,
                 field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
                 // TODO: How closely should we be to emmy...
                 optional(
                     seq(
                         /\s*:\s*/,
-                        field("description", optional($.parameter_description))
+                        field("description", $.parameter_description)
                     )
                 ),
                 "\n"
@@ -483,19 +482,15 @@ module.exports = grammar({
 
         parameter_description: ($) =>
             prec.right(
-                PREC.PRIORITY,
-                seq(
-                    /[^\n]*/,
-                    // optional(seq("\n", list_of($.emmy_comment, "\n", false)))
-                    optional(/\n\s*---cont[^\n]*/)
-                )
+                PREC.STATEMENT,
+                seq(/[^\n]*/, any_amount_of(/\s*---[^\n]*/))
             ),
 
         emmy_return: ($) =>
             seq(/---@return/, field("type", list_of($.emmy_type, "|")), /\n/),
 
         emmy_documentation: ($) =>
-            prec.left(
+            prec.right(
                 PREC.DEFAULT,
                 seq(
                     one_or_more($.emmy_comment),
