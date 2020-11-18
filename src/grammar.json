@@ -2149,13 +2149,29 @@
       ]
     },
     "parameter_description": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "PATTERN",
-          "value": "[^\\n]*"
-        }
-      ]
+      "type": "PREC_RIGHT",
+      "value": 2,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^\\n]*"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": "\\n\\s*---cont[^\\n]*"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
     },
     "emmy_return": {
       "type": "SEQ",
@@ -2201,7 +2217,7 @@
     },
     "emmy_documentation": {
       "type": "PREC_LEFT",
-      "value": 15,
+      "value": 1,
       "content": {
         "type": "SEQ",
         "members": [

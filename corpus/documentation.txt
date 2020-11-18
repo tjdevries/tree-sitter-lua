@@ -262,7 +262,7 @@ Multiline params
 
 --- Get the diagnostics by line
 ---@param opts table|nil: Configuration keys
----         - severity: (DiagnosticSeverity, default nil)
+---cont         - severity: (DiagnosticSeverity, default nil)
 function M.get_line_diagnostics(bufnr, line_nr, opts, client_id)
 end
 

@@ -472,18 +472,23 @@ module.exports = grammar({
                 field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
                 // TODO: How closely should we be to emmy...
-                optional(seq(
-                    /\s*:\s*/,
-                    field("description", optional($.parameter_description)),
-                )),
+                optional(
+                    seq(
+                        /\s*:\s*/,
+                        field("description", optional($.parameter_description))
+                    )
+                ),
                 "\n"
             ),
 
         parameter_description: ($) =>
-            seq(
-                /[^\n]*/
-                // optional(seq("\n", list_of($.emmy_comment, "\n", false)))
-                // optional(seq("\n", /\s*---[^@][^\n]*/))
+            prec.right(
+                PREC.PRIORITY,
+                seq(
+                    /[^\n]*/,
+                    // optional(seq("\n", list_of($.emmy_comment, "\n", false)))
+                    optional(/\n\s*---cont[^\n]*/)
+                )
             ),
 
         emmy_return: ($) =>
@@ -491,7 +496,7 @@ module.exports = grammar({
 
         emmy_documentation: ($) =>
             prec.left(
-                PREC.STATEMENT,
+                PREC.DEFAULT,
                 seq(
                     one_or_more($.emmy_comment),
                     any_amount_of(
