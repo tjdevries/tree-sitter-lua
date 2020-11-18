@@ -2203,6 +2203,23 @@
         }
       ]
     },
+    "emmy_eval": {
+      "type": "SYMBOL",
+      "name": "_expression"
+    },
+    "_emmy_eval_container": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "---@eval\\s+"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "emmy_eval"
+        }
+      ]
+    },
     "emmy_documentation": {
       "type": "PREC_RIGHT",
       "value": 1,
@@ -2232,6 +2249,10 @@
                     {
                       "type": "SYMBOL",
                       "name": "emmy_ignore"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_emmy_eval_container"
                     },
                     {
                       "type": "SYMBOL",

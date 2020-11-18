@@ -223,10 +223,29 @@
                 (field (boolean))))))))
     (function_end)))
 
+;;; Eval doc
+; --- Cooler function, with no params
+; ---@eval 7 + 15
+; function M:even_cooler()
+; end
+(program
+  (function_statement
+    (emmy_documentation
+      (emmy_comment)
+      (emmy_eval))
+    (function_start)
+    (function_name
+      (identifier)
+      (table_colon)
+      (identifier))
+    (function_body_paren)
+    (function_body_paren)
+    (function_end)))
+
 ;;; Multiline params
 ; --- Get the diagnostics by line
 ; ---@param opts table|nil: Configuration keys
 ; ---             - severity: (DiagnosticSeverity, default nil)
 ; function M.get_line_diagnostics(bufnr, line_nr, opts, client_id)
 ; end
-()
+;()

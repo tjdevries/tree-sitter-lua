@@ -490,13 +490,21 @@ module.exports = grammar({
         emmy_return: ($) =>
             seq(/---@return/, field("type", list_of($.emmy_type, "|")), /\n/),
 
+        emmy_eval: ($) => $._expression,
+        _emmy_eval_container: ($) => seq(/---@eval\s+/, $.emmy_eval),
+
         emmy_documentation: ($) =>
             prec.right(
                 PREC.DEFAULT,
                 seq(
                     one_or_more($.emmy_comment),
                     any_amount_of(
-                        choice($.emmy_ignore, $.emmy_parameter, $.emmy_return)
+                        choice(
+                            $.emmy_ignore,
+                            $._emmy_eval_container,
+                            $.emmy_parameter,
+                            $.emmy_return
+                        )
                     )
                 )
             ),

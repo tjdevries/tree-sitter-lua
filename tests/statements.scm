@@ -80,7 +80,7 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (tableconstructor
-      (fieldlist (field value: (number))))))
+            (fieldlist (field value: (number))))))
 
 ;;; Can make a table with a list of numbers
 ; t = { 1, 2, 3 }
@@ -88,10 +88,10 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (tableconstructor
-      (fieldlist
-        (field value: (number))
-        (field value: (number))
-        (field value: (number))))))
+            (fieldlist
+              (field value: (number))
+              (field value: (number))
+              (field value: (number))))))
 
 ;;; Can make a table with keys
 ; t = { x = 1, y = 2 }
@@ -99,13 +99,13 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (tableconstructor
-      (fieldlist
-        (field
-          name: (identifier)
-          value: (number))
-        (field
-          name: (identifier)
-          value: (number))))))
+            (fieldlist
+              (field
+                name: (identifier)
+                value: (number))
+              (field
+                name: (identifier)
+                value: (number))))))
 
 
 ;;; Can make a table with expression keys
@@ -114,18 +114,18 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (tableconstructor
-      (fieldlist
-        (field
-          field_left_bracket: (field_left_bracket)
-          key: (identifier)
-          field_right_bracket: (field_right_bracket)
-          value: (number))
-        (field
-          field_left_bracket: (field_left_bracket)
-          key: (string)
-          field_right_bracket: (field_right_bracket)
-          value: (number))
-        ))))
+            (fieldlist
+              (field
+                field_left_bracket: (field_left_bracket)
+                key: (identifier)
+                field_right_bracket: (field_right_bracket)
+                value: (number))
+              (field
+                field_left_bracket: (field_left_bracket)
+                key: (string)
+                field_right_bracket: (field_right_bracket)
+                value: (number))))))
+        
 
 ;;; Can make a table with some expressions, some nothing and some keys
 ; t = { 1, 2, x = 1, ["y"] = 2 }
@@ -133,18 +133,18 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (tableconstructor
-      (fieldlist
-        (field value: (number))
-        (field value: (number))
-        (field
-          name: (identifier)
-          value: (number))
-        (field
-          field_left_bracket: (field_left_bracket)
-          key: (string)
-          field_right_bracket: (field_right_bracket)
-          value: (number))
-        ))))
+            (fieldlist
+              (field value: (number))
+              (field value: (number))
+              (field
+                name: (identifier)
+                value: (number))
+              (field
+                field_left_bracket: (field_left_bracket)
+                key: (string)
+                field_right_bracket: (field_right_bracket)
+                value: (number))))))
+        
 
 ;;; Can assign a function result
 ; foo = my_func()
@@ -152,10 +152,10 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (function_call
-      prefix: (identifier)
-      (function_call_paren)
-      (function_call_paren)
-      )))
+            prefix: (identifier)
+            (function_call_paren)
+            (function_call_paren))))
+      
 
 ;;; Can assign a function with params
 ; foo = my_func(x, 2, "3")
@@ -163,15 +163,15 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (function_call
-      prefix: (identifier)
-      (function_call_paren)
-      args: (function_arguments
-              (identifier)
-              (number)
-              (string))
-      (function_call_paren)
+            prefix: (identifier)
+            (function_call_paren)
+            args: (function_arguments
+                    (identifier)
+                    (number)
+                    (string))
+            (function_call_paren))))
 
-      )))
+      
 
 ;;; Can call a function with a string value
 ; foo = my_func "hello world"
@@ -179,8 +179,8 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (function_call
-      prefix: (identifier)
-      args: (string_argument))))
+            prefix: (identifier)
+            args: (string_argument))))
 
 ;;; Can call a function with a table value
 ; foo = my_func {}
@@ -188,8 +188,8 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (function_call
-      prefix: (identifier)
-      args: (table_argument))))
+            prefix: (identifier)
+            args: (table_argument))))
 
 ;;; Can call a function returned by a function
 ; foo = my_func()()
@@ -197,13 +197,13 @@
   (variable_declaration
     name: (variable_declarator (identifier))
     value: (function_call
-      prefix: (function_call
-                prefix: (identifier)
-                (function_call_paren)
-                (function_call_paren))
+            prefix: (function_call
+                      prefix: (identifier)
+                      (function_call_paren)
+                      (function_call_paren))
 
-      (function_call_paren)
-      (function_call_paren))))
+            (function_call_paren)
+            (function_call_paren))))
 
 ;;; Can call a table function // TODO: Decide if it makes sense with identifiers
 ; foo = my_table.func()
@@ -213,8 +213,8 @@
     (function_call
       (identifier) (identifier)
       (function_call_paren)
-      (function_call_paren)
-      )))
+      (function_call_paren))))
+      
 
 ;;; Can call a table function with lots of ids
 ; foo = my_table.func.x.y()
@@ -224,8 +224,8 @@
     (function_call
       (identifier) (identifier) (identifier) (identifier)
       (function_call_paren)
-      (function_call_paren)
-      )))
+      (function_call_paren))))
+      
 
 
 ;;; Can set namelist
@@ -252,8 +252,8 @@
 ; y = 2
 (program
   (variable_declaration (variable_declarator (identifier)) (number))
-  (variable_declaration (variable_declarator (identifier)) (number))
-  )
+  (variable_declaration (variable_declarator (identifier)) (number)))
+  
 
 ;;; Can do comments at the end of a line
 ; x = nil -- Comment
@@ -267,3 +267,7 @@
 ; x = (1)
 (program
   (variable_declaration (variable_declarator (identifier)) (left_paren) (number) (right_paren)))
+
+;;; Can do multi-line local with nothing else happening
+; local documentation_node, name_node
+; local x = 1

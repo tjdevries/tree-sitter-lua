@@ -1,24 +1,13 @@
-(function_statement
- (emmy_documentation
-  (emmy_parameter
-   name: (identifier) @parameter_name
-   type: (emmy_type) @parameter_type
-   description: (parameter_description) @parameter_description)
+(
+ [
+  (variable_declaration
+    documentation: (emmy_documentation) @func
+    name: (variable_declarator (identifier) @name)) @doc
 
-  (emmy_return)? @returns
-  )
+  (function_statement
+    documentation: (emmy_documentation) @func
+    name: (function_name (identifier) @name)) @doc
+  ]
 
-
- name: (function_name (identifier) @var))
-
-(variable_declaration
- (emmy_documentation
-  (emmy_parameter
-   name: (identifier) @parameter_name
-   type: (emmy_type) @parameter_type
-   description: (parameter_description) @parameter_description)
-
-  (emmy_return)? @returns
-  )
-
- (variable_declarator) @var)
+ (module_return_statement (identifier) @exported)
+ (#eq? @exported @name))

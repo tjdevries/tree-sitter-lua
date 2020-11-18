@@ -1,0 +1,23 @@
+M:even_cooler()                                              *M:even_cooler()*
+        --- Cooler function, with no params
+
+        Return: ~
+            Docs generated at: Wed 18 Nov 2020 02:00:04 PM EST
+            ---@return nil
+
+M.cool({longer_name})                                               *M.cool()*
+        --- Cool function, not as cool as rocker tho
+
+        Parameters: ~
+            {longer_name} (string)  This is a string
+
+        Return: ~
+            ---@return nil
+
+M.example({a}, {b})                                              *M.example()*
+        --- Example function
+
+        Parameters: ~
+            {a} (number)  This is a number
+            {b} (number)  Also a number
+

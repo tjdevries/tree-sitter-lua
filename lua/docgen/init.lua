@@ -1,15 +1,14 @@
+local Query = require('vim.treesitter.query')
+
+local call_transformer = require('docgen.transformers')
+
 -- Load up our build parser.
 -- TODO: Check if this changes within one session?...
 vim.treesitter.require_language("lua", "./build/parser.so", true)
 
 local log = require('docgen.log')
 
-local ts_utils = require('nvim-treesitter.ts_utils')
-local get_text = function(bufnr, node, single)
-  local res = ts_utils.get_node_text(node, bufnr)
-
-  if single then return res[1] else return res end
-end
+local get_node_text = Query.get_node_text
 
 local read = function(f)
   local fp = assert(io.open(f))
@@ -48,9 +47,9 @@ local PARAMETER_TYPE_CAPTURE = 'parameter_type'
 
 local docgen = {}
 
--- TODO: Figure out how you can document this with no actual code for it.
---          This would let you stub things out very nicely.
----@class Parser
+function docgen._get_query_text(query_name)
+  return read(string.format('./query/lua/%s.scm', query_name))
+end
 
 --- Gather the results of a query
 ---@param bufnr string|number
@@ -62,11 +61,10 @@ function docgen.gather_query_results(bufnr, tree, query_string)
 
   local gathered_results = {}
   for _, match in query:iter_matches(root, bufnr, 0, -1) do
-    print("MATCH:", vim.inspect(match))
     local temp = {}
     for match_id, node in pairs(match) do
       local capture_name = query.captures[match_id]
-      local text = ts_utils.get_node_text(node, bufnr)[1]
+      local text = get_node_text(node, bufnr)
 
       temp[capture_name] = text
     end
@@ -83,9 +81,9 @@ function docgen.get_query_results(bufnr, query_string)
   return docgen.gather_query_results(bufnr, parser:parse(), query_string)
 end
 
-function docgen.get_documentation(bufnr)
+function docgen.get_documentation(contents)
   local query_string = read("./query/lua/documentation.scm")
-  local gathered_results = docgen.get_query_results(bufnr, query_string)
+  local gathered_results = docgen.get_query_results(contents, query_string)
   print("GATHERED: ", vim.inspect(gathered_results))
 
   local results = {}
@@ -157,105 +155,70 @@ docgen.get_exported_documentation = function(lua_string)
   return transformed_items
 end
 
+function docgen.get_ts_query(query_name)
+  return vim.treesitter.parse_query("lua", docgen._get_query_text(query_name))
+end
 
-local for_each_child = function(node, cb)
-  local named_children_count = node:named_child_count()
-  for child = 0, named_children_count - 1 do
-    local child_node = node:named_child(child)
-    cb(child_node)
+function docgen.get_parser(contents)
+  return vim.treesitter.get_string_parser(contents, "lua")
+end
+
+function docgen.foreach_node(contents, query_name, cb)
+  local parser = docgen.get_parser(contents)
+  local query = docgen.get_ts_query(query_name)
+
+  for id, node in query:iter_captures(parser:parse():root(), contents, 0, -1) do
+    if docgen.debug then print(id, node:type()) end
+    cb(id, node)
   end
 end
 
-local transformers = {}
-
-local call_transformer = function(accumulator, bufnr, node)
-  if transformers[node:type()] then
-    return transformers[node:type()](accumulator, bufnr, node)
-  end
-end
-
-transformers.variable_declaration = function(accumulator, bufnr, node)
-  local documentation_node, name_node
-
-  -- TODO: Get a field API merged upstream for tree sitter.
-  for_each_child(node, function(child_node)
-    if child_node:type() == "variable_declarator" then
-      name_node = child_node
-    elseif child_node:type() == "emmy_documentation" then
-      documentation_node = child_node
+function docgen.transform_nodes(contents, query_name, toplevel_types)
+  local t = {}
+  docgen.foreach_node(contents, query_name, function(id, node)
+    if toplevel_types[node:type()] then
+      local ok, result = pcall(call_transformer, t, contents, node)
+      if not ok then
+        print("ERROR:", id, node, result)
+      end
     end
   end)
 
-  assert(documentation_node, "Documentation must exist for this variable")
-  assert(name_node, "Variable must have a name")
+  return t
+end
 
-  local name = ts_utils.get_node_text(name_node, bufnr)[1]
+function docgen.write(input_file, output_file)
+  local contents = read(input_file)
 
-  accumulator[name] = {
-    name = name,
-    format = "function",
+  local query_name = 'documentation'
+  local toplevel_types = {
+    variable_declaration = true,
+    function_statement = true,
   }
-  call_transformer(accumulator[name], bufnr, documentation_node)
-end
 
-transformers.emmy_documentation = function(accumulator, bufnr, node)
-  accumulator.parameters = {}
-  log.trace("Accumulator:", accumulator)
+  local resulting_nodes = docgen.transform_nodes(contents, query_name, toplevel_types)
 
-  for_each_child(node, function(child_node)
-    call_transformer(accumulator, bufnr, child_node)
-  end)
-end
+  if docgen.debug then print(vim.inspect(resulting_nodes)) end
 
-transformers.emmy_comment = function(accumulator, bufnr, node)
-  -- TODO: Make this not ugly
-  -- It should strip out the --- at the begging of the comment
-  accumulator.description = vim.trim(table.concat(ts_utils.get_node_text(node, bufnr), "\n"))
-end
+  -- Clear everything
+  local out = io.open(output_file, "w")
+  for _, v in pairs(resulting_nodes) do
+    local result = docgen.transform_function(v)
+    if not result then error("Missing result") end
 
-transformers.emmy_parameter = function(accumulator, bufnr, node)
-  local name_node = node:named_child(0)
-  assert(name_node, "Parameters must have a name")
+    out:write(result)
+    out:write("\n")
+  end
 
-  local type_node = node:named_child(1)
-  local desc_node = node:named_child(2)
-
-  local name = ts_utils.get_node_text(name_node, bufnr)[1]
-
-  accumulator.parameters[name] = {
-    name = name,
-    type = get_text(bufnr, type_node, true),
-    description = get_text(bufnr, desc_node),
-  }
-end
-
-transformers.emmy_return = function(accumulator, bufnr, node)
+  out:close()
 end
 
 function docgen.test()
-  -- local bufnr = vim.api.nvim_get_current_buf()
-  local bufnr = 42
-  print(bufnr)
+  local input_file = "./scratch/module_example.lua"
+  local output_file = "./scratch/output.txt"
 
-  local parser = vim.treesitter.get_parser(bufnr, "lua")
-  local return_string = read("./query/lua/_test.scm")
-  local query = vim.treesitter.parse_query("lua", return_string)
-
-  print(parser, return_string, query)
-
-  local t = {}
-  for id, node in query:iter_captures(parser:parse():root(), bufnr, 0, -1) do
-    print(id, node:type())
-    if transformers[node:type()] then
-      -- TODO: Return and accumulate something...
-      call_transformer(t, bufnr, node)
-    end
-  end
-
-  print(vim.inspect(t))
-  for _, v in pairs(t) do
-    vim.api.nvim_buf_set_lines(44, 0, -1, false, vim.split(docgen.transform_function(v), "\n"))
-  end
+  docgen.write(input_file, output_file)
+  vim.cmd [[checktime]]
 end
 
 function docgen.transform_function(metadata)
