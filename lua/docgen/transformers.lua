@@ -11,8 +11,14 @@ local for_each_child = function(node, cb)
 end
 
 
+---@brief [[
+--- Transforms generated tree from tree sitter -> metadata nodes that we can use for the project.
+--- Structure of a program is: (TODO)
+---@brief ]]
+---@tag docgen-transformers
 local transformers = {}
 
+--- Takes any node and recursively transforms its children into the corresponding metadata required by |docgen|.
 local call_transformer = function(accumulator, str, node)
   if transformers[node:type()] then
     return transformers[node:type()](accumulator, str, node)
@@ -28,11 +34,29 @@ transformers._function = function(accumulator, str, node)
 
   local name = get_node_text(name_node, str)
 
-  accumulator[name] = {
+  if not accumulator.functions then
+    accumulator.functions = {}
+  end
+
+  accumulator.functions[name] = {
     name = name,
     format = "function",
   }
-  call_transformer(accumulator[name], str, documentation_node)
+  call_transformer(accumulator.functions[name], str, documentation_node)
+end
+
+--- Transform briefs into the accumulator.brief
+transformers.documentation_brief = function(accumulator, str, node)
+  if not accumulator.brief then
+    accumulator.brief = {}
+  end
+
+  local result = get_node_text(node, str)
+  table.insert(accumulator.brief, vim.trim(result))
+end
+
+transformers.documentation_tag = function(accumulator, str, node)
+  accumulator.tag = get_node_text(node, str)
 end
 
 transformers.function_statement = transformers._function
@@ -49,8 +73,10 @@ end
 
 transformers.emmy_comment = function(accumulator, str, node)
   -- TODO: Make this not ugly
-  -- It should strip out the --- at the begging of the comment
-  accumulator.description = vim.trim(get_node_text(node, str))
+  local text = get_node_text(node, str)
+  text = text:gsub("---", "")
+
+  accumulator.description = vim.trim(text)
 end
 
 transformers.emmy_parameter = function(accumulator, str, node)
@@ -71,7 +97,6 @@ transformers.emmy_parameter = function(accumulator, str, node)
 end
 
 transformers.emmy_return = function(accumulator, str, node)
-  -- print(get_node_text(node, str))
   if not accumulator['return'] then
     accumulator['return'] = {}
   end
@@ -79,7 +104,8 @@ transformers.emmy_return = function(accumulator, str, node)
   table.insert(accumulator['return'], get_node_text(node, str))
 end
 
-transformers.emmy_eval = function(accumulator, str, node)
+--- transformers.emmy_eval = function(accumulator, str, node)
+function transformers.emmy_eval(accumulator, str, node)
   local ok, result = pcall(loadstring('return ' .. get_node_text(node, str)))
 
   if ok then

@@ -42,9 +42,6 @@ module.exports = grammar({
 
         $.function_body,
         $._multi_comment,
-        //
-        // TODO: Decide if we want to show these or not.
-        //$.variable_declarator
     ],
 
     conflicts: ($) => [],
@@ -54,15 +51,22 @@ module.exports = grammar({
             prec(
                 PREC.PROGRAM,
                 seq(
-                    any_amount_of($._statement),
+                    any_amount_of(
+                        choice(
+                            $._statement,
+                            $._documentation_brief_container,
+                            $._documentation_tag_container
+                        )
+                    ),
                     optional(
                         alias($.return_statement, $.module_return_statement)
-                    )
+                    ),
+                    optional("\0")
                 )
             ),
 
         _statement: ($) =>
-            prec(
+            prec.right(
                 PREC.STATEMENT,
                 seq(
                     choice(
@@ -74,6 +78,7 @@ module.exports = grammar({
                         $.if_statement,
                         $.for_statement,
                         $.function_statement
+                        // $.comment
                     ),
                     optional(";")
                 )
@@ -209,16 +214,37 @@ module.exports = grammar({
         local: (_) => "local",
 
         variable_declaration: ($) =>
-            seq(
-                // TODO: Is this the best way of marking something local
-                field("documentation", optional($.emmy_documentation)),
-                optional($.local),
-                field("name", $.variable_declarator),
-                any_amount_of(",", field("name", $.variable_declarator)),
-                "=",
-                field("value", $._expression),
-                any_amount_of(",", field("value", $._expression))
+            prec.right(
+                PREC.DEFAULT,
+                seq(
+                    field("documentation", optional($.emmy_documentation)),
+                    optional($.local),
+                    field("name", $.variable_declarator),
+                    any_amount_of(",", field("name", $.variable_declarator)),
+                    "=",
+                    field("value", $._expression),
+                    any_amount_of(",", field("value", $._expression))
+                )
             ),
+
+        // TODO: Fix that one test
+        // variable_declaration: ($) =>
+        //     prec.right(
+        //         PREC.PRIORITY,
+        //         seq(
+        //             field("documentation", optional($.emmy_documentation)),
+        //             optional($.local),
+        //             field("name", $.variable_declarator),
+        //             any_amount_of(",", field("name", $.variable_declarator)),
+        //             optional(
+        //                 seq(
+        //                     "=",
+        //                     field("value", $._expression),
+        //                     any_amount_of(",", field("value", $._expression))
+        //                 )
+        //             )
+        //         )
+        //     ),
 
         variable_declarator: ($) => $._var,
 
@@ -391,7 +417,7 @@ module.exports = grammar({
         prefix_exp: ($) => $._prefix_exp,
 
         function_call: ($) =>
-            prec.left(
+            prec.right(
                 PREC.FUNCTION,
                 seq(
                     field("prefix", $.prefix_exp),
@@ -439,7 +465,22 @@ module.exports = grammar({
         _comma: (_) => ",",
         // }}}
 
-        // Documentation {{
+        // Documentation {{{
+        documentation_tag: () => /[^\n]*/,
+        _documentation_tag_container: ($) =>
+            prec.right(PREC.PROGRAM, seq(/\s*---@tag\s+/, $.documentation_tag)),
+
+        documentation_brief: () => /[^\n]*/,
+        _documentation_brief_container: ($) =>
+            prec.right(
+                PREC.PROGRAM,
+                seq(
+                    /\s*---@brief \[\[/,
+                    any_amount_of(/\s*---/, $.documentation_brief),
+                    /\s*---@brief \]\]/
+                )
+            ),
+
         emmy_ignore: () => /---\n/,
         emmy_comment: () => /---[^@][^\n]+\n/,
 
@@ -466,7 +507,7 @@ module.exports = grammar({
         // ---@param example (table): hello
         emmy_parameter: ($) =>
             seq(
-                /---@param/,
+                /---@param\s+/,
                 field("name", $.identifier),
                 field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
@@ -480,21 +521,32 @@ module.exports = grammar({
                 "\n"
             ),
 
-        parameter_description: ($) =>
+        _multiline_emmy_string: ($) =>
             prec.right(
-                PREC.STATEMENT,
-                seq(/[^\n]*/, any_amount_of(/\s*---[^\n]*/))
+                PREC.PRIORITY,
+                seq(/[^\n]+/, any_amount_of(/\s*---[^\n]*/))
                 // seq(/[^\n]*/, any_amount_of(/\n\s*---[^\n]*/))
             ),
 
+        parameter_description: ($) => $._multiline_emmy_string,
+
+        emmy_return_description: ($) => $._multiline_emmy_string,
+        emmy_return_description: ($) => /[^\n]*/,
+
         emmy_return: ($) =>
-            seq(/---@return/, field("type", list_of($.emmy_type, "|")), /\n/),
+            seq(
+                /---@return/,
+                field("type", list_of($.emmy_type, "|")),
+                // field("description", optional($.emmy_return_description))
+                // field("description", optional(/[^\n]+/))
+                field("description", $.emmy_return_description)
+            ),
 
         emmy_eval: ($) => $._expression,
         _emmy_eval_container: ($) => seq(/---@eval\s+/, $.emmy_eval),
 
         emmy_documentation: ($) =>
-            prec.right(
+            prec.left(
                 PREC.DEFAULT,
                 seq(
                     one_or_more($.emmy_comment),

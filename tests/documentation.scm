@@ -27,6 +27,28 @@
     body: (return_statement (boolean))
     (function_end)))
 
+;;; Return documentation with text
+; --- With Text
+; ---@return bool Explanation of bool
+; function with_text()
+;   return false
+; end
+(program
+  (function_statement
+    documentation: (emmy_documentation
+      (emmy_comment)
+      (emmy_return
+        type: (emmy_type (identifier))
+        description: (emmy_return_description)))
+    (function_start)
+    name: (function_name
+      (identifier))
+    (function_body_paren)
+    (function_body_paren)
+    body: (return_statement
+      (boolean))
+    (function_end)))
+
 ;;; Two lines of top level documentation
 ; --- hello world
 ; --- goodbye world
@@ -68,7 +90,8 @@
                        description: (parameter_description))
 
                      (emmy_return
-                       type: (emmy_type (identifier))))
+                       type: (emmy_type (identifier))
+                       description: (emmy_return_description)))
 
     (function_start)
     name: (function_name (identifier))
@@ -144,7 +167,8 @@
                      (emmy_return
                        type: (emmy_type (emmy_type_map
                                           key: (emmy_type (identifier))
-                                          value: (emmy_type (emmy_type_list type: (emmy_type (identifier))))))))
+                                          value: (emmy_type (emmy_type_list type: (emmy_type (identifier))))))
+                       description: (emmy_return_description)))
 
     (local)
     name: (variable_declarator (identifier))
@@ -232,7 +256,7 @@
   (function_statement
     (emmy_documentation
       (emmy_comment)
-      (emmy_eval))
+      (emmy_eval (binary_operation (number) (number))))
     (function_start)
     (function_name
       (identifier)

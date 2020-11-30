@@ -1,0 +1,54 @@
+================================================================================
+                                                                        *docgen*
+
+Public API for all associated docgen procedures.
+
+docgen.foreach_node({contents}, {cb}, {query_name})    *docgen.foreach_node()*
+        Run {cb} on each node from contents and query
+
+        Parameters: ~
+            {contents} (string)  Contents to pass to string parser
+            {cb} (function)  Function to call on captures with (id, node)
+            {query_name} (string)  Name of the query to search for
+
+
+docgen.get_ts_query({query_name})                      *docgen.get_ts_query()*
+        Get the query for a tree sitter query, loaded from query directory.
+
+        Parameters: ~
+            {query_name} (string)  The name of the query file (without .scm)
+
+
+docgen.get_parser()                                      *docgen.get_parser()*
+        Get the string parser for some contents
+
+
+
+================================================================================
+                                                         *docgen-help-formatter*
+
+All help formatting related utilties. Used to transform output from |docgen|
+into vim style documentation. Other documentation styles are possible, but have
+not yet been implemented.
+
+help.format({metadata})                                        *help.format()*
+        Format an entire generated metadata from |docgen|
+
+        Parameters: ~
+            {metadata} (table)  The metadata from docgen
+
+
+
+================================================================================
+                                                           *docgen-transformers*
+
+Transforms generated tree from tree sitter -> metadata nodes that we can use
+for the project. Structure of a program is: (TODO)
+
+call_transformer()                                        *call_transformer()*
+        Takes any node and recursively transforms its children into the
+        corresponding metadata required by |docgen|.
+
+
+
+ vim:tw=78:ts=8:ft=help:norl:

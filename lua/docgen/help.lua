@@ -1,3 +1,12 @@
+local log = require('docgen.log')
+local utils = require('docgen.utils')
+
+---@brief [[
+--- All help formatting related utilties. Used to transform output from |docgen| into vim style documentation.
+--- Other documentation styles are possible, but have not yet been implemented.
+---@brief ]]
+
+---@tag docgen-help-formatter
 local help = {}
 
 local map = vim.tbl_map
@@ -10,6 +19,80 @@ local align_text = function(left, right, width)
   local remaining = width - #left - #right
 
   return string.format("%s%s%s", left, string.rep(" ", remaining), right)
+end
+
+local doc_wrap = function(text, opts)
+  opts = opts or {}
+
+  local prefix = opts.prefix or ''
+  local width = opts.width or 70
+  -- local is_func = opts.width or false
+  local indent = opts.indent
+
+  if not width then
+    return text
+  end
+
+  if indent == nil then
+    indent = string.rep(' ', #prefix)
+  end
+
+  -- local indent_only = (prefix == '') and (indent ~= nil)
+
+  -- if is_func then
+  --   return text
+  -- end
+
+  return utils.wrap(text, opts.width, indent, indent)
+end
+
+--- Format an entire generated metadata from |docgen|
+---@param metadata table: The metadata from docgen
+help.format = function(metadata)
+  if vim.tbl_isempty(metadata) then
+    return ''
+  end
+
+  local formatted = ''
+
+  local add = function(text, no_nl)
+    formatted = formatted .. (text or '') .. (no_nl and '' or "\n")
+  end
+
+  -- TODO: Make top level
+
+  add(string.rep('=', 80) )
+  if metadata.tag then
+    add(align_text(nil, "*" .. metadata.tag .. "*", 80))
+    add()
+  end
+
+  -- Make brief
+  if metadata.brief then
+    local result = help.format_brief(metadata.brief)
+
+    if not result then error("Missing result") end
+
+    add(result)
+    add()
+  end
+
+  -- Make functions
+  for _, v in pairs(metadata.functions or {}) do
+    local result = help.format_function_metadata(v)
+    if not result then error("Missing result") end
+
+    add(result)
+    add()
+  end
+
+  add()
+
+  return formatted
+end
+
+help.format_brief = function(brief_metadata)
+  return doc_wrap(table.concat(brief_metadata, " "))
 end
 
 help.format_function_metadata = function(metadata)
@@ -33,11 +116,11 @@ help.format_function_metadata = function(metadata)
   local right_side = string.format("*%s()*", name)
 
   local header = align_text(left_side, right_side, 78)
-  local description = string.format(
-    "%s%s",
-    space_prefix,
-    metadata.description
-  )
+
+  local description = doc_wrap(metadata.description, {
+    prefix = space_prefix,
+    width = 80,
+  })
 
   local doc = ""
   doc = doc .. header  .. "\n"

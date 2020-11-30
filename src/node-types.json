@@ -127,6 +127,16 @@
     }
   },
   {
+    "type": "documentation_brief",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "documentation_tag",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "emmy_documentation",
     "named": true,
     "fields": {},
@@ -260,6 +270,16 @@
     "type": "emmy_return",
     "named": true,
     "fields": {
+      "description": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "emmy_return_description",
+            "named": true
+          }
+        ]
+      },
       "type": {
         "multiple": true,
         "required": true,
@@ -275,6 +295,11 @@
         ]
       }
     }
+  },
+  {
+    "type": "emmy_return_description",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "emmy_type",
@@ -1560,6 +1585,14 @@
           "named": true
         },
         {
+          "type": "documentation_brief",
+          "named": true
+        },
+        {
+          "type": "documentation_tag",
+          "named": true
+        },
+        {
           "type": "for_statement",
           "named": true
         },
@@ -2136,6 +2169,10 @@
         }
       ]
     }
+  },
+  {
+    "type": "\u0000",
+    "named": false
   },
   {
     "type": "\n",

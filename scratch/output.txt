@@ -1,8 +1,14 @@
+================================================================================
+                                                            *docgen-test-module*
+
+Hello world. And then some more text And we can keep typing things here. and
+even more text that should be split in a way that definitely makes sense.
+
 M:even_cooler()                                              *M:even_cooler()*
         --- Cooler function, with no params
 
         Return: ~
-            Docs generated at: Wed 18 Nov 2020 02:00:04 PM EST
+            Docs generated at: Mon 30 Nov 2020 04:53:01 PM EST
             ---@return nil
 
 M.cool({longer_name})                                               *M.cool()*
@@ -21,3 +27,6 @@ M.example({a}, {b})                                              *M.example()*
             {a} (number)  This is a number
             {b} (number)  Also a number
 
+
+
+ vim:tw=78:ts=8:ft=help:norl:

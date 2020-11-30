@@ -3,6 +3,15 @@
 -- TODO: Need to parse return { x = y, z = foo }, etc. and transform
 -- TODO: Also need to add boilerplate stuff like modeline, etc.
 
+---@brief [[
+--- Hello world.
+--- And then some more text
+--- And we can keep typing things here.
+--- and even more text that should be split in a way that definitely makes sense.
+---@brief ]]
+
+---@tag docgen-test-module
+
 local M = {}
 
 --- Example function

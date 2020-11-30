@@ -271,3 +271,4 @@
 ;;; Can do multi-line local with nothing else happening
 ; local documentation_node, name_node
 ; local x = 1
+()
