@@ -163,6 +163,10 @@
         {
           "type": "emmy_return",
           "named": true
+        },
+        {
+          "type": "emmy_see",
+          "named": true
         }
       ]
     }
@@ -298,6 +302,11 @@
   },
   {
     "type": "emmy_return_description",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "emmy_see",
     "named": true,
     "fields": {}
   },
@@ -1916,7 +1925,7 @@
       },
       "value": {
         "multiple": true,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": ".",

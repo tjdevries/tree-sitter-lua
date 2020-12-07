@@ -44,7 +44,9 @@ module.exports = grammar({
         $._multi_comment,
     ],
 
-    conflicts: ($) => [],
+    conflicts: ($) => [
+    [$.variable_declarator, $._prefix_exp],
+    ],
 
     rules: {
         program: ($) =>
@@ -219,11 +221,13 @@ module.exports = grammar({
                 seq(
                     field("documentation", optional($.emmy_documentation)),
                     optional($.local),
-                    field("name", $.variable_declarator),
-                    any_amount_of(",", field("name", $.variable_declarator)),
-                    "=",
-                    field("value", $._expression),
-                    any_amount_of(",", field("value", $._expression))
+                    list_of(field("name", $.variable_declarator), ",", false),
+                    optional(
+                        seq(
+                            "=",
+                            list_of(field("value", $._expression), ",", false)
+                        )
+                    )
                 )
             ),
 
@@ -265,7 +269,10 @@ module.exports = grammar({
             prec.right(PREC.COMMA, list_of($.identifier, ",", false)),
 
         return_statement: ($) =>
-            prec(PREC.PRIORITY, seq("return", optional($._expression))),
+            prec(
+                PREC.PRIORITY,
+                seq("return", optional(list_of($._expression, ",")))
+            ),
 
         break_statement: (_) => "break",
 
@@ -545,6 +552,8 @@ module.exports = grammar({
         emmy_eval: ($) => $._expression,
         _emmy_eval_container: ($) => seq(/---@eval\s+/, $.emmy_eval),
 
+        emmy_see: (_) => seq(/---@see\s+/, /[^\n]*/),
+
         emmy_documentation: ($) =>
             prec.left(
                 PREC.DEFAULT,
@@ -555,6 +564,7 @@ module.exports = grammar({
                             $.emmy_ignore,
                             $._emmy_eval_container,
                             $.emmy_parameter,
+                            $.emmy_see,
                             $.emmy_return
                         )
                     )

@@ -18,7 +18,10 @@ local docgen = {}
 docgen.debug = false
 
 function docgen._get_query_text(query_name)
-  return read(string.format('./query/lua/%s.scm', query_name))
+
+  return read(vim.api.nvim_get_runtime_file(
+    string.format('query/lua/%s.scm', query_name), false
+  )[1])
 end
 
 --- Get the query for a tree sitter query, loaded from query directory.

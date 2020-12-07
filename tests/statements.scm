@@ -268,7 +268,44 @@
 (program
   (variable_declaration (variable_declarator (identifier)) (left_paren) (number) (right_paren)))
 
+
+;;; Multi declaration
+; local x, y = 1, 2
+(program
+  (variable_declaration
+    (local)
+    (variable_declarator
+      (identifier))
+    (variable_declarator
+      (identifier))
+    (number)
+    (number)))
+
 ;;; Can do multi-line local with nothing else happening
 ; local documentation_node, name_node
 ; local x = 1
-()
+(program
+  (variable_declaration
+    (local)
+    (variable_declarator
+      (identifier))
+    (variable_declarator
+      (identifier)))
+  (variable_declaration
+    (local)
+    (variable_declarator
+      (identifier))
+    (number)))
+
+;;; Can do single statments
+; local x
+; x = {}
+(program
+  (variable_declaration
+    (local)
+    (variable_declarator
+      (identifier)))
+  (variable_declaration
+    (variable_declarator
+      (identifier))
+    (tableconstructor)))

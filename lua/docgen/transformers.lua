@@ -76,6 +76,10 @@ transformers.emmy_comment = function(accumulator, str, node)
   local text = get_node_text(node, str)
   text = text:gsub("---", "")
 
+  if not accumulator.description then
+    accumulator.description = ''
+  end
+
   accumulator.description = vim.trim(text)
 end
 
