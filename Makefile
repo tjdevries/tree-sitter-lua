@@ -1,15 +1,20 @@
+ts := $(shell which tree-sitter 2> /dev/null)
+ifeq (, ${ts})
+	ts := $(shell which tree-sitter-cli 2> /dev/null)
+endif
+
 generate:
-	tree-sitter-cli generate
+	${ts} generate
 
 test: generate
 	nvim --headless -c "luafile ./lua/tests_to_corpus.lua" -c "qa!"
-	tree-sitter-cli test
+	${ts} test
 
 build_parser: generate
 	cc -o ./build/parser.so -I./src src/parser.c src/scanner.cc -shared -Os -lstdc++ -fPIC
 
 wasm: build_parser
-	tree-sitter-cli build-wasm
+	${ts} build-wasm
 
 web: wasm
-	tree-sitter-cli web-ui
+	${ts} web-ui

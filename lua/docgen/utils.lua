@@ -24,7 +24,7 @@ end
 
 utils.read = function(f)
   local fp = assert(io.open(f))
-  local contents = fp:read("all")
+  local contents = fp:read("*all")
   fp:close()
 
   return contents
