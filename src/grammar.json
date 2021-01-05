@@ -2402,6 +2402,19 @@
         }
       ]
     },
+    "emmy_varargs": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "---@varargs\\s+"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[^\\n]*"
+        }
+      ]
+    },
     "emmy_documentation": {
       "type": "PREC_LEFT",
       "value": 1,
@@ -2451,6 +2464,10 @@
                     {
                       "type": "SYMBOL",
                       "name": "emmy_usage"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "emmy_varargs"
                     },
                     {
                       "type": "SYMBOL",

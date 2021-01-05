@@ -100,49 +100,24 @@ transformers.emmy_parameter = function(accumulator, str, node)
   }
 end
 
-transformers.emmy_return = function(accumulator, str, node)
-  if not accumulator['return'] then
-    accumulator['return'] = {}
+local create_emmy_type_function = function(identifier)
+  return function(accumulator, str, node)
+    if not accumulator[identifier] then
+      accumulator[identifier] = {}
+    end
+
+    local text = get_node_text(node, str)
+    text = text:gsub(string.format('---@%s ', identifier), '')
+
+    table.insert(accumulator[identifier], text)
   end
-
-  local text = get_node_text(node, str)
-  text = text:gsub('---@return ', '')
-
-  table.insert(accumulator['return'], text)
 end
 
-transformers.emmy_see = function(accumulator, str, node)
-  if not accumulator['see'] then
-    accumulator['see'] = {}
-  end
-
-  local text = get_node_text(node, str)
-  text = text:gsub('---@see ', '')
-
-  table.insert(accumulator['see'], text)
-end
-
-transformers.emmy_todo = function(accumulator, str, node)
-  if not accumulator['todo'] then
-    accumulator['todo'] = {}
-  end
-
-  local text = get_node_text(node, str)
-  text = text:gsub('---@todo ', '')
-
-  table.insert(accumulator['todo'], text)
-end
-
-transformers.emmy_usage = function(accumulator, str, node)
-  if not accumulator['usage'] then
-    accumulator['usage'] = {}
-  end
-
-  local text = get_node_text(node, str)
-  text = text:gsub('---@usage ', '')
-
-  table.insert(accumulator['usage'], text)
-end
+transformers.emmy_return = create_emmy_type_function('return')
+transformers.emmy_see = create_emmy_type_function('see')
+transformers.emmy_todo = create_emmy_type_function('todo')
+transformers.emmy_usage = create_emmy_type_function('usage')
+transformers.emmy_varargs = create_emmy_type_function('varargs')
 
 --- transformers.emmy_eval = function(accumulator, str, node)
 function transformers.emmy_eval(accumulator, str, node)

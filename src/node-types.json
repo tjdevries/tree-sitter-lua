@@ -180,6 +180,10 @@
         {
           "type": "emmy_usage",
           "named": true
+        },
+        {
+          "type": "emmy_varargs",
+          "named": true
         }
       ]
     }
@@ -395,6 +399,11 @@
   },
   {
     "type": "emmy_usage",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "emmy_varargs",
     "named": true,
     "fields": {}
   },

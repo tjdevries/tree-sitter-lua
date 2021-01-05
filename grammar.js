@@ -555,6 +555,7 @@ module.exports = grammar({
         emmy_see: (_) => seq(/---@see\s+/, /[^\n]*/),
         emmy_usage: (_) => seq(/---@usage\s+/, /[^\n]*/),
         emmy_todo: (_) => seq(/---@todo\s+/, /[^\n]*/),
+        emmy_varargs: (_) => seq(/---@varargs\s+/, /[^\n]*/),
 
         emmy_documentation: ($) =>
             prec.left(
@@ -569,6 +570,7 @@ module.exports = grammar({
                             $.emmy_see,
                             $.emmy_todo,
                             $.emmy_usage,
+                            $.emmy_varargs,
                             $.emmy_return
                         )
                     )

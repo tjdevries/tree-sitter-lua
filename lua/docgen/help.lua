@@ -120,16 +120,19 @@ help.format_function_metadata = function(metadata)
   local doc = ""
   doc = doc .. header  .. "\n"
 
-  -- TODO(conni2461): I don't think thats the best idea to do that but it works for now.
-  -- It kinda looks not right for us but i also don't want to write a 200 chars long
-  -- line description
-  for _, v in ipairs(metadata.description) do
-    local description = doc_wrap(v, {
-      prefix = space_prefix,
-      width = 80,
-    })
-    doc = doc .. description .. "\n"
-  end
+  local description = table.concat(
+    map(function(val)
+      if val == '' then return '\n' end
+      return val
+    end, metadata.description),
+    ' '
+  )
+
+  description = doc_wrap(description, {
+    prefix = space_prefix,
+    width = 80,
+  })
+  doc = doc .. description .. "\n"
 
   if not vim.tbl_isempty(metadata["parameters"]) then
     -- TODO: This needs to handle strings that get wrapped.
@@ -165,15 +168,20 @@ help.format_function_metadata = function(metadata)
     doc = doc .. parameter_docs .. "\n"
   end
 
-  local gen_misc_doc = function(ident, title, ins)
-    if metadata[ident] then
+  local gen_misc_doc = function(identification, ins)
+    if metadata[identification] then
+      local title = identification:sub(1, 1):upper() .. identification:sub(2, -1)
+
       doc = doc .. "\n"
       doc = doc .. string.format("%s%s: ~", space_prefix, title) .. "\n"
 
       local return_docs = table.concat(
         map(function(val)
-          return string.format("%s    " .. ins, space_prefix, val)
-        end, metadata[ident]),
+          return doc_wrap(string.format(ins, val), {
+            prefix = space_prefix .. '    ',
+            width = 80,
+          })
+        end, metadata[identification]),
         "\n"
       )
 
@@ -181,9 +189,10 @@ help.format_function_metadata = function(metadata)
     end
   end
 
-  gen_misc_doc('return', 'Return', '%s')
-  gen_misc_doc('see', 'See', '|%s()|')
-  gen_misc_doc('usage', 'Usage', '%s')
+  gen_misc_doc('varargs', '%s')
+  gen_misc_doc('return', '%s')
+  gen_misc_doc('usage', '%s')
+  gen_misc_doc('see', '|%s()|')
 
   return doc
 end
