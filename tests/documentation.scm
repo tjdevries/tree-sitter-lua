@@ -49,6 +49,26 @@
       (boolean))
     (function_end)))
 
+;;; Return documentation with todo
+; --- With Text
+; ---@todo Something has to be done
+; function with_text()
+;   return false
+; end
+(program
+  (function_statement
+    documentation: (emmy_documentation
+      (emmy_comment)
+      (emmy_todo))
+    (function_start)
+    name: (function_name
+      (identifier))
+    (function_body_paren)
+    (function_body_paren)
+    body: (return_statement
+      (boolean))
+    (function_end)))
+
 ;;; Two lines of top level documentation
 ; --- hello world
 ; --- goodbye world
@@ -143,7 +163,7 @@
                        description: (parameter_description)))
 
     name: (variable_declarator (identifier) (identifier))
-    value: (function 
+    value: (function
              (function_start)
              (function_body_paren)
              (parameter_list (identifier))
@@ -172,7 +192,7 @@
 
     (local)
     name: (variable_declarator (identifier))
-    value: (function 
+    value: (function
              (function_start)
              (function_body_paren)
              (parameter_list (identifier))

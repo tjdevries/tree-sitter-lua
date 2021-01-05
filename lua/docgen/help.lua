@@ -117,14 +117,19 @@ help.format_function_metadata = function(metadata)
 
   local header = align_text(left_side, right_side, 78)
 
-  local description = doc_wrap(metadata.description, {
-    prefix = space_prefix,
-    width = 80,
-  })
-
   local doc = ""
   doc = doc .. header  .. "\n"
-  doc = doc .. description .. "\n"
+
+  -- TODO(conni2461): I don't think thats the best idea to do that but it works for now.
+  -- It kinda looks not right for us but i also don't want to write a 200 chars long
+  -- line description
+  for _, v in ipairs(metadata.description) do
+    local description = doc_wrap(v, {
+      prefix = space_prefix,
+      width = 80,
+    })
+    doc = doc .. description .. "\n"
+  end
 
   if not vim.tbl_isempty(metadata["parameters"]) then
     -- TODO: This needs to handle strings that get wrapped.
@@ -160,20 +165,25 @@ help.format_function_metadata = function(metadata)
     doc = doc .. parameter_docs .. "\n"
   end
 
-  if metadata["return"] then
-    doc = doc .. "\n"
-    doc = doc .. string.format("%sReturn: ~", space_prefix) .. "\n"
-    -- doc = doc .. %s", space_prefix, metadata["return"]) .. "\n"
+  local gen_misc_doc = function(ident, title, ins)
+    if metadata[ident] then
+      doc = doc .. "\n"
+      doc = doc .. string.format("%s%s: ~", space_prefix, title) .. "\n"
 
-    local return_docs = table.concat(
-      map(function(val)
-        return string.format("%s    %s", space_prefix, val)
-      end, metadata["return"]),
-      "\n"
-    )
+      local return_docs = table.concat(
+        map(function(val)
+          return string.format("%s    " .. ins, space_prefix, val)
+        end, metadata[ident]),
+        "\n"
+      )
 
-    doc = doc .. return_docs
+      doc = doc .. return_docs
+    end
   end
+
+  gen_misc_doc('return', 'Return', '%s')
+  gen_misc_doc('see', 'See', '|%s()|')
+  gen_misc_doc('usage', 'Usage', '%s')
 
   return doc
 end

@@ -2376,6 +2376,32 @@
         }
       ]
     },
+    "emmy_usage": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "---@usage\\s+"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[^\\n]*"
+        }
+      ]
+    },
+    "emmy_todo": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "---@todo\\s+"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[^\\n]*"
+        }
+      ]
+    },
     "emmy_documentation": {
       "type": "PREC_LEFT",
       "value": 1,
@@ -2417,6 +2443,14 @@
                     {
                       "type": "SYMBOL",
                       "name": "emmy_see"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "emmy_todo"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "emmy_usage"
                     },
                     {
                       "type": "SYMBOL",

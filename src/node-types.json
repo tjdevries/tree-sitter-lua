@@ -68,6 +68,11 @@
     "fields": {}
   },
   {
+    "type": "comment",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "do_statement",
     "named": true,
     "fields": {},
@@ -166,6 +171,14 @@
         },
         {
           "type": "emmy_see",
+          "named": true
+        },
+        {
+          "type": "emmy_todo",
+          "named": true
+        },
+        {
+          "type": "emmy_usage",
           "named": true
         }
       ]
@@ -311,6 +324,11 @@
     "fields": {}
   },
   {
+    "type": "emmy_todo",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "emmy_type",
     "named": true,
     "fields": {},
@@ -374,6 +392,11 @@
         ]
       }
     }
+  },
+  {
+    "type": "emmy_usage",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "field",
