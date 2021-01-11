@@ -77,8 +77,13 @@ help.format = function(metadata)
     add()
   end
 
-  -- Make functions
-  for _, v in pairs(metadata.functions or {}) do
+  -- Make functions, always do them sorted.
+  local metadata_keys = vim.tbl_keys(metadata.functions or {})
+  table.sort(metadata_keys)
+
+  for _, func_name in ipairs(metadata_keys) do
+    local v = metadata.functions[func_name]
+
     local result = help.format_function_metadata(v)
     if not result then error("Missing result") end
 
