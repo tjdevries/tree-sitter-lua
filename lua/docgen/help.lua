@@ -117,13 +117,21 @@ help.format_function_metadata = function(metadata)
 
   local header = align_text(left_side, right_side, 78)
 
-  local description = doc_wrap(metadata.description, {
+  local doc = ""
+  doc = doc .. header  .. "\n"
+
+  local description = table.concat(
+    map(function(val)
+      if val == '' then return '\n' end
+      return val
+    end, metadata.description),
+    ' '
+  )
+
+  description = doc_wrap(description, {
     prefix = space_prefix,
     width = 80,
   })
-
-  local doc = ""
-  doc = doc .. header  .. "\n"
   doc = doc .. description .. "\n"
 
   if not vim.tbl_isempty(metadata["parameters"]) then
@@ -160,20 +168,31 @@ help.format_function_metadata = function(metadata)
     doc = doc .. parameter_docs .. "\n"
   end
 
-  if metadata["return"] then
-    doc = doc .. "\n"
-    doc = doc .. string.format("%sReturn: ~", space_prefix) .. "\n"
-    -- doc = doc .. %s", space_prefix, metadata["return"]) .. "\n"
+  local gen_misc_doc = function(identification, ins)
+    if metadata[identification] then
+      local title = identification:sub(1, 1):upper() .. identification:sub(2, -1)
 
-    local return_docs = table.concat(
-      map(function(val)
-        return string.format("%s    %s", space_prefix, val)
-      end, metadata["return"]),
-      "\n"
-    )
+      doc = doc .. "\n"
+      doc = doc .. string.format("%s%s: ~", space_prefix, title) .. "\n"
 
-    doc = doc .. return_docs
+      local return_docs = table.concat(
+        map(function(val)
+          return doc_wrap(string.format(ins, val), {
+            prefix = space_prefix .. '    ',
+            width = 80,
+          })
+        end, metadata[identification]),
+        "\n"
+      )
+
+      doc = doc .. return_docs
+    end
   end
+
+  gen_misc_doc('varargs', '%s')
+  gen_misc_doc('return', '%s')
+  gen_misc_doc('usage', '%s')
+  gen_misc_doc('see', '|%s()|')
 
   return doc
 end

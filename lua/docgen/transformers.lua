@@ -77,10 +77,10 @@ transformers.emmy_comment = function(accumulator, str, node)
   text = text:gsub("---", "")
 
   if not accumulator.description then
-    accumulator.description = ''
+    accumulator.description = {}
   end
 
-  accumulator.description = vim.trim(text)
+  table.insert(accumulator.description, vim.trim(text))
 end
 
 transformers.emmy_parameter = function(accumulator, str, node)
@@ -100,13 +100,24 @@ transformers.emmy_parameter = function(accumulator, str, node)
   }
 end
 
-transformers.emmy_return = function(accumulator, str, node)
-  if not accumulator['return'] then
-    accumulator['return'] = {}
-  end
+local create_emmy_type_function = function(identifier)
+  return function(accumulator, str, node)
+    if not accumulator[identifier] then
+      accumulator[identifier] = {}
+    end
 
-  table.insert(accumulator['return'], get_node_text(node, str))
+    local text = get_node_text(node, str)
+    text = text:gsub(string.format('---@%s ', identifier), '')
+
+    table.insert(accumulator[identifier], text)
+  end
 end
+
+transformers.emmy_return = create_emmy_type_function('return')
+transformers.emmy_see = create_emmy_type_function('see')
+transformers.emmy_todo = create_emmy_type_function('todo')
+transformers.emmy_usage = create_emmy_type_function('usage')
+transformers.emmy_varargs = create_emmy_type_function('varargs')
 
 --- transformers.emmy_eval = function(accumulator, str, node)
 function transformers.emmy_eval(accumulator, str, node)
