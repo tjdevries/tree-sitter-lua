@@ -126,7 +126,11 @@ function transformers.emmy_eval(accumulator, str, node)
   if ok then
     if type(result) == 'table' then
       for k, v in pairs(result) do
-        assert(type(k) == 'string', "Not implemented to be nested tables yet.")
+        -- assert(type(v) == 'string', "Not implemented to be nested tables yet." .. vim.inspect(accumulator))
+        -- local current_accumulator = accumulator
+        -- if type(v) == 'table' then
+        --   -- curre
+        -- end
 
         if not accumulator[k] then
           accumulator[k] = {}

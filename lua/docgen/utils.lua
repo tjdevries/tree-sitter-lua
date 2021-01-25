@@ -4,6 +4,9 @@ utils.wrap = function(str, limit, indent, indent1)
   indent = indent or ""
   indent1 = indent1 or indent
   limit = limit or 79
+
+  str = str:gsub("\n", "\n" .. indent)
+
   local here = 1-#indent1
   return indent1 .. str:gsub("(%s+)()(%S+)()", function(sp, st, word, fi)
     local delta = 0
