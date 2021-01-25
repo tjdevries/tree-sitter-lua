@@ -45,7 +45,8 @@ module.exports = grammar({
     ],
 
     conflicts: ($) => [
-    [$.variable_declarator, $._prefix_exp],
+        [$.variable_declarator, $._prefix_exp],
+        [$.emmy_ignore, $.emmy_comment],
     ],
 
     rules: {
@@ -489,7 +490,8 @@ module.exports = grammar({
             ),
 
         emmy_ignore: () => /---\n/,
-        emmy_comment: () => /---[^@][^\n]+\n/,
+        emmy_comment: ($) =>
+            token(prec.right(repeat1(choice(/---[^@\n]*\n/, /---\n/)))),
 
         emmy_type_list: ($) => seq(field("type", $.emmy_type), "[]"),
         emmy_type_map: ($) =>
@@ -561,7 +563,7 @@ module.exports = grammar({
             prec.left(
                 PREC.DEFAULT,
                 seq(
-                    one_or_more($.emmy_comment),
+                    alias($.emmy_comment, $.emmy_header),
                     any_amount_of(
                         choice(
                             $.emmy_ignore,

@@ -2122,8 +2122,27 @@
       "value": "---\\n"
     },
     "emmy_comment": {
-      "type": "PATTERN",
-      "value": "---[^@][^\\n]+\\n"
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC_RIGHT",
+        "value": 0,
+        "content": {
+          "type": "REPEAT1",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": "---[^@\\n]*\\n"
+              },
+              {
+                "type": "PATTERN",
+                "value": "---\\n"
+              }
+            ]
+          }
+        }
+      }
     },
     "emmy_type_list": {
       "type": "SEQ",
@@ -2422,16 +2441,13 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "REPEAT1",
+            "type": "ALIAS",
             "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "emmy_comment"
-                }
-              ]
-            }
+              "type": "SYMBOL",
+              "name": "emmy_comment"
+            },
+            "named": true,
+            "value": "emmy_header"
           },
           {
             "type": "REPEAT",
@@ -2522,6 +2538,10 @@
     [
       "variable_declarator",
       "_prefix_exp"
+    ],
+    [
+      "emmy_ignore",
+      "emmy_comment"
     ]
   ],
   "externals": [

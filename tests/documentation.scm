@@ -18,7 +18,7 @@
 ; end
 (program
   (function_statement
-    documentation: (emmy_documentation (emmy_comment))
+    documentation: (emmy_documentation (emmy_header))
 
     (function_start)
     name: (function_name (identifier))
@@ -36,7 +36,7 @@
 (program
   (function_statement
     documentation: (emmy_documentation
-      (emmy_comment)
+      (emmy_header)
       (emmy_return
         type: (emmy_type (identifier))
         description: (emmy_return_description)))
@@ -58,7 +58,7 @@
 (program
   (function_statement
     documentation: (emmy_documentation
-      (emmy_comment)
+      (emmy_header)
       (emmy_todo))
     (function_start)
     name: (function_name
@@ -77,7 +77,7 @@
 ; end
 (program
   (function_statement
-    documentation: (emmy_documentation (emmy_comment) (emmy_comment))
+    documentation: (emmy_documentation (emmy_header))
 
     (function_start)
     name: (function_name (identifier))
@@ -97,7 +97,7 @@
 (program
   (function_statement
     documentation: (emmy_documentation
-                     (emmy_comment)
+                     (emmy_header)
 
                      (emmy_parameter
                        name: (identifier)
@@ -131,7 +131,7 @@
 (program
   (function_statement
     documentation: (emmy_documentation
-                     (emmy_comment)
+                     (emmy_header)
 
                      (emmy_parameter
                        name: (identifier)
@@ -156,7 +156,7 @@
 (program
   (variable_declaration
     documentation: (emmy_documentation
-                     (emmy_comment)
+                     (emmy_header)
                      (emmy_parameter
                        name: (identifier)
                        type: (emmy_type (identifier))
@@ -179,7 +179,7 @@
 (program
   (variable_declaration
     documentation: (emmy_documentation
-                     (emmy_comment)
+                     (emmy_header)
                      (emmy_parameter
                        name: (identifier)
                        type: (emmy_type (emmy_type_list type: (emmy_type (identifier))))
@@ -217,8 +217,7 @@
 (program
   (function_statement
     (emmy_documentation
-      (emmy_comment)
-      (emmy_comment)
+      (emmy_header)
       (emmy_parameter
         (identifier)
         (emmy_type
@@ -275,7 +274,7 @@
 (program
   (function_statement
     (emmy_documentation
-      (emmy_comment)
+      (emmy_header)
       (emmy_eval (binary_operation (number) (number))))
     (function_start)
     (function_name

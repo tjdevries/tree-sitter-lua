@@ -116,3 +116,17 @@
   (parameter_list (identifier) (ellipsis))
   (function_body_paren)
   (function_end)))
+
+;;; Declare a function with documentation ahead of it
+; ---
+; function f() end
+(program
+  (function_statement
+    (emmy_documentation
+      (emmy_header))
+    (function_start)
+    (function_name
+      (identifier))
+    (function_body_paren)
+    (function_body_paren)
+    (function_end)))

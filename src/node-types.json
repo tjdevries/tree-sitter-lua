@@ -145,11 +145,11 @@
       "required": true,
       "types": [
         {
-          "type": "emmy_comment",
+          "type": "emmy_eval",
           "named": true
         },
         {
-          "type": "emmy_eval",
+          "type": "emmy_header",
           "named": true
         },
         {
@@ -2335,7 +2335,7 @@
     "named": true
   },
   {
-    "type": "emmy_comment",
+    "type": "emmy_header",
     "named": true
   },
   {
