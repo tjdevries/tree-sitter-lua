@@ -6,6 +6,16 @@ local read = utils.read
 
 ---@brief [[
 --- Public API for all associated docgen procedures.
+---
+--- Supported tags:
+---     - @brief:
+---         - Usage:
+--- <pre>
+--- ---@brief [[
+--- --- You can put things you want to say about the project here.
+--- --- It gets put at the top of the help file.
+--- ---@brief ]]
+
 ---@brief ]]
 
 ---@tag docgen
@@ -66,11 +76,7 @@ function docgen.transform_nodes(contents, query_name, toplevel_types)
   return t
 end
 
-function docgen.write(input_file, output_file_handle)
-  log.trace("Transforming:", input_file)
-
-  local contents = read(input_file)
-
+function docgen.get_nodes(contents)
   local query_name = 'documentation'
   local toplevel_types = {
     variable_declaration = true,
@@ -79,9 +85,13 @@ function docgen.write(input_file, output_file_handle)
     documentation_tag = true,
   }
 
-  local resulting_nodes = docgen.transform_nodes(contents, query_name, toplevel_types)
+  return docgen.transform_nodes(contents, query_name, toplevel_types)
+end
 
-  -- resulting_nodes._file_name = input_file
+function docgen.write(input_file, output_file_handle)
+  log.trace("Transforming:", input_file)
+  local contents = read(input_file)
+  local resulting_nodes = docgen.get_nodes(contents)
 
   if docgen.debug then print("Resulting Nodes:", vim.inspect(resulting_nodes)) end
 
@@ -135,7 +145,5 @@ end
   }
 --]]
 
-
-vim.cmd [[nnoremap asdf :lua require('plenary.reload').reload_module('docgen'); require('docgen').test()<CR>]]
 
 return docgen

@@ -80,6 +80,21 @@ help.format = function(metadata)
   -- Make functions, always do them sorted.
   local metadata_keys = vim.tbl_keys(metadata.functions or {})
   table.sort(metadata_keys)
+  metadata_keys = vim.tbl_filter(function(func_name)
+    if string.find(func_name, ".__", 1, true) then
+      return false
+    end
+
+    if string.find(func_name, ":__", 1, true) then
+      return false
+    end
+
+    if func_name:sub(1, 2) == "__" then
+      return false
+    end
+
+    return func_name:sub(1, 2) ~= "__"
+  end, metadata_keys)
 
   for _, func_name in ipairs(metadata_keys) do
     local v = metadata.functions[func_name]
@@ -97,7 +112,10 @@ help.format = function(metadata)
 end
 
 help.format_brief = function(brief_metadata)
-  return doc_wrap(table.concat(brief_metadata, " "))
+  -- TODO: In the future, maybe we could do more intelligent wrapping here.
+  -- return doc_wrap(table.concat(brief_metadata, " "))
+
+  return table.concat(brief_metadata, "\n")
 end
 
 help.format_function_metadata = function(metadata)
@@ -129,7 +147,7 @@ help.format_function_metadata = function(metadata)
     map(function(val)
       if val == '' then return '\n' end
       return val
-    end, metadata.description),
+    end, metadata.description or {}),
     ' '
   )
 

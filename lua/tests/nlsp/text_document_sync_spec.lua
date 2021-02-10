@@ -1,5 +1,3 @@
-require('plenary.test_harness'):setup_busted()
-
 local methods = require('nlsp.methods')
 local state = require('nlsp.state')
 -- local structures = require('nlsp.structures')
@@ -145,7 +143,8 @@ describe('text_document_sync', function()
       local parser = state.get_ts_parser(uri)
       assert.are_not.same(parser, nil)
 
-      local root = parser:parse():root()
+      parser = parser:parse()[1]
+      local root = parser:root()
       assert.are.same(query.get_node_text(root, item.text), item.text)
       assert.are.same(root:type(), 'program')
     end)

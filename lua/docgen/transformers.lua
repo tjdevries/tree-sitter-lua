@@ -52,7 +52,11 @@ transformers.documentation_brief = function(accumulator, str, node)
   end
 
   local result = get_node_text(node, str)
-  table.insert(accumulator.brief, vim.trim(result))
+  if result:sub(1, 1) == " " then
+    result = result:sub(2)
+  end
+
+  table.insert(accumulator.brief, result)
 end
 
 transformers.documentation_tag = function(accumulator, str, node)
