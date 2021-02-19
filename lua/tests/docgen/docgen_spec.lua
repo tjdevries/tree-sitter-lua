@@ -164,4 +164,33 @@ describe('docgen', function()
       end)
     end)
   end)
+
+  describe('functions', function()
+    it('should generate a function that is exported', function()
+      local nodes = get_dedented_nodes [[
+        local x = {}
+
+        --- This function has documentation
+        ---@param abc string: Docs for abc
+        ---@param def string: Other docs for def
+        ---@param bxy string: Final docs
+        function x.hello(abc, def, bxy)
+          return abc .. def .. bxy
+        end
+
+        return x
+      ]]
+
+      local params = nodes.functions["x.hello"].parameters
+      local param_names = {}
+      for k, _ in pairs(params) do param_names[k] = true end
+      eq({
+        abc = true,
+        def = true,
+        bxy = true
+      }, param_names)
+
+      -- eq({}, nodes)
+    end)
+  end)
 end)

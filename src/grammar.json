@@ -2216,7 +2216,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "---@param\\s+"
+          "value": "\\s*---@param\\s+"
         },
         {
           "type": "FIELD",
@@ -2281,8 +2281,8 @@
           ]
         },
         {
-          "type": "STRING",
-          "value": "\n"
+          "type": "PATTERN",
+          "value": "\\n\\s*"
         }
       ]
     },

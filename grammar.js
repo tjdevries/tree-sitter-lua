@@ -516,7 +516,7 @@ module.exports = grammar({
         // ---@param example (table): hello
         emmy_parameter: ($) =>
             seq(
-                /---@param\s+/,
+                /\s*---@param\s+/,
                 field("name", $.identifier),
                 field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
@@ -527,7 +527,7 @@ module.exports = grammar({
                         field("description", $.parameter_description)
                     )
                 ),
-                "\n"
+                /\n\s*/
             ),
 
         _multiline_emmy_string: ($) =>

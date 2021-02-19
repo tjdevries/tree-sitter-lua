@@ -68,6 +68,8 @@ transformers.variable_declaration = transformers._function
 
 transformers.emmy_documentation = function(accumulator, str, node)
   accumulator.parameters = {}
+  accumulator.parameter_list = {}
+
   log.trace("Accumulator:", accumulator)
 
   for_each_child(node, function(child_node)
@@ -102,6 +104,10 @@ transformers.emmy_parameter = function(accumulator, str, node)
     type = get_node_text(type_node, str),
     description = {get_node_text(desc_node, str)},
   }
+
+  if not vim.tbl_contains(accumulator.parameter_list, name) then
+    table.insert(accumulator.parameter_list, name)
+  end
 end
 
 local create_emmy_type_function = function(identifier)

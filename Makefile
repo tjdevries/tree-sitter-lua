@@ -7,11 +7,14 @@ generate:
 	${ts} generate
 
 test: generate
-	nvim --headless -c "luafile ./lua/tests_to_corpus.lua" -c "qa!"
-	${ts} test
+	make test_ts
 	make test_docgen
 
-test_docgen:
+test_ts: generate
+	nvim --headless -c "luafile ./lua/tests_to_corpus.lua" -c "qa!"
+	${ts} test
+
+test_docgen: generate
 	nvim \
 		--headless \
 		--noplugin \
