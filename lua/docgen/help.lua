@@ -143,18 +143,25 @@ help.format_function_metadata = function(function_metadata)
   local doc = ""
   doc = doc .. header  .. "\n"
 
-  local description = table.concat(
-    map(function(val)
-      if val == '' then return '\n' end
-      return val
-    end, function_metadata.description or {}),
-    ' '
+  -- local description = table.concat(
+  --   map(function(val)
+  --     if val == '' then return '\n' end
+  --     return val
+  --   end, function_metadata.description or {}),
+  --   ' '
+  -- )
+  print(vim.inspect(function_metadata.description))
+  local description = help._format(
+    function_metadata.description,
+    space_prefix,
+    80
   )
+  print(description)
 
-  description = doc_wrap(description, {
-    prefix = space_prefix,
-    width = 80,
-  })
+  -- description = doc_wrap(description, {
+  --   prefix = space_prefix,
+  --   width = 80,
+  -- })
   doc = doc .. description .. "\n"
 
   if not vim.tbl_isempty(function_metadata["parameters"]) then
@@ -218,6 +225,36 @@ help.format_function_metadata = function(function_metadata)
   gen_misc_doc('see', '|%s()|')
 
   return doc
+end
+
+help._format = function(lines, prefix, width)
+  assert(#prefix < width, "Please don't play games with me.")
+
+  local formatted_lines = {}
+  for _, line in ipairs(lines) do
+    local prefixed_line = prefix .. line
+
+    if #prefixed_line > width then
+      local split_line = vim.split(line, " ")
+
+      local progress_line = prefix
+      for _, word in ipairs(split_line) do
+        if #progress_line + #word > width then
+          table.insert(formatted_lines, (progress_line:gsub("%s$", "")))
+
+          progress_line = prefix
+        end
+
+        progress_line = progress_line .. word .. ' '
+      end
+
+      table.insert(formatted_lines, (progress_line:gsub("%s$", "")))
+    else
+      table.insert(formatted_lines, prefix .. line)
+    end
+  end
+
+  return table.concat(formatted_lines, "\n")
 end
 
 return help
