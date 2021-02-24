@@ -22,6 +22,7 @@ test_docgen: generate
 		-c "PlenaryBustedDirectory lua/tests/ {minimal_init = 'tests/minimal_init.vim'}"
 
 build_parser: generate
+	mkdir -p build
 	cc -o ./build/parser.so -I./src src/parser.c src/scanner.cc -shared -Os -lstdc++ -fPIC
 
 wasm: build_parser
