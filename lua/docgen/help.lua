@@ -119,7 +119,7 @@ help.format_brief = function(brief_metadata)
 end
 
 help.format_function_metadata = function(function_metadata)
-  local space_prefix = string.rep(" ", 8)
+  local space_prefix = string.rep(" ", 4)
 
   local name = function_metadata.name
   local parameter_names = map(function(val)
@@ -227,8 +227,15 @@ help.format_function_metadata = function(function_metadata)
   return doc
 end
 
-help._format = function(lines, prefix, width)
+help._format = function(in_lines, prefix, width)
   assert(#prefix < width, "Please don't play games with me.")
+
+  local flattened_lines = vim.tbl_flatten(in_lines)
+  local lines = {}
+  for _, line in ipairs(flattened_lines) do
+    table.insert(lines, vim.split(line, "\n"))
+  end
+  lines = vim.tbl_flatten(lines)
 
   local formatted_lines = {}
   for _, line in ipairs(lines) do
@@ -253,6 +260,14 @@ help._format = function(lines, prefix, width)
       table.insert(formatted_lines, prefix .. line)
     end
   end
+
+  formatted_lines = vim.tbl_map(function(line)
+    if line:find("^%s*$") then
+      return ""
+    else
+      return line
+    end
+  end, formatted_lines)
 
   return table.concat(formatted_lines, "\n")
 end
