@@ -118,13 +118,13 @@ help.format_brief = function(brief_metadata)
   return table.concat(brief_metadata, "\n")
 end
 
-help.format_function_metadata = function(metadata)
+help.format_function_metadata = function(function_metadata)
   local space_prefix = string.rep(" ", 8)
 
-  local name = metadata.name
+  local name = function_metadata.name
   local parameter_names = map(function(val)
     return val.name
-  end, values(metadata.parameters))
+  end, values(function_metadata.parameters))
 
 
   local left_side = string.format(
@@ -147,7 +147,7 @@ help.format_function_metadata = function(metadata)
     map(function(val)
       if val == '' then return '\n' end
       return val
-    end, metadata.description or {}),
+    end, function_metadata.description or {}),
     ' '
   )
 
@@ -157,7 +157,7 @@ help.format_function_metadata = function(metadata)
   })
   doc = doc .. description .. "\n"
 
-  if not vim.tbl_isempty(metadata["parameters"]) then
+  if not vim.tbl_isempty(function_metadata["parameters"]) then
     -- TODO: This needs to handle strings that get wrapped.
 
     local parameter_header = string.format("%sParameters: ~", space_prefix)
@@ -167,13 +167,13 @@ help.format_function_metadata = function(metadata)
           "%s    {%s} (%s)  ",
           space_prefix,
           val,
-          metadata.parameters[val].type
+          function_metadata.parameters[val].type
         )
 
         local empty_prefix = string.rep(" ", #param_prefix)
 
         local result = ''
-        for i, v in ipairs(metadata.parameters[val].description) do
+        for i, v in ipairs(function_metadata.parameters[val].description) do
           if i == 1 then
             result = param_prefix .. v
           else
@@ -192,7 +192,7 @@ help.format_function_metadata = function(metadata)
   end
 
   local gen_misc_doc = function(identification, ins)
-    if metadata[identification] then
+    if function_metadata[identification] then
       local title = identification:sub(1, 1):upper() .. identification:sub(2, -1)
 
       doc = doc .. "\n"
@@ -204,7 +204,7 @@ help.format_function_metadata = function(metadata)
             prefix = space_prefix .. '    ',
             width = 80,
           })
-        end, metadata[identification]),
+        end, function_metadata[identification]),
         "\n"
       )
 

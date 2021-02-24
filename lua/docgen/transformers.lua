@@ -77,6 +77,10 @@ transformers.emmy_documentation = function(accumulator, str, node)
   end)
 end
 
+transformers.emmy_header = function(accumulator, str, node)
+  return transformers.emmy_comment(accumulator, str, node)
+end
+
 transformers.emmy_comment = function(accumulator, str, node)
   -- TODO: Make this not ugly
   local text = get_node_text(node, str)
