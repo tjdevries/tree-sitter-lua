@@ -220,7 +220,11 @@ describe('docgen', function()
     end)
 
     it('should wrap and indent long lines', function()
-      eq("   hello\n   world", wrap { "hello world", width = 9, prefix = "   " })
+      eq("   hello\n   world", wrap {
+        "hello world",
+        width = 9,
+        prefix = "   "
+      })
     end)
   end)
 end)
