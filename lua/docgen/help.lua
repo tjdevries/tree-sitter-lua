@@ -150,13 +150,12 @@ help.format_function_metadata = function(function_metadata)
   --   end, function_metadata.description or {}),
   --   ' '
   -- )
-  print(vim.inspect(function_metadata.description))
+  -- print(vim.inspect(function_metadata.description))
   local description = help._format(
     function_metadata.description,
     space_prefix,
     80
   )
-  print(description)
 
   -- description = doc_wrap(description, {
   --   prefix = space_prefix,

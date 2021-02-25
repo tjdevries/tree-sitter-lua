@@ -84,13 +84,28 @@ end
 transformers.emmy_comment = function(accumulator, str, node)
   -- TODO: Make this not ugly
   local text = get_node_text(node, str)
-  text = text:gsub("---", "")
+
+  local raw_lines = vim.split(text, "\n")
+  if raw_lines[1] == "" then
+    table.remove(raw_lines, 1)
+  end
 
   if not accumulator.description then
     accumulator.description = {}
   end
 
-  table.insert(accumulator.description, vim.trim(text))
+  for _, line in ipairs(raw_lines) do
+    local start, finish = line:find("^%s*---")
+    if start then
+      line = line:sub(finish + 3)
+    end
+
+    if line:sub(1, 1) == " " then
+      line = line:sub(2)
+    end
+
+    table.insert(accumulator.description, line)
+  end
 end
 
 transformers.emmy_parameter = function(accumulator, str, node)
