@@ -38,6 +38,10 @@ describe('renderer', function()
       eq('Hello\nWorld', renderer.render({ 'Hello<br>' , 'World' }, '', 80))
     end)
 
+    it('should allow manually breakage at the end of line and trim', function()
+      eq('Hello.\nWorld', renderer.render({ 'Hello. <br>' , 'World' }, '', 80))
+    end)
+
     it('should wrap line that exceed width', function()
       eq('Hello\nWorld', renderer.render({ 'Hello World' }, '', 5))
     end)
@@ -66,6 +70,10 @@ describe('renderer', function()
 
     it('should allow manually breakage at the end of line', function()
       eq('    Hello\n    World', renderer.render({ 'Hello<br>' , 'World' }, '    ', 80))
+    end)
+
+    it('should allow manually breakage at the end of line and trim', function()
+      eq('    Hello.\n    World', renderer.render({ 'Hello. <br>' , 'World' }, '    ', 80))
     end)
 
     it('should wrap line that exceed width', function()

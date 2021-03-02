@@ -64,6 +64,10 @@ local append = function(l, r)
   end
 end
 
+local trim_trailing = function(str)
+  return str:gsub('%s*$', '')
+end
+
 function Text:error()
   error(
     string.format('Error while rendering things. Order: %s, paragraphs: %s, itemizes: %s, enumerates: %s, ignores: %s',
@@ -148,6 +152,9 @@ function Text:iter()
 end
 
 function Text:start_new_paragraph(line)
+  if table.getn(self.paragraphs) > 0 then
+    self.paragraphs[#self.paragraphs] = trim_trailing(self.paragraphs[#self.paragraphs])
+  end
   table.insert(self.paragraphs, "")
   table.insert(self.order, states.PARAGRAPH)
   if line then
@@ -243,7 +250,7 @@ m.render = function(input, prefix, width)
       end
     elseif type == states.IGNORE then
       for _, str in ipairs(paragraph) do
-        local construct = (prefix .. str):gsub('%s*$', '')
+        local construct = trim_trailing(prefix .. str)
         table.insert(output, construct)
       end
     else
