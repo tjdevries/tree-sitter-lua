@@ -206,6 +206,139 @@ describe('renderer', function()
     end)
   end)
 
+  describe('can handle enumerate without prefix', function()
+    it('works with one short item', function()
+      eq('1. item', renderer.render({ '1. item' }, '', 80))
+    end)
+
+    it('works with multiple short items', function()
+      eq('1. item\n2. item', renderer.render({ '1. item', '2. item' }, '', 80))
+    end)
+
+    it('works with wrap', function()
+      eq('1. item and\n   some more\n   things\n2. item',
+        renderer.render({ '1. item and some more things', '2. item' }, '', 12)
+      )
+    end)
+
+    it('can skip numbers', function()
+      eq('1. item\n3. item\n5. item',
+        renderer.render({ '1. item', '3. item', '5. item' }, '', 12)
+      )
+    end)
+
+    it('formats against biggest number', function()
+      eq(' 1. item\n 3. item\n10. item',
+        renderer.render({ '1. item', '3. item', '10. item' }, '', 12)
+      )
+    end)
+
+    it('formats against biggest number works in any order', function()
+      eq('  1. item\n100. item\n 10. item',
+        renderer.render({ '1. item', '100. item', '10. item' }, '', 12)
+      )
+    end)
+
+    it('works with nested enumerate', function()
+      eq('1. item\n  1.1. item\n    1.1.1. item\n  1.2. item\n2. item',
+        renderer.render({
+          '1. item',
+          '  1.1. item',
+          '    1.1.1. item',
+          '  1.2. item',
+          '2. item',
+        }, '', 80)
+      )
+    end)
+
+    it('works with nested complex enumerate', function()
+      eq(dedent[[
+        1. item
+           10. item this
+               should
+               wrap at
+               some
+               point
+            1.1.1. item
+          1.2. item
+        2. item]],
+        renderer.render({
+          '1. item',
+          '  10. item this should wrap at some point',
+          '    1.1.1. item',
+          '  1.2. item',
+          '2. item',
+        }, '', 16)
+      )
+    end)
+  end)
+
+  describe('can handle enumerate with prefix', function()
+    it('works with one short item', function()
+      eq('  1. item', renderer.render({ '1. item' }, '  ', 80))
+    end)
+
+    it('works with multiple short items', function()
+      eq('  1. item\n  2. item', renderer.render({ '1. item', '2. item' }, '  ', 80))
+    end)
+
+    it('works with wrap', function()
+      eq('  1. item\n     and\n     some\n     more\n     things\n  2. item',
+        renderer.render({ '1. item and some more things', '2. item' }, '  ', 12)
+      )
+    end)
+
+    it('can skip numbers', function()
+      eq('  1. item\n  3. item\n  5. item',
+        renderer.render({ '1. item', '3. item', '5. item' }, '  ', 12)
+      )
+    end)
+
+    it('formats against biggest number', function()
+      eq('   1. item\n   3. item\n  10. item',
+        renderer.render({ '1. item', '3. item', '10. item' }, '  ', 12)
+      )
+    end)
+
+    it('formats against biggest number works in any order', function()
+      eq('    1. item\n  100. item\n   10. item',
+        renderer.render({ '1. item', '100. item', '10. item' }, '  ', 12)
+      )
+    end)
+
+    it('works with nested enumerate', function()
+      eq('  1. item\n    1.1. item\n      1.1.1. item\n    1.2. item\n  2. item',
+        renderer.render({
+          '1. item',
+          '  1.1. item',
+          '    1.1.1. item',
+          '  1.2. item',
+          '2. item',
+        }, '  ', 80)
+      )
+    end)
+
+    it('works with nested complex enumerate', function()
+      eq([[  1. item
+     10. item this
+         should
+         wrap at
+         some
+         point
+      1.1.1. item
+    1.2. item
+  2. item]],
+        renderer.render({
+          '1. item',
+          '  10. item this should wrap at some point',
+          '    1.1.1. item',
+          '  1.2. item',
+          '2. item',
+        }, '  ', 18)
+      )
+    end)
+  end)
+
   describe('combination', function()
     it('can handle a text with paragraphes and itemize', function()
       local input = dedent[[
@@ -285,6 +418,40 @@ describe('renderer', function()
         What `:new` expects is listed below]]
       eq(expected, renderer.render(vim.split(input, '\n'), '', 80))
     end)
+
+    it('More changes between paragraph, itemize and enumerate', function()
+      local input = dedent[[
+        Examples of wrappers are:
+          1. `new_buffer_previewer`
+          2. `new_termopen_previewer`
+
+        To create a new table do following:
+          - `local new_previewer = Previewer:new(opts)`
+
+        What `:new` expects is listed below with a long wrapping line that will lead into nested enumerate:
+          1. Item
+            1.1. Nooooo
+              1.1.1. :(
+            1.2. Nice
+          2. I lost it writing this parser]]
+
+      local expected = dedent[[
+        Examples of wrappers are:
+          1. `new_buffer_previewer`
+          2. `new_termopen_previewer`
+
+        To create a new table do following:
+          - `local new_previewer = Previewer:new(opts)`
+
+        What `:new` expects is listed below with a long wrapping line that will lead
+        into nested enumerate:
+          1. Item
+            1.1. Nooooo
+              1.1.1. :(
+            1.2. Nice
+          2. I lost it writing this parser]]
+      eq(expected, renderer.render(vim.split(input, '\n'), '', 80))
+    end)
   end)
 
   describe('pre without prefix', function()
@@ -353,5 +520,4 @@ describe('renderer', function()
         }, '    ', 80))
     end)
   end)
-
 end)

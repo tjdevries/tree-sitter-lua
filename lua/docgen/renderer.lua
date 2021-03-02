@@ -111,11 +111,19 @@ function Text:handle_line(line)
   elseif self.state == states.ITEMIZE and new_state == states.PARAGRAPH then
     -- If we have a new paragraph in an itemize (part of the previous itemize)
     self:append_to_itemize(line)
+  elseif new_state == states.ENUMERATE then
+    -- Start new Itemize block
+    self:start_new_enumerate(line)
+    self.state = new_state
+  elseif self.state == states.ENUMERATE and new_state == states.PARAGRAPH then
+    -- If we have a new paragraph in an itemize (part of the previous itemize)
+    self:append_to_enumerate(line)
   elseif self.state == nil and new_state == states.PARAGRAPH then
     -- Start a new paragraph
     self:start_new_paragraph(line)
     self.state = new_state
   elseif new_state == states.NEWLINE and (self.state == states.ITEMIZE or
+         self.state == states.ENUMERATE or
          self.state == states.PARAGRAPH or
          self.state == nil) then
     -- After a itemize have a empty line or
@@ -153,7 +161,7 @@ end
 
 function Text:start_new_paragraph(line)
   if table.getn(self.paragraphs) > 0 then
-    self.paragraphs[#self.paragraphs] = trim_trailing(self.paragraphs[#self.paragraphs])
+    self.paragraphs[table.getn(self.paragraphs)] = trim_trailing(self.paragraphs[table.getn(self.paragraphs)])
   end
   table.insert(self.paragraphs, "")
   table.insert(self.order, states.PARAGRAPH)
@@ -170,6 +178,14 @@ function Text:start_new_itemize(line)
   end
 end
 
+function Text:start_new_enumerate(line)
+  table.insert(self.enumerates, { })
+  table.insert(self.order, states.ENUMERATE)
+  if line then
+    self:add_to_enumerate(line)
+  end
+end
+
 function Text:start_new_ignore()
   table.insert(self.ignores, { })
   table.insert(self.order, states.IGNORE)
@@ -177,29 +193,33 @@ end
 
 function Text:add_to_paragraph(str)
   if str:match('<br>$') then
-    self.paragraphs[#self.paragraphs] = append(self.paragraphs[#self.paragraphs], str:gsub('<br>$', ''))
+    self.paragraphs[table.getn(self.paragraphs)] = append(self.paragraphs[table.getn(self.paragraphs)], str:gsub('<br>$', ''))
     self:start_new_paragraph()
   else
-    self.paragraphs[#self.paragraphs] = append(self.paragraphs[#self.paragraphs], str)
+    self.paragraphs[table.getn(self.paragraphs)] = append(self.paragraphs[table.getn(self.paragraphs)], str)
   end
 end
 
 function Text:add_to_itemize(str)
-  table.insert(self.itemizes[#self.itemizes], str)
-end
-
-function Text:add_to_ignore(str)
-  table.insert(self.ignores[#self.ignores], str)
-end
-
-function Text:append_to_itemize(str)
-  local last_itemize = self.itemizes[#self.itemizes]
-  self.itemizes[#self.itemizes][#last_itemize] = append(last_itemize[#last_itemize], str)
+  table.insert(self.itemizes[table.getn(self.itemizes)], str)
 end
 
 function Text:add_to_enumerate(str)
-  -- TODO(conni2461):
-  return str
+  table.insert(self.enumerates[table.getn(self.enumerates)], str)
+end
+
+function Text:add_to_ignore(str)
+  table.insert(self.ignores[table.getn(self.ignores)], str)
+end
+
+function Text:append_to_itemize(str)
+  local last_itemize = self.itemizes[table.getn(self.itemizes)]
+  self.itemizes[table.getn(self.itemizes)][table.getn(last_itemize)] = append(last_itemize[table.getn(last_itemize)], str)
+end
+
+function Text:append_to_enumerate(str)
+  local last_enumerate = self.enumerates[table.getn(self.enumerates)]
+  self.enumerates[table.getn(self.enumerates)][table.getn(last_enumerate)] = append(last_enumerate[table.getn(last_enumerate)], str)
 end
 
 function Text:is_empty()
@@ -246,6 +266,34 @@ m.render = function(input, prefix, width)
         local str_start, _ = str:find('-')
         local base = string.rep(' ', (str_start - 1))
         local additional_prefix = { base, base .. '  ' }
+        handle(str, additional_prefix)
+      end
+    elseif type == states.ENUMERATE then
+      local max, maxc = {}, {}
+      for _, str in ipairs(paragraph) do
+        local indent_level, newc = str:find('[0-9.]+%. ')
+        indent_level = indent_level - 1
+        newc = newc - indent_level
+        if not newc then
+          error('Invalid enumerate. Enumerates have to end with `dot`. Example: `1. Item` or `1.1. Item`')
+        end
+        if not maxc[indent_level] then
+          maxc[indent_level] = newc
+        else
+          if newc > maxc[indent_level] then
+            maxc[indent_level] = newc
+          end
+        end
+      end
+      for k, v in pairs(maxc) do
+        max[k] = string.rep(' ', v)
+      end
+      for _, str in ipairs(paragraph) do
+        local str_start, _ = str:find('[0-9.]+%. ')
+        local _, str_end = str:gsub('^%s*', ''):find('[0-9]+. ')
+        local base = string.rep(' ', (str_start - 1))
+        local diff = string.rep(' ', (maxc[str_start - 1] - str_end))
+        local additional_prefix = { base .. diff, base .. max[str_start - 1] }
         handle(str, additional_prefix)
       end
     elseif type == states.IGNORE then
