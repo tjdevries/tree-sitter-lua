@@ -199,6 +199,10 @@ help.format_function_metadata = function(function_metadata)
     if function_metadata[identification] then
       local title = identification:sub(1, 1):upper() .. identification:sub(2, -1)
 
+      if doc:sub(#doc, #doc) ~= '\n' then
+        doc = doc .. '\n'
+      end
+
       doc = doc .. "\n"
       doc = doc .. string.format("%s%s: ~", space_prefix, title) .. "\n"
 

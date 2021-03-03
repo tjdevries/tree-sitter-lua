@@ -135,7 +135,7 @@ local create_emmy_type_function = function(identifier)
       accumulator[identifier] = {}
     end
 
-    local text = get_node_text(node, str)
+    local text = vim.trim(get_node_text(node, str))
     text = text:gsub(string.format('---@%s ', identifier), '')
 
     table.insert(accumulator[identifier], text)

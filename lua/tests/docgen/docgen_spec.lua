@@ -204,13 +204,49 @@ describe('docgen', function()
     end)
 
     describe('help output', function()
-      local function check_function_output(input, output)
+      local function check_function_output(input, output, block)
         local nodes = require('docgen').get_nodes(input)
         local result = docgen_help.format(nodes)
+        block = block == nil and true or block
+        output = block and help_block(output) or ''
 
-        eq(help_block(output), vim.trim(result))
+        eq(vim.trim(output), vim.trim(result))
       end
-      it('should work with describe', function()
+      it('should export documented function', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          function x.hello()
+            return 5
+          end
+
+          return x]], [[
+          x.hello()                                                          *x.hello()*
+              This function has documentation]])
+      end)
+
+      it('should not export local function', function()
+        check_function_output([[
+          --- This function has documentation
+          local hello()
+            return 5
+          end]], [[]], false)
+      end)
+
+      it('should not export hidden functions', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          function x.__hello()
+            return 5
+          end
+
+          return x]], [[]])
+      end)
+
+      it('should work with param', function()
         check_function_output([[
           local x = {}
 
@@ -231,6 +267,79 @@ describe('docgen', function()
                   {abc} (string)  Docs for abc
                   {def} (string)  Other docs for def
                   {bxy} (string)  Final docs]])
+      end)
+
+      it('should work with return', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          ---@param abc string: Docs for abc
+          ---@param def string: Other docs for def
+          ---@param bxy string: Final docs
+          ---@return string: concat
+          function x.hello(abc, def, bxy)
+            return abc .. def .. bxy
+          end
+
+          return x]], [[
+          x.hello({abc}, {def}, {bxy})                                       *x.hello()*
+              This function has documentation
+
+
+              Parameters: ~
+                  {abc} (string)  Docs for abc
+                  {def} (string)  Other docs for def
+                  {bxy} (string)  Final docs
+
+              Return: ~
+                  string: concat]])
+      end)
+
+      it('should work with see', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          ---@see x.bye
+          function x.hello()
+            return 0
+          end
+
+          return x]], [[
+          x.hello()                                                          *x.hello()*
+              This function has documentation
+
+
+              See: ~
+                  |x.bye()|]])
+      end)
+
+      it('should work with see, param and return', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          ---@param a string: hello
+          ---@return string: hello
+          ---@see x.bye
+          function x.hello(a)
+            return a
+          end
+
+          return x]], [[
+          x.hello({a})                                                       *x.hello()*
+              This function has documentation
+
+
+              Parameters: ~
+                  {a} (string)  hello
+
+              Return: ~
+                  string: hello
+
+              See: ~
+                  |x.bye()|]])
       end)
     end)
   end)
