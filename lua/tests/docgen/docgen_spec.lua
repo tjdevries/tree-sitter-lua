@@ -193,6 +193,7 @@ describe('docgen', function()
       ]]
 
       local params = nodes.functions["x.hello"].parameters
+      eq({ 'abc', 'def', 'bxy' }, nodes.functions["x.hello"].parameter_list)
       local param_names = {}
       for k, _ in pairs(params) do param_names[k] = true end
       eq({
@@ -200,8 +201,37 @@ describe('docgen', function()
         def = true,
         bxy = true
       }, param_names)
+    end)
 
-      -- eq({}, nodes)
+    describe('help output', function()
+      local function check_function_output(input, output)
+        local nodes = require('docgen').get_nodes(input)
+        local result = docgen_help.format(nodes)
+
+        eq(help_block(output), vim.trim(result))
+      end
+      it('should work with describe', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          ---@param abc string: Docs for abc
+          ---@param def string: Other docs for def
+          ---@param bxy string: Final docs
+          function x.hello(abc, def, bxy)
+            return abc .. def .. bxy
+          end
+
+          return x]], [[
+          x.hello({abc}, {def}, {bxy})                                       *x.hello()*
+              This function has documentation
+
+
+              Parameters: ~
+                  {abc} (string)  Docs for abc
+                  {def} (string)  Other docs for def
+                  {bxy} (string)  Final docs]])
+      end)
     end)
   end)
 end)
