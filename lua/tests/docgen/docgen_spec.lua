@@ -121,15 +121,26 @@ describe('docgen', function()
         eq(help_block(output), vim.trim(result))
       end
 
-      it('should not wrap lines, even if no empty lines', function()
+      it('should not wrap lines, if <br>', function()
+        check_brief_output([=[
+          ---@brief [[
+          --- Hello world<br>
+          --- Yup again
+          ---@brief ]]
+        ]=], [[
+          Hello world
+          Yup again
+        ]])
+      end)
+
+      it('should wrap lines', function()
         check_brief_output([=[
           ---@brief [[
           --- Hello world
           --- Yup again
           ---@brief ]]
         ]=], [[
-          Hello world
-          Yup again
+          Hello world Yup again
         ]])
       end)
 

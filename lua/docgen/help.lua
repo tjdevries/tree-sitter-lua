@@ -1,5 +1,6 @@
 local log = require('docgen.log')
 local utils = require('docgen.utils')
+local render = require('docgen.renderer').render
 
 ---@brief [[
 --- All help formatting related utilties. Used to transform output from |docgen| into vim style documentation.
@@ -114,8 +115,9 @@ end
 help.format_brief = function(brief_metadata)
   -- TODO: In the future, maybe we could do more intelligent wrapping here.
   -- return doc_wrap(table.concat(brief_metadata, " "))
+  -- print(vim.inspect(brief_metadata))
 
-  return table.concat(brief_metadata, "\n")
+  return render(brief_metadata, '', 79)
 end
 
 help.format_function_metadata = function(function_metadata)
@@ -151,10 +153,10 @@ help.format_function_metadata = function(function_metadata)
   --   ' '
   -- )
   -- print(vim.inspect(function_metadata.description))
-  local description = help._format(
+  local description = render(
     function_metadata.description,
     space_prefix,
-    80
+    79
   )
 
   -- description = doc_wrap(description, {
@@ -224,51 +226,6 @@ help.format_function_metadata = function(function_metadata)
   gen_misc_doc('see', '|%s()|')
 
   return doc
-end
-
-help._format = function(in_lines, prefix, width)
-  assert(#prefix < width, "Please don't play games with me.")
-
-  local flattened_lines = vim.tbl_flatten(in_lines)
-  local lines = {}
-  for _, line in ipairs(flattened_lines) do
-    table.insert(lines, vim.split(line, "\n"))
-  end
-  lines = vim.tbl_flatten(lines)
-
-  local formatted_lines = {}
-  for _, line in ipairs(lines) do
-    local prefixed_line = prefix .. line
-
-    if #prefixed_line > width then
-      local split_line = vim.split(line, " ")
-
-      local progress_line = prefix
-      for _, word in ipairs(split_line) do
-        if #progress_line + #word > width then
-          table.insert(formatted_lines, (progress_line:gsub("%s$", "")))
-
-          progress_line = prefix
-        end
-
-        progress_line = progress_line .. word .. ' '
-      end
-
-      table.insert(formatted_lines, (progress_line:gsub("%s$", "")))
-    else
-      table.insert(formatted_lines, prefix .. line)
-    end
-  end
-
-  formatted_lines = vim.tbl_map(function(line)
-    if line:find("^%s*$") then
-      return ""
-    else
-      return line
-    end
-  end, formatted_lines)
-
-  return table.concat(formatted_lines, "\n")
 end
 
 return help
