@@ -124,17 +124,13 @@ help.format_function_metadata = function(function_metadata)
   local space_prefix = string.rep(" ", 4)
 
   local name = function_metadata.name
-  local parameter_names = map(function(val)
-    return val.name
-  end, values(function_metadata.parameters))
-
 
   local left_side = string.format(
     "%s(%s)",
     name,
     table.concat(map(
-      function(val) return string.format("{%s}", val) end,
-      parameter_names
+      function(val) return string.format("{%s}", function_metadata.parameters[val].name) end,
+      function_metadata.parameter_list
     ), ", ")
   )
 
@@ -174,7 +170,7 @@ help.format_function_metadata = function(function_metadata)
         local param_prefix = string.format(
           "%s    {%s} (%s)  ",
           space_prefix,
-          val,
+          function_metadata.parameters[val].name,
           function_metadata.parameters[val].type
         )
 
@@ -190,7 +186,7 @@ help.format_function_metadata = function(function_metadata)
         end
 
         return result
-      end, parameter_names),
+      end, function_metadata.parameter_list),
       "\n"
     )
 
