@@ -58,7 +58,8 @@ module.exports = grammar({
                         choice(
                             $._statement,
                             $._documentation_brief_container,
-                            $._documentation_tag_container
+                            $._documentation_tag_container,
+                            $.emmy_class
                         )
                     ),
                     optional(
@@ -507,6 +508,32 @@ module.exports = grammar({
             choice($.emmy_type_map, $.emmy_type_list, $.identifier),
 
         // Definition:
+        // ---@class MY_TYPE[:PARENT_TYPE] [@comment]
+        //
+        // Example:
+        //
+        // ---@class transport @supper class
+        // ---@class car : transport @car class
+        emmy_class: ($) =>
+            seq(
+                /\s*---@class\s+/,
+                field("type", $.emmy_type),
+                optional(
+                    seq(
+                        /\s*:\s*/,
+                        field("parent", $.emmy_type)
+                    ),
+                ),
+                optional(
+                    seq(
+                        /\s*@\s*/,
+                        field("description", $.class_description)
+                    )
+                ),
+                /\n\s*/
+          ),
+
+        // Definition:
         // ---@param param_name MY_TYPE[|other_type] [@comment]
         //
         // I don't think this is needed (read this as: I hate it)
@@ -530,6 +557,29 @@ module.exports = grammar({
                 /\n\s*/
             ),
 
+        // Definition:
+        // ---@field [public|protected|private] field_name MY_TYPE[|other_type] [@comment]
+        //
+        // I don't think [public|protected|private] is useful for us.
+        //
+        // ---@field example table hello
+        // ---@field example (table): hello
+        emmy_field: ($) =>
+            seq(
+                /\s*---@field\s+/,
+                field("name", $.identifier),
+                field("type", list_of($.emmy_type, /\s*\|\s*/)),
+
+                // TODO: How closely should we be to emmy...
+                optional(
+                    seq(
+                        /\s*:\s*/,
+                        field("description", $.field_description)
+                    )
+                ),
+                /\n\s*/
+            ),
+
         _multiline_emmy_string: ($) =>
             prec.right(
                 PREC.PRIORITY,
@@ -537,6 +587,10 @@ module.exports = grammar({
                 // seq(/[^\n]*/, any_amount_of(/\n\s*---[^\n]*/))
             ),
 
+        class_description: ($) => $._multiline_emmy_string,
+        field_description: ($) => $._multiline_emmy_string,
+
+        // TODO(conni2461): Pretty sure that doesn't work as expected
         parameter_description: ($) => $._multiline_emmy_string,
 
         emmy_return_description: ($) => $._multiline_emmy_string,
@@ -568,7 +622,9 @@ module.exports = grammar({
                         choice(
                             $.emmy_ignore,
                             $._emmy_eval_container,
+                            $.emmy_class,
                             $.emmy_parameter,
+                            $.emmy_field,
                             $.emmy_see,
                             $.emmy_todo,
                             $.emmy_usage,

@@ -26,6 +26,10 @@
                     {
                       "type": "SYMBOL",
                       "name": "_documentation_tag_container"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "emmy_class"
                     }
                   ]
                 }
@@ -2211,6 +2215,77 @@
         }
       ]
     },
+    "emmy_class": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "\\s*---@class\\s+"
+        },
+        {
+          "type": "FIELD",
+          "name": "type",
+          "content": {
+            "type": "SYMBOL",
+            "name": "emmy_type"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "\\s*:\\s*"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "parent",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "emmy_type"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "\\s*@\\s*"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "description",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "class_description"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\n\\s*"
+        }
+      ]
+    },
     "emmy_parameter": {
       "type": "SEQ",
       "members": [
@@ -2286,6 +2361,81 @@
         }
       ]
     },
+    "emmy_field": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "\\s*---@field\\s+"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "type",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "emmy_type"
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "PATTERN",
+                      "value": "\\s*\\|\\s*"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "emmy_type"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "\\s*:\\s*"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "description",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "field_description"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "PATTERN",
+          "value": "\\n\\s*"
+        }
+      ]
+    },
     "_multiline_emmy_string": {
       "type": "PREC_RIGHT",
       "value": 2,
@@ -2310,6 +2460,14 @@
           }
         ]
       }
+    },
+    "class_description": {
+      "type": "SYMBOL",
+      "name": "_multiline_emmy_string"
+    },
+    "field_description": {
+      "type": "SYMBOL",
+      "name": "_multiline_emmy_string"
     },
     "parameter_description": {
       "type": "SYMBOL",
@@ -2467,7 +2625,15 @@
                     },
                     {
                       "type": "SYMBOL",
+                      "name": "emmy_class"
+                    },
+                    {
+                      "type": "SYMBOL",
                       "name": "emmy_parameter"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "emmy_field"
                     },
                     {
                       "type": "SYMBOL",
@@ -2544,6 +2710,7 @@
       "emmy_comment"
     ]
   ],
+  "precedences": [],
   "externals": [
     {
       "type": "SYMBOL",

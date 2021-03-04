@@ -68,6 +68,16 @@
     "fields": {}
   },
   {
+    "type": "class_description",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "comment",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "do_statement",
     "named": true,
     "fields": {},
@@ -137,6 +147,42 @@
     "fields": {}
   },
   {
+    "type": "emmy_class",
+    "named": true,
+    "fields": {
+      "description": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "class_description",
+            "named": true
+          }
+        ]
+      },
+      "parent": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "emmy_type",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "emmy_type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "emmy_documentation",
     "named": true,
     "fields": {},
@@ -145,7 +191,15 @@
       "required": true,
       "types": [
         {
+          "type": "emmy_class",
+          "named": true
+        },
+        {
           "type": "emmy_eval",
+          "named": true
+        },
+        {
+          "type": "emmy_field",
           "named": true
         },
         {
@@ -244,6 +298,42 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "emmy_field",
+    "named": true,
+    "fields": {
+      "description": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "field_description",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "emmy_type",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -577,6 +667,11 @@
         ]
       }
     }
+  },
+  {
+    "type": "field_description",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "field_left_bracket",
@@ -1626,6 +1721,10 @@
         },
         {
           "type": "documentation_tag",
+          "named": true
+        },
+        {
+          "type": "emmy_class",
           "named": true
         },
         {
