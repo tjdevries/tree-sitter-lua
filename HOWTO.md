@@ -86,6 +86,21 @@ This will result into this module header:
                                                                    *your_module*
 ```
 
+## Class
+
+Output:
+
+```
+Job : System                                                              *Job*
+    A way to call system processes
+
+    Parent: ~
+        |System|
+
+    Fields: ~
+        {command} (string) The command to execute
+```
+
 ## Function header
 
 You can describe your functions.

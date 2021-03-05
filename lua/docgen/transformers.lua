@@ -59,6 +59,8 @@ transformers.documentation_brief = function(accumulator, str, node)
   table.insert(accumulator.brief, result)
 end
 
+-- TODO(conni2461): DO a documentation class
+
 transformers.documentation_tag = function(accumulator, str, node)
   accumulator.tag = get_node_text(node, str)
 end
@@ -67,6 +69,12 @@ transformers.function_statement = transformers._function
 transformers.variable_declaration = transformers._function
 
 transformers.emmy_documentation = function(accumulator, str, node)
+  accumulator.classes = {}
+  accumulator.class_list = {}
+
+  accumulator.fields = {}
+  accumulator.field_list = {}
+
   accumulator.parameters = {}
   accumulator.parameter_list = {}
 
@@ -105,6 +113,49 @@ transformers.emmy_comment = function(accumulator, str, node)
     end
 
     table.insert(accumulator.description, line)
+  end
+end
+
+transformers.emmy_class = function(accumulator, str, node)
+  local type_node = node:named_child(0)
+  local parent_or_desc = node:named_child(1)
+  local desc_node = node:named_child(2)
+
+  local class = {}
+  local name = get_node_text(type_node, str)
+  class.name = name
+
+  if desc_node == nil then
+    class.desc = { get_node_text(parent_or_desc, str) }
+  else
+    class.parent = get_node_text(parent_or_desc, str)
+    class.desc = { get_node_text(desc_node, str) }
+  end
+
+  accumulator.classes[name] = class
+
+  if not vim.tbl_contains(accumulator.class_list, name) then
+    table.insert(accumulator.class_list, name)
+  end
+end
+
+transformers.emmy_field = function(accumulator, str, node)
+  local name_node = node:named_child(0)
+  assert(name_node, "Field must have a name")
+
+  local type_node = node:named_child(1)
+  local desc_node = node:named_child(2)
+
+  local name = get_node_text(name_node, str)
+
+  accumulator.fields[name] = {
+    name = name,
+    type = get_node_text(type_node, str),
+    description = {get_node_text(desc_node, str)},
+  }
+
+  if not vim.tbl_contains(accumulator.field_list, name) then
+    table.insert(accumulator.field_list, name)
   end
 end
 

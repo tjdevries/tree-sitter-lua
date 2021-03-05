@@ -59,7 +59,9 @@ module.exports = grammar({
                             $._statement,
                             $._documentation_brief_container,
                             $._documentation_tag_container,
-                            $.emmy_class
+                            // TODO(conni2461): TO make this possible, which we should,
+                            // we need another container, because if not it will be picked up twice :(
+                            // $.emmy_class
                         )
                     ),
                     optional(

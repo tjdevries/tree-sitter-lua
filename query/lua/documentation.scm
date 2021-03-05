@@ -22,3 +22,7 @@
 (
  (documentation_tag) @tag
 )
+
+(
+ (emmy_class) @class
+)

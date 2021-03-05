@@ -230,6 +230,7 @@ end
 
 m.render = function(input, prefix, width)
   assert(#prefix < width, "Please don't play games with me.")
+  assert(type(input) == 'table', "Input has to be a table")
 
   local text = Text:new()
 

@@ -1724,10 +1724,6 @@
           "named": true
         },
         {
-          "type": "emmy_class",
-          "named": true
-        },
-        {
           "type": "for_statement",
           "named": true
         },

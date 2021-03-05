@@ -78,8 +78,26 @@ help.format = function(metadata)
     add()
   end
 
+  -- Make classes
+  local metadata_classes = vim.tbl_keys(metadata.classes or {})
+  -- TODO(conni2461): NO don't u do this. Make a @config annotation for this right now!!!
+  -- TODO(conni2461): Thanks to lua table weirdness we need to save the order of the classes
+  -- as they are in the document. Same applies to functions
+  table.sort(metadata_classes)
+  for _, class_name in ipairs(metadata_classes) do
+    local v = metadata.classes[class_name]
+
+    local result = help.format_class_metadata(v)
+    if not result then error("Missing result") end
+
+    add(result)
+    add()
+  end
+
   -- Make functions, always do them sorted.
   local metadata_keys = vim.tbl_keys(metadata.functions or {})
+
+  -- TODO(conni2461): NO don't u do this. Make a @config annotation for this right now!!!
   table.sort(metadata_keys)
   metadata_keys = vim.tbl_filter(function(func_name)
     if string.find(func_name, ".__", 1, true) then
@@ -113,11 +131,37 @@ help.format = function(metadata)
 end
 
 help.format_brief = function(brief_metadata)
-  -- TODO: In the future, maybe we could do more intelligent wrapping here.
-  -- return doc_wrap(table.concat(brief_metadata, " "))
-  -- print(vim.inspect(brief_metadata))
-
   return render(brief_metadata, '', 79)
+end
+
+help.format_class_metadata = function(class)
+  local space_prefix = string.rep(" ", 4)
+
+  local doc = ""
+  local left_side = class.parent and
+                    string.format("%s : %s", class.name, class.parent) or
+                    class.name
+
+  local header = align_text(left_side, string.format("*%s*", class.name), 78)
+  doc = doc .. header .. "\n"
+
+  local description = render(
+    class.desc,
+    space_prefix,
+    79
+  )
+  doc = doc .. description .. "\n"
+
+  if class.parent then
+    doc = doc .. "\n" .. space_prefix .. "Parents: ~" .. "\n"
+    doc = doc .. string.format('%s%s|%s|\n', space_prefix, space_prefix, class.parent)
+  end
+
+  if class.fields then
+    print('HERE')
+  end
+
+  return doc
 end
 
 help.format_function_metadata = function(function_metadata)
@@ -136,29 +180,17 @@ help.format_function_metadata = function(function_metadata)
 
   local right_side = string.format("*%s()*", name)
 
+  -- TODO(conni2461): LONG function names break this thing
   local header = align_text(left_side, right_side, 78)
 
   local doc = ""
   doc = doc .. header  .. "\n"
 
-  -- local description = table.concat(
-  --   map(function(val)
-  --     if val == '' then return '\n' end
-  --     return val
-  --   end, function_metadata.description or {}),
-  --   ' '
-  -- )
-  -- print(vim.inspect(function_metadata.description))
   local description = render(
     function_metadata.description,
     space_prefix,
     79
   )
-
-  -- description = doc_wrap(description, {
-  --   prefix = space_prefix,
-  --   width = 80,
-  -- })
   doc = doc .. description .. "\n"
 
   if not vim.tbl_isempty(function_metadata["parameters"]) then

@@ -26,10 +26,6 @@
                     {
                       "type": "SYMBOL",
                       "name": "_documentation_tag_container"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "emmy_class"
                     }
                   ]
                 }
