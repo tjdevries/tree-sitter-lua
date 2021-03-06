@@ -521,3 +521,25 @@ describe('renderer', function()
     end)
   end)
 end)
+
+describe("renderi", function()
+  it("works with short line and no prefix", function()
+    eq('Short line', renderer.renderi({'Short line'}, '', 80))
+  end)
+
+  it("works with short line and prefix", function()
+    eq('Short line', renderer.renderi({'Short line'}, '    ', 80))
+  end)
+
+  it("works with long wrapping line and prefix", function()
+    eq([[This should be longer than the line
+    width, causing this to wrap and not
+    wrap the first line. Thats insane.
+    Hype!]],
+    renderer.renderi(
+      {
+        'This should be longer than the line width, causing',
+        'this to wrap and not wrap the first line. Thats insane. Hype!'
+      }, '    ', 40))
+  end)
+end)

@@ -1,6 +1,7 @@
 local log = require('docgen.log')
 local utils = require('docgen.utils')
 local render = require('docgen.renderer').render
+local renderi = require('docgen.renderer').renderi
 
 ---@brief [[
 --- All help formatting related utilties. Used to transform output from |docgen| into vim style documentation.
@@ -143,6 +144,18 @@ help.format_brief = function(brief_metadata)
   return render(brief_metadata, '', 79)
 end
 
+help.format_field = function(field, space_prefix)
+  local left_side = string.format("%s%s{%s} (%s) ",
+    space_prefix,
+    space_prefix,
+    field.name,
+    field.type
+  )
+  local right_side = renderi(field.description, string.rep(' ', #left_side), 79)
+
+  return left_side .. right_side .. '\n'
+end
+
 help.format_class_metadata = function(class)
   local space_prefix = string.rep(" ", 4)
 
@@ -166,9 +179,11 @@ help.format_class_metadata = function(class)
     doc = doc .. string.format('%s%s|%s|\n', space_prefix, space_prefix, class.parent)
   end
 
-  if class.fields then
-    -- TODO(conni2461): SHOULD FORMAT FIELDS
-    -- print(vim.inspect(class.fields))
+  if class.field_list and table.getn(class.field_list) > 0 then
+    doc = doc .. "\n" .. space_prefix .. "Fields: ~" .. "\n"
+    for _, field_name in ipairs(class.field_list) do
+      doc = doc .. help.format_field(class.fields[field_name], space_prefix)
+    end
   end
 
   return doc
@@ -209,6 +224,7 @@ help.format_function_metadata = function(function_metadata)
     local parameter_header = string.format("%sParameters: ~", space_prefix)
     local parameter_docs = table.concat(
       map(function(val)
+        -- TODO(conni2461): DID YOU HERE ABOUT RENDER?!
         local param_prefix = string.format(
           "%s    {%s} (%s)  ",
           space_prefix,

@@ -106,22 +106,44 @@ Available keys value pairs are:
   - `ascending`
   - `descending`
   - If you have a typo it will do `file_order` sorting
+  <!----> TODO(conni2461): DO WE WANT THIS? IF YES IMPLEMENT IT
+- `field_order`:
+  - `file_order` (default)
+  - `ascending`
+  - `descending`
+  - If you have a typo it will do `file_order` sorting
 
 ## Class
 
-<!----> TODO(conni2461): FINISH THIS HERE
+You can define your own classes and types to give a better sense of the Input of another function.
+Another good usecase for this are structs defined by ffi.
+
+Input:
+
+```lua
+---@class Array : Map @number indexed starting at 1
+---@field count number: Always handy to have a count
+---@field type string: Imagine having a type for an array
+---@field begin function: It even has a begin()?! Is this cpp?
+---@field end function: It even has an end()?! Get out of here cpp! Oh by the way did you know that fields are wrapping? I didn't and this should prove this.
+```
 
 Output:
 
 ```
-Job : System                                                              *Job*
-    A way to call system processes
+Array : Map                                                            *Array*
+    number indexed starting at 1
 
-    Parent: ~
-        |System|
+    Parents: ~
+        |Map|
 
     Fields: ~
-        {command} (string) The command to execute
+        {count} (number) Always handy to have a count
+        {type} (string) Imagine having a type for an array
+        {begin} (function) It even has a begin()?! Is this cpp?
+        {end} (function) It even has an end()?! Get out of here cpp! Oh by the
+                         way did you know that fields are wrapping? I didn't
+                         and this should prove this.
 ```
 
 ## Function header

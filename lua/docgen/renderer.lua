@@ -309,4 +309,45 @@ m.render = function(input, prefix, width)
   return table.concat(output, '\n')
 end
 
+--- renderi is a paragraph only rendering and is used for prefix indentation,
+--- beginning second line.
+---
+--- Used for parameters and field description
+m.renderi = function(input, prefix, width)
+  assert(#prefix < width, "Please don't play games with me.")
+  assert(type(input) == 'table', "Input has to be a table")
+
+  local text = Text:new()
+
+  for _, line in ipairs(vim.tbl_flatten(input)) do
+    if not text:is_empty() or line ~= '' then
+      text:handle_line(line)
+    end
+  end
+
+  local output = {}
+  for type, paragraph in text:iter() do
+    if type == states.PARAGRAPH then
+      local line = ""
+      for _, word in ipairs(vim.split(paragraph, ' ')) do
+        local inner_width = width
+        if table.getn(output) == 0 then
+          inner_width = inner_width - #prefix
+        end
+        if #append(line, word) <= inner_width then
+          line = append(line, word)
+        else
+          table.insert(output, line)
+          line = prefix .. word
+        end
+      end
+      if line:match('^%s+$') then line = '' end
+      table.insert(output, line)
+    else
+      error("Didn't i said paragraph only?! Read the friendly manual")
+    end
+  end
+  return table.concat(output, '\n')
+end
+
 return m

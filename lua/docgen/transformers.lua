@@ -108,8 +108,7 @@ transformers.function_statement = transformers._function
 transformers.variable_declaration = transformers._function
 
 transformers.emmy_documentation = function(accumulator, str, node)
-  accumulator.classes = {}
-  accumulator.class_list = {}
+  accumulator.class = {}
 
   accumulator.fields = {}
   accumulator.field_list = {}
@@ -160,23 +159,14 @@ transformers.emmy_class = function(accumulator, str, node)
   local parent_or_desc = node:named_child(1)
   local desc_node = node:named_child(2)
 
-  local class = {}
   local name = get_node_text(type_node, str)
-  class.name = name
+  accumulator.class.name = name
 
   if desc_node == nil then
-    class.desc = { get_node_text(parent_or_desc, str) }
+    accumulator.class.desc = { get_node_text(parent_or_desc, str) }
   else
-    class.parent = get_node_text(parent_or_desc, str)
-    class.desc = { get_node_text(desc_node, str) }
-  end
-
-  -- TODO(conni2461): YOU DON'T NEED A CLASSES FOR EMMY_CLASS.
-  -- THERE IS ONLY ONE CLASS DEFINITION ON A FUNCTION
-  accumulator.classes[name] = class
-
-  if not vim.tbl_contains(accumulator.class_list, name) then
-    table.insert(accumulator.class_list, name)
+    accumulator.class.parent = get_node_text(parent_or_desc, str)
+    accumulator.class.desc = { get_node_text(desc_node, str) }
   end
 end
 

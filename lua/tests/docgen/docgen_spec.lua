@@ -193,7 +193,7 @@ describe('docgen', function()
           ["function_list"] = { "x.hello" },
           functions = {
             ["x.hello"] = {
-              ["class_list"] = {}, classes = {},
+              class = {},
               description = { "", "This function has documentation", "" },
               ["field_list"] = {}, fields = {},
               format = "function",
@@ -229,7 +229,7 @@ describe('docgen', function()
           ["function_list"] = { "x.hello", "x.bye", "x.good_evening" },
           functions = {
             ["x.hello"] = {
-              ["class_list"] = {}, classes = {},
+              class = {},
               description = { "", "This function has documentation", "" },
               ["field_list"] = {}, fields = {},
               format = "function",
@@ -237,7 +237,7 @@ describe('docgen', function()
               ["parameter_list"] = {}, parameters = {}
             },
             ["x.bye"] = {
-              ["class_list"] = {}, classes = {},
+              class = {},
               description = { "", "This function no documentation", "" },
               ["field_list"] = {}, fields = {},
               format = "function",
@@ -245,7 +245,7 @@ describe('docgen', function()
               ["parameter_list"] = {}, parameters = {}
             },
             ["x.good_evening"] = {
-              ["class_list"] = {}, classes = {},
+              class = {},
               description = { "", "This function some documentation", "" },
               ["field_list"] = {}, fields = {},
               format = "function",
@@ -274,7 +274,7 @@ describe('docgen', function()
           ["function_list"] = { "x.hello" },
           functions = {
             ["x.hello"] = {
-              ["class_list"] = {}, classes = {},
+              class = {},
               description = { "", "This function has documentation", "" },
               ["field_list"] = {}, fields = {},
               format = "function",
@@ -601,7 +601,6 @@ describe('docgen', function()
         }, nodes)
       end)
 
-      -- TODO(conni2461): MAYBE WE SHOULD DO MORE TESTING HERE
       it('should get the nodes of a parent and sub class', function()
         local nodes = get_dedented_nodes [=[
           local Job = {}
@@ -666,6 +665,52 @@ describe('docgen', function()
 
               Parents: ~
                   |TestMap|
+        ]])
+      end)
+
+      it('should generate the documentation of a class with fields', function()
+        check_class_output([[
+          ---@class Array @number indexed starting at 1
+          ---@field count number: Always handy to have a count
+          ---@field type string: Imagine having a type for an array
+          ---@field begin function: It even has a begin()?! Is this cpp?
+          ---@field end function: It even has an end()?! Get out of here cpp! Oh by the way did you know that fields are wrapping? I didn't and this should prove this. Please work :)
+        ]], [[
+          Array                                                                  *Array*
+              number indexed starting at 1
+
+              Fields: ~
+                  {count} (number) Always handy to have a count
+                  {type} (string) Imagine having a type for an array
+                  {begin} (function) It even has a begin()?! Is this cpp?
+                  {end} (function) It even has an end()?! Get out of here cpp! Oh by the
+                                   way did you know that fields are wrapping? I didn't
+                                   and this should prove this. Please work :)
+        ]])
+      end)
+
+
+      it('should generate the documentation of a sub class with fields', function()
+        check_class_output([[
+          ---@class Array : Map @number indexed starting at 1
+          ---@field count number: Always handy to have a count
+          ---@field type string: Imagine having a type for an array
+          ---@field begin function: It even has a begin()?! Is this cpp?
+          ---@field end function: It even has an end()?! Get out of here cpp! Oh by the way did you know that fields are wrapping? I didn't and this should prove this. Please work :)
+        ]], [[
+          Array : Map                                                            *Array*
+              number indexed starting at 1
+
+              Parents: ~
+                  |Map|
+
+              Fields: ~
+                  {count} (number) Always handy to have a count
+                  {type} (string) Imagine having a type for an array
+                  {begin} (function) It even has a begin()?! Is this cpp?
+                  {end} (function) It even has an end()?! Get out of here cpp! Oh by the
+                                   way did you know that fields are wrapping? I didn't
+                                   and this should prove this. Please work :)
         ]])
       end)
 
