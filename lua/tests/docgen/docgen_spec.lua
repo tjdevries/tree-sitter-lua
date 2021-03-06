@@ -343,73 +343,46 @@ describe('docgen', function()
               See: ~
                   |x.bye()|]])
       end)
-
-      it('class should work', function()
-        check_function_output([[
-          local x = {}
-
-          --- This function has documentation
-          ---@param a string: hello
-          ---@return string: hello
-          ---@see x.bye
-          function x.hello(a)
-            return a
-          end
-
-          return x]], [[
-          x.hello({a})                                                       *x.hello()*
-              This function has documentation
-
-
-              Parameters: ~
-                  {a} (string)  hello
-
-              Return: ~
-                  string: hello
-
-              See: ~
-                  |x.bye()|]])
-      end)
     end)
   end)
 
   describe('class', function()
     describe('transform', function()
-     it('should get the nodes of a simple class', function()
-       local nodes = get_dedented_nodes [=[
-         ---@class TestMap @table
-       ]=]
-       eq({ classes = { ["TestMap"] = {
-         name = 'TestMap',
-         desc = 'table',
-       } } }, nodes)
-     end)
+      it('should get the nodes of a simple class', function()
+        local nodes = get_dedented_nodes [=[
+          ---@class TestMap @table
+        ]=]
+        eq({ classes = { ["TestMap"] = {
+          name = 'TestMap',
+          desc = { 'table' },
+        } } }, nodes)
+      end)
 
-     it('should get the nodes of a sub class', function()
-       local nodes = get_dedented_nodes [=[
-         ---@class TestArray : TestMap @Numeric table
-       ]=]
-       eq({ classes = { ["TestArray"] = {
-         name = 'TestArray',
-         parent = 'TestMap',
-         desc = 'Numeric table',
-       } } }, nodes)
-     end)
+      it('should get the nodes of a sub class', function()
+        local nodes = get_dedented_nodes [=[
+          ---@class TestArray : TestMap @Numeric table
+        ]=]
+        eq({ classes = { ["TestArray"] = {
+          name = 'TestArray',
+          parent = 'TestMap',
+          desc = { 'Numeric table' },
+        } } }, nodes)
+      end)
 
-     it('should get the nodes of a parent and sub class', function()
-       local nodes = get_dedented_nodes [=[
-         ---@class TestMap @table
-         ---@class TestArray : TestMap @Numeric table
-       ]=]
-       eq({ classes = { ["TestMap"] = {
-         name = 'TestMap',
-         desc = 'table',
-       }, ["TestArray"] = {
-         name = 'TestArray',
-         parent = 'TestMap',
-         desc = 'Numeric table',
-       } } }, nodes)
-     end)
+      it('should get the nodes of a parent and sub class', function()
+        local nodes = get_dedented_nodes [=[
+          ---@class TestMap @table
+          ---@class TestArray : TestMap @Numeric table
+        ]=]
+        eq({ classes = { ["TestMap"] = {
+          name = 'TestMap',
+          desc = { 'table' },
+        }, ["TestArray"] = {
+          name = 'TestArray',
+          parent = 'TestMap',
+          desc = { 'Numeric table' },
+        } } }, nodes)
+      end)
 
       it('should get the nodes of a parent and sub class', function()
         local nodes = get_dedented_nodes [=[
@@ -448,14 +421,15 @@ describe('docgen', function()
     end)
 
     describe('generate', function()
-     local function check_class_output(input, output, block)
-       local nodes = require('docgen').get_nodes(input)
-       local result = docgen_help.format(nodes)
-       block = block == nil and true or block
-       output = block and help_block(output) or ''
+      local function check_class_output(input, output, block)
+        local nodes = require('docgen').get_nodes(input)
+        local result = docgen_help.format(nodes)
+        block = block == nil and true or block
+        output = block and help_block(output) or ''
 
-       eq(vim.trim(output), vim.trim(result))
-     end
+        eq(vim.trim(output), vim.trim(result))
+      end
+
       it('should generate the documentation of a class', function()
         check_class_output([[
           ---@class TestMap @table
@@ -489,7 +463,7 @@ describe('docgen', function()
           TestMap                                                              *TestMap*
               table
         ]])
-      end)
+       end)
     end)
   end)
 end)

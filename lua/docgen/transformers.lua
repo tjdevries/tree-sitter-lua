@@ -38,6 +38,7 @@ transformers._function = function(accumulator, str, node)
     accumulator.functions = {}
   end
 
+  -- TODO(conni2461): HEY CONNI WE NEED TO MAKE SURE WE REMEMBER THE ORDER
   accumulator.functions[name] = {
     name = name,
     format = "function",
@@ -59,7 +60,34 @@ transformers.documentation_brief = function(accumulator, str, node)
   table.insert(accumulator.brief, result)
 end
 
--- TODO(conni2461): DO a documentation class
+transformers.documentation_class = function(accumulator, str, node)
+  if not accumulator.classes then
+    accumulator.classes = {}
+  end
+  -- TODO(conni2461): HEY WE ALSO NEED TO HANDLE ALL OTHER NAMED CHILDS.
+  -- FIRST CHILD WILL ALSO BE CLASS_NODE, ALL OTHERS ARE FIELDS.
+  -- DON'T FORGET TO WRITE TESTS
+  -- ALSO DID YOU KNOW THAT YOU NEED TO REMEMBER THE ORDER OR THE CLASSES.
+  -- NOT EVERYBODY WANTS SORTED THINGS
+  local class_node = node:named_child(0)
+
+  local type_node = class_node:named_child(0)
+  local parent_or_desc = class_node:named_child(1)
+  local desc_node = class_node:named_child(2)
+
+  local class = {}
+  local name = get_node_text(type_node, str)
+  class.name = name
+
+  if desc_node == nil then
+    class.desc = { get_node_text(parent_or_desc, str) }
+  else
+    class.parent = get_node_text(parent_or_desc, str)
+    class.desc = { get_node_text(desc_node, str) }
+  end
+
+  accumulator.classes[name] = class
+end
 
 transformers.documentation_tag = function(accumulator, str, node)
   accumulator.tag = get_node_text(node, str)
@@ -132,6 +160,8 @@ transformers.emmy_class = function(accumulator, str, node)
     class.desc = { get_node_text(desc_node, str) }
   end
 
+  -- TODO(conni2461): YOU DON'T NEED A CLASSES FOR EMMY_CLASS.
+  -- THERE IS ONLY ONE CLASS DEFINITION ON A FUNCTION
   accumulator.classes[name] = class
 
   if not vim.tbl_contains(accumulator.class_list, name) then
@@ -224,5 +254,6 @@ function transformers.emmy_eval(accumulator, str, node)
   end
 end
 
+-- TODO(conni2461): HERE SHOULD YOU HANDLE THE @CONFIG ANNOTATION
 
 return call_transformer
