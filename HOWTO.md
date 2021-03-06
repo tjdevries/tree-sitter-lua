@@ -86,7 +86,30 @@ This will result into this module header:
                                                                    *your_module*
 ```
 
+## Config
+
+You can configure docgen on file basis. For example you can define how `functions` or `classes`
+are sorted.
+
+```lua
+---@config { ['function_order'] = 'ascending', ['class_order'] = 'descending' }
+```
+
+Available keys value pairs are:
+- `function_order`:
+  - `file_order` (default)
+  - `ascending`
+  - `descending`
+  - If you have a typo it will do `file_order` sorting
+- `class_order`:
+  - `file_order` (default)
+  - `ascending`
+  - `descending`
+  - If you have a typo it will do `file_order` sorting
+
 ## Class
+
+<!----> TODO(conni2461): FINISH THIS HERE
 
 Output:
 

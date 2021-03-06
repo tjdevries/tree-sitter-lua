@@ -178,30 +178,116 @@ describe('docgen', function()
 
   describe('functions', function()
     describe('transform', function()
-      it('should get the nodes of a exported function', function()
+      it('should get the nodes of a simple exported function', function()
+        local nodes = get_dedented_nodes [[
+          local x = {}
+
+          --- This function has documentation
+          function x.hello()
+            return 5
+          end
+
+          return x
+        ]]
+        eq({
+          ["function_list"] = { "x.hello" },
+          functions = {
+            ["x.hello"] = {
+              ["class_list"] = {}, classes = {},
+              description = { "", "This function has documentation", "" },
+              ["field_list"] = {}, fields = {},
+              format = "function",
+              name = "x.hello",
+              ["parameter_list"] = {}, parameters = {}
+            }
+          }
+        }, nodes)
+      end)
+
+      it('should get the nodes of multiple simple functions', function()
+        local nodes = get_dedented_nodes [[
+          local x = {}
+
+          --- This function has documentation
+          function x.hello()
+            return 5
+          end
+
+          --- This function no documentation
+          function x.bye()
+            return 10
+          end
+
+          --- This function some documentation
+          function x.good_evening()
+            return 15
+          end
+
+          return x
+        ]]
+        eq({
+          ["function_list"] = { "x.hello", "x.bye", "x.good_evening" },
+          functions = {
+            ["x.hello"] = {
+              ["class_list"] = {}, classes = {},
+              description = { "", "This function has documentation", "" },
+              ["field_list"] = {}, fields = {},
+              format = "function",
+              name = "x.hello",
+              ["parameter_list"] = {}, parameters = {}
+            },
+            ["x.bye"] = {
+              ["class_list"] = {}, classes = {},
+              description = { "", "This function no documentation", "" },
+              ["field_list"] = {}, fields = {},
+              format = "function",
+              name = "x.bye",
+              ["parameter_list"] = {}, parameters = {}
+            },
+            ["x.good_evening"] = {
+              ["class_list"] = {}, classes = {},
+              description = { "", "This function some documentation", "" },
+              ["field_list"] = {}, fields = {},
+              format = "function",
+              name = "x.good_evening",
+              ["parameter_list"] = {}, parameters = {}
+            }
+          }
+        }, nodes)
+      end)
+
+      it('should get the nodes of a complex exported function', function()
         local nodes = get_dedented_nodes [[
           local x = {}
 
           --- This function has documentation
           ---@param abc string: Docs for abc
           ---@param def string: Other docs for def
-          ---@param bxy string: Final docs
+          ---@param bxy number: Final docs
           function x.hello(abc, def, bxy)
-            return abc .. def .. bxy
+            return abc .. def .. tostring(bxy)
           end
 
           return x
         ]]
-
-        local params = nodes.functions["x.hello"].parameters
-        eq({ 'abc', 'def', 'bxy' }, nodes.functions["x.hello"].parameter_list)
-        local param_names = {}
-        for k, _ in pairs(params) do param_names[k] = true end
         eq({
-          abc = true,
-          def = true,
-          bxy = true
-        }, param_names)
+          ["function_list"] = { "x.hello" },
+          functions = {
+            ["x.hello"] = {
+              ["class_list"] = {}, classes = {},
+              description = { "", "This function has documentation", "" },
+              ["field_list"] = {}, fields = {},
+              format = "function",
+              name = "x.hello",
+              ["parameter_list"] = { "abc", "def", "bxy" },
+              parameters = {
+                ["abc"] = { description = { "Docs for abc" }, name = "abc", type = "string" },
+                ["def"] = { description = { "Other docs for def" }, name = "def", type = "string" },
+                ["bxy"] = { description = { "Final docs" }, name = "bxy", type = "number" },
+              }
+            }
+          }
+        }, nodes)
       end)
     end)
 
@@ -226,6 +312,94 @@ describe('docgen', function()
           return x]], [[
           x.hello()                                                          *x.hello()*
               This function has documentation]])
+      end)
+
+      it('should export multiple functions in file order', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          function x.ba() return 5 end
+
+          --- This function other documentation
+          function x.cb() return 5 end
+
+          --- This function no documentation
+          function x.ac() return 5 end
+
+          return x]], [[
+            x.ba()                                                                *x.ba()*
+                This function has documentation
+
+
+
+            x.cb()                                                                *x.cb()*
+                This function other documentation
+
+
+
+            x.ac()                                                                *x.ac()*
+                This function no documentation]])
+      end)
+
+      it('should export multiple functions in ascending order', function()
+        check_function_output([[
+          ---@config { ['function_order'] = "ascending" }
+
+          local x = {}
+
+          --- This function has documentation
+          function x.b() return 5 end
+
+          --- This function other documentation
+          function x.c() return 5 end
+
+          --- This function no documentation
+          function x.a() return 5 end
+
+          return x]], [[
+            x.a()                                                                  *x.a()*
+                This function no documentation
+
+
+
+            x.b()                                                                  *x.b()*
+                This function has documentation
+
+
+
+            x.c()                                                                  *x.c()*
+                This function other documentation]])
+      end)
+
+      it('should export multiple functions in descending order', function()
+        check_function_output([[
+          ---@config { ['function_order'] = "descending" }
+
+          local x = {}
+
+          --- This function has documentation
+          function x.ba() return 5 end
+
+          --- This function other documentation
+          function x.cb() return 5 end
+
+          --- This function no documentation
+          function x.ac() return 5 end
+
+          return x]], [[
+            x.cb()                                                                *x.cb()*
+                This function other documentation
+
+
+
+            x.ba()                                                                *x.ba()*
+                This function has documentation
+
+
+
+            x.ac()                                                                *x.ac()*
+                This function no documentation]])
       end)
 
       it('should not export local function', function()
@@ -352,21 +526,55 @@ describe('docgen', function()
         local nodes = get_dedented_nodes [=[
           ---@class TestMap @table
         ]=]
-        eq({ classes = { ["TestMap"] = {
-          name = 'TestMap',
-          desc = { 'table' },
-        } } }, nodes)
+        eq({
+          classes = { ["TestMap"] = {
+            name = 'TestMap',
+            desc = { 'table' },
+            fields = {},
+            field_list = {}
+          } },
+          class_list = { 'TestMap' }
+        }, nodes)
+      end)
+
+      it('should get the fields of a simple class as well', function()
+        local nodes = get_dedented_nodes [=[
+          ---@class Array @number indexed starting at 1
+          ---@field count number: Always handy to have a count
+          ---@field type string: Imagine having a type for an array
+          ---@field begin function: It even has a begin()?! Is this cpp?
+          ---@field end function: It even has an end()?! Get out of here cpp!
+        ]=]
+        eq({
+          classes = { ["Array"] = {
+            name = 'Array',
+            desc = { 'number indexed starting at 1' },
+            fields = {
+              count = { description = { "Always handy to have a count" }, name = "count", type = "number", },
+              type = { description = { "Imagine having a type for an array" }, name = "type", type = "string", },
+              begin = { description = { "It even has a begin()?! Is this cpp?" }, name = "begin", type = "function", },
+              ["end"] = { description = { "It even has an end()?! Get out of here cpp!" }, name = "end", type = "function", },
+            },
+            field_list = { "count", "type", "begin", "end" },
+          } },
+          class_list = { 'Array' },
+        }, nodes)
       end)
 
       it('should get the nodes of a sub class', function()
         local nodes = get_dedented_nodes [=[
           ---@class TestArray : TestMap @Numeric table
         ]=]
-        eq({ classes = { ["TestArray"] = {
-          name = 'TestArray',
-          parent = 'TestMap',
-          desc = { 'Numeric table' },
-        } } }, nodes)
+        eq({
+          classes = { ["TestArray"] = {
+            name = 'TestArray',
+            parent = 'TestMap',
+            desc = { 'Numeric table' },
+            fields = {},
+            field_list = {}
+          } },
+          class_list = { "TestArray" },
+        }, nodes)
       end)
 
       it('should get the nodes of a parent and sub class', function()
@@ -374,16 +582,26 @@ describe('docgen', function()
           ---@class TestMap @table
           ---@class TestArray : TestMap @Numeric table
         ]=]
-        eq({ classes = { ["TestMap"] = {
-          name = 'TestMap',
-          desc = { 'table' },
-        }, ["TestArray"] = {
-          name = 'TestArray',
-          parent = 'TestMap',
-          desc = { 'Numeric table' },
-        } } }, nodes)
+        eq({
+          classes = {
+            ["TestMap"] = {
+                name = 'TestMap',
+                desc = { 'table' },
+                fields = {},
+                field_list = {}
+            }, ["TestArray"] = {
+              name = 'TestArray',
+              parent = 'TestMap',
+              desc = { 'Numeric table' },
+              fields = {},
+              field_list = {}
+            }
+          },
+          class_list = { 'TestMap', 'TestArray' }
+        }, nodes)
       end)
 
+      -- TODO(conni2461): MAYBE WE SHOULD DO MORE TESTING HERE
       it('should get the nodes of a parent and sub class', function()
         local nodes = get_dedented_nodes [=[
           local Job = {}
@@ -398,25 +616,25 @@ describe('docgen', function()
 
           return Job
         ]=]
-        eq({ functions = {
-          ["Job:new"] = {
-            classes = { Job =
-              { desc = { "desc" }, name = "Job" }
-            },
-            class_list = { "Job" },
-            description = { "", "HEADER", "" },
-            fields = { cmd = {
-              description = { "command" }, name = "cmd", type = "string",
-            } },
-            field_list = { "cmd" },
-            format = "function",
-            name = "Job:new",
-            parameter_list = { "o" },
-            parameters = { o = {
-              description = { "options" }, name = "o", type = "table"
-            } }
+        eq({
+          function_list = { 'Job:new' },
+          functions = {
+            ["Job:new"] = {
+              class = { desc = { "desc" }, name = "Job" },
+              description = { "", "HEADER", "" },
+              fields = {
+                cmd = { description = { "command" }, name = "cmd", type = "string", }
+              },
+              field_list = { "cmd" },
+              format = "function",
+              name = "Job:new",
+              parameter_list = { "o" },
+              parameters = {
+                o = { description = { "options" }, name = "o", type = "table" }
+              }
             }
-        } }, nodes)
+          },
+        }, nodes)
       end)
     end)
 
@@ -451,19 +669,74 @@ describe('docgen', function()
         ]])
       end)
 
-      it('should generate the documentation of multiple classes', function()
+      it('should generate the documentation of multiple classes in file order', function()
         check_class_output([[
           ---@class TestMap @table
           ---@class TestArray @array
         ]], [[
-          TestArray                                                          *TestArray*
-              array
-
-
           TestMap                                                              *TestMap*
               table
+
+
+          TestArray                                                          *TestArray*
+              array
         ]])
        end)
+
+      it('should generate the documentation of multiple classes in ascending order', function()
+        check_class_output([[
+          ---@config { ['class_order'] = 'ascending' }
+
+          ---@class B @desc
+          ---@class C @desc
+          ---@class A @desc
+        ]], [[
+            A                                                                          *A*
+                desc
+
+
+            B                                                                          *B*
+                desc
+
+
+            C                                                                          *C*
+                desc
+        ]])
+      end)
+
+      it('should generate the documentation of multiple classes in descending order', function()
+        check_class_output([[
+          ---@config { ['class_order'] = 'descending' }
+
+          ---@class Ba @desc
+          ---@class Cb @desc
+          ---@class Ac @desc
+        ]], [[
+            Cb                                                                        *Cb*
+                desc
+
+
+            Ba                                                                        *Ba*
+                desc
+
+
+            Ac                                                                        *Ac*
+                desc
+        ]])
+       end)
+    end)
+  end)
+
+  describe('config', function()
+    describe('transform', function()
+      it('should interpret config', function()
+        local nodes = get_dedented_nodes [=[
+          ---@config { ['function_order'] = "ascending" }
+        ]=]
+        eq({ config = {
+          ['function_order'] = "ascending"
+        }}, nodes)
+      end)
     end)
   end)
 end)

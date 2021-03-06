@@ -24,5 +24,9 @@
 )
 
 (
+ (documentation_config) @config
+)
+
+(
  (documentation_class) @class
 )

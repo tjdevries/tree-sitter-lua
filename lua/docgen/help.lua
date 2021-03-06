@@ -79,11 +79,15 @@ help.format = function(metadata)
   end
 
   -- Make classes
-  local metadata_classes = vim.tbl_keys(metadata.classes or {})
-  -- TODO(conni2461): NO don't u do this. Make a @config annotation for this right now!!!
-  -- TODO(conni2461): Thanks to lua table weirdness we need to save the order of the classes
-  -- as they are in the document. Same applies to functions
-  table.sort(metadata_classes)
+  local metadata_classes = vim.deepcopy(metadata.class_list or {})
+
+  if metadata.config then
+    if metadata.config.class_order == 'ascending' then
+      table.sort(metadata_classes)
+    elseif metadata.config.class_order == 'descending' then
+      table.sort(metadata_classes, function(a, b) return a > b end)
+    end
+  end
   for _, class_name in ipairs(metadata_classes) do
     local v = metadata.classes[class_name]
 
@@ -94,11 +98,16 @@ help.format = function(metadata)
     add()
   end
 
-  -- Make functions, always do them sorted.
-  local metadata_keys = vim.tbl_keys(metadata.functions or {})
+  -- Make functions
+  local metadata_keys = vim.deepcopy(metadata.function_list or {})
 
-  -- TODO(conni2461): NO don't u do this. Make a @config annotation for this right now!!!
-  table.sort(metadata_keys)
+  if metadata.config then
+    if metadata.config.function_order == 'ascending' then
+      table.sort(metadata_keys)
+    elseif metadata.config.function_order == 'descending' then
+      table.sort(metadata_keys, function(a, b) return a > b end)
+    end
+  end
   metadata_keys = vim.tbl_filter(function(func_name)
     if string.find(func_name, ".__", 1, true) then
       return false
@@ -158,7 +167,8 @@ help.format_class_metadata = function(class)
   end
 
   if class.fields then
-    print('HERE')
+    -- TODO(conni2461): SHOULD FORMAT FIELDS
+    -- print(vim.inspect(class.fields))
   end
 
   return doc
