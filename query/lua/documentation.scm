@@ -24,5 +24,5 @@
 )
 
 (
- (emmy_class) @class
+ (documentation_class) @class
 )

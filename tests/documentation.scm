@@ -1,3 +1,11 @@
+;;; Config
+; ---@config { ["FUNCTION_ORDER"] = "orig" }
+(program
+  (documentation_config
+    (tableconstructor
+      (fieldlist
+        (field (field_left_bracket) (string) (field_right_bracket) (string))))))
+
 ;;; Comments before function
 ; --  This is a comment
 ; function not_documented()
@@ -340,15 +348,29 @@
 ;;; Class comment
 ; ---@class Array @Numeric table
 (program
- (emmy_class (emmy_type (identifier)) (class_description))
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
 )
 
 ;;; Super class comment
 ; ---@class Map @table table
 ; ---@class Array : Map @Numeric table
 (program
- (emmy_class (emmy_type (identifier)) (class_description))
- (emmy_class (emmy_type (identifier)) (emmy_type (identifier)) (class_description))
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
+  (documentation_class (emmy_class (emmy_type (identifier)) (emmy_type (identifier)) (class_description)))
+)
+
+
+;;; Class with fields
+; ---@class sqlite @db connection
+;
+; ---@class Stmt @object to deal with sqlite statements
+; ---@field conn sqlite: connection to database
+(program
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
+  (documentation_class
+    (emmy_class (emmy_type (identifier)) (class_description))
+    (emmy_field (identifier) (emmy_type (identifier)) (field_description))
+  )
 )
 
 ;;; Real world class
@@ -394,7 +416,7 @@
 ; end
 (program
   (variable_declaration (local) (variable_declarator (identifier)) (tableconstructor))
-  (emmy_class (emmy_type (identifier)) (class_description))
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
   (function_statement
    (emmy_documentation
     (emmy_header)

@@ -59,9 +59,8 @@ module.exports = grammar({
                             $._statement,
                             $._documentation_brief_container,
                             $._documentation_tag_container,
-                            // TODO(conni2461): TO make this possible, which we should,
-                            // we need another container, because if not it will be picked up twice :(
-                            // $.emmy_class
+                            $._documentation_config_container,
+                            $.documentation_class
                         )
                     ),
                     optional(
@@ -481,6 +480,10 @@ module.exports = grammar({
         _documentation_tag_container: ($) =>
             prec.right(PREC.PROGRAM, seq(/\s*---@tag\s+/, $.documentation_tag)),
 
+        documentation_config: ($) => $._expression,
+        _documentation_config_container: ($) =>
+            prec.right(PREC.PROGRAM, seq(/\s*---@config\s+/, $.documentation_config)),
+
         documentation_brief: () => /[^\n]*/,
         _documentation_brief_container: ($) =>
             prec.right(
@@ -534,6 +537,12 @@ module.exports = grammar({
                 ),
                 /\n\s*/
           ),
+
+        documentation_class: ($) =>
+            prec.right(
+                PREC.PROGRAM,
+                seq($.emmy_class, any_amount_of($.emmy_field))
+            ),
 
         // Definition:
         // ---@param param_name MY_TYPE[|other_type] [@comment]

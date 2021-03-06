@@ -26,6 +26,14 @@
                     {
                       "type": "SYMBOL",
                       "name": "_documentation_tag_container"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_documentation_config_container"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "documentation_class"
                     }
                   ]
                 }
@@ -2080,6 +2088,27 @@
         ]
       }
     },
+    "documentation_config": {
+      "type": "SYMBOL",
+      "name": "_expression"
+    },
+    "_documentation_config_container": {
+      "type": "PREC_RIGHT",
+      "value": 16,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "\\s*---@config\\s+"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "documentation_config"
+          }
+        ]
+      }
+    },
     "documentation_brief": {
       "type": "PATTERN",
       "value": "[^\\n]*"
@@ -2281,6 +2310,31 @@
           "value": "\\n\\s*"
         }
       ]
+    },
+    "documentation_class": {
+      "type": "PREC_RIGHT",
+      "value": 16,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "emmy_class"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "emmy_field"
+                }
+              ]
+            }
+          }
+        ]
+      }
     },
     "emmy_parameter": {
       "type": "SEQ",

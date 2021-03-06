@@ -2,6 +2,8 @@ local TestJob = {}
 TestJob.__index = TestJob
 
 ---@class TestArray @Numeric table
+---@field len int: size
+
 ---@class TestMap @Map-like table
 
 --- Some docs for that class
