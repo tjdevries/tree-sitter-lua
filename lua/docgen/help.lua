@@ -23,31 +23,6 @@ local align_text = function(left, right, width)
   return string.format("%s%s%s", left, string.rep(" ", remaining), right)
 end
 
-local doc_wrap = function(text, opts)
-  opts = opts or {}
-
-  local prefix = opts.prefix or ''
-  local width = opts.width or 70
-  -- local is_func = opts.width or false
-  local indent = opts.indent
-
-  if not width then
-    return text
-  end
-
-  if indent == nil then
-    indent = string.rep(' ', #prefix)
-  end
-
-  -- local indent_only = (prefix == '') and (indent ~= nil)
-
-  -- if is_func then
-  --   return text
-  -- end
-
-  return utils.wrap(text, opts.width, indent, indent)
-end
-
 --- Format an entire generated metadata from |docgen|
 ---@param metadata table: The metadata from docgen
 help.format = function(metadata)
