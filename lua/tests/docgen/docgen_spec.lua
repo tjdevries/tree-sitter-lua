@@ -445,6 +445,27 @@ describe('docgen', function()
                   {bxy} (string)  Final docs]])
       end)
 
+      it('should work with long param', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          ---@param x string: This is some documentation for a pretty long param. This means that this description needs to be wrapped. Comon wrap.
+          function x.hello(abc, def, bxy)
+            return abc .. def .. bxy
+          end
+
+          return x]], [[
+          x.hello({x})                                                       *x.hello()*
+              This function has documentation
+
+
+              Parameters: ~
+                  {x} (string)  This is some documentation for a pretty long param. This
+                                means that this description needs to be wrapped. Comon
+                                wrap.]])
+      end)
+
       it('should work with return', function()
         check_function_output([[
           local x = {}
@@ -489,6 +510,33 @@ describe('docgen', function()
 
               See: ~
                   |x.bye()|]])
+      end)
+
+      it('should work with field', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          ---@param t table: some input table
+          ---@field k1 number: first key of input table
+          ---@field key function: second key of input table
+          ---@field key3 table: third key of input table
+          function x.hello(t)
+            return 0
+          end
+
+          return x]], [[
+          x.hello({t})                                                       *x.hello()*
+              This function has documentation
+
+
+              Parameters: ~
+                  {t} (table)  some input table
+
+              Fields: ~
+                  {k1}   (number)    first key of input table
+                  {key}  (function)  second key of input table
+                  {key3} (table)     third key of input table]])
       end)
 
       it('should work with see, param and return', function()
@@ -680,12 +728,12 @@ describe('docgen', function()
               number indexed starting at 1
 
               Fields: ~
-                  {count} (number) Always handy to have a count
-                  {type} (string) Imagine having a type for an array
-                  {begin} (function) It even has a begin()?! Is this cpp?
-                  {end} (function) It even has an end()?! Get out of here cpp! Oh by the
-                                   way did you know that fields are wrapping? I didn't
-                                   and this should prove this. Please work :)
+                  {count} (number)    Always handy to have a count
+                  {type}  (string)    Imagine having a type for an array
+                  {begin} (function)  It even has a begin()?! Is this cpp?
+                  {end}   (function)  It even has an end()?! Get out of here cpp! Oh by
+                                      the way did you know that fields are wrapping? I
+                                      didn't and this should prove this. Please work :)
         ]])
       end)
 
@@ -705,12 +753,12 @@ describe('docgen', function()
                   |Map|
 
               Fields: ~
-                  {count} (number) Always handy to have a count
-                  {type} (string) Imagine having a type for an array
-                  {begin} (function) It even has a begin()?! Is this cpp?
-                  {end} (function) It even has an end()?! Get out of here cpp! Oh by the
-                                   way did you know that fields are wrapping? I didn't
-                                   and this should prove this. Please work :)
+                  {count} (number)    Always handy to have a count
+                  {type}  (string)    Imagine having a type for an array
+                  {begin} (function)  It even has a begin()?! Is this cpp?
+                  {end}   (function)  It even has an end()?! Get out of here cpp! Oh by
+                                      the way did you know that fields are wrapping? I
+                                      didn't and this should prove this. Please work :)
         ]])
       end)
 

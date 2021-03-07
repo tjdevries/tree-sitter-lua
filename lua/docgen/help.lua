@@ -144,16 +144,53 @@ help.format_brief = function(brief_metadata)
   return render(brief_metadata, '', 79)
 end
 
-help.format_field = function(field, space_prefix)
-  local left_side = string.format("%s%s{%s} (%s) ",
+-- TODO(conni2461): Do we want some configuration for alignment?!
+help.__left_side_parameter_field = function(input, max_name_width, space_prefix)
+  local name = string.format("%s%s{%s} ",
     space_prefix,
     space_prefix,
-    field.name,
-    field.type
+    input.name
   )
-  local right_side = renderi(field.description, string.rep(' ', #left_side), 79)
+  local diff = max_name_width - #input.name
 
-  return left_side .. right_side .. '\n'
+  return string.format("%s%s(%s)  ", name, string.rep(' ', diff), input.type)
+end
+
+help.format_parameter_field = function(input, space_prefix, max_name_width, align_width)
+  local left_side = help.__left_side_parameter_field(input, max_name_width, space_prefix)
+  local right_side = renderi(input.description, string.rep(' ', align_width), 79)
+
+  local diff = align_width - #left_side
+  assert(diff >= 0, "Otherwise we have a big error somewhere in docgen")
+
+  return left_side .. string.rep(' ', diff) .. right_side .. '\n'
+end
+
+help.iter_parameter_field = function(input, list, name, space_prefix)
+  local output = ""
+  if list and table.getn(list) > 0 then
+    output = output .. "\n" .. space_prefix .. name .. ": ~" .. "\n"
+    local max_name_width = 0
+    for _, e in ipairs(list) do
+      local width = #input[e].name
+      if width > max_name_width then
+        max_name_width = width
+      end
+    end
+
+    local left_width = 0
+    for _, e in ipairs(list) do
+      local width = #(help.__left_side_parameter_field(input[e], max_name_width, space_prefix))
+      if width > left_width then
+        left_width = width
+      end
+    end
+
+    for _, e in ipairs(list) do
+      output = output .. help.format_parameter_field(input[e], space_prefix, max_name_width, left_width)
+    end
+  end
+  return output
 end
 
 help.format_class_metadata = function(class)
@@ -179,12 +216,12 @@ help.format_class_metadata = function(class)
     doc = doc .. string.format('%s%s|%s|\n', space_prefix, space_prefix, class.parent)
   end
 
-  if class.field_list and table.getn(class.field_list) > 0 then
-    doc = doc .. "\n" .. space_prefix .. "Fields: ~" .. "\n"
-    for _, field_name in ipairs(class.field_list) do
-      doc = doc .. help.format_field(class.fields[field_name], space_prefix)
-    end
-  end
+
+  doc = doc .. help.iter_parameter_field(class.fields,
+                                         class.field_list,
+                                         "Fields",
+                                         space_prefix
+                                        )
 
   return doc
 end
@@ -218,40 +255,21 @@ help.format_function_metadata = function(function_metadata)
   )
   doc = doc .. description .. "\n"
 
-  if not vim.tbl_isempty(function_metadata["parameters"]) then
-    -- TODO: This needs to handle strings that get wrapped.
+  -- TODO(conni2461): CLASS
 
-    local parameter_header = string.format("%sParameters: ~", space_prefix)
-    local parameter_docs = table.concat(
-      map(function(val)
-        -- TODO(conni2461): DID YOU HERE ABOUT RENDER?!
-        local param_prefix = string.format(
-          "%s    {%s} (%s)  ",
-          space_prefix,
-          function_metadata.parameters[val].name,
-          function_metadata.parameters[val].type
-        )
+  -- Handles parameter if used
+  doc = doc .. help.iter_parameter_field(function_metadata.parameters,
+                                         function_metadata.parameter_list,
+                                         "Parameters",
+                                         space_prefix
+                                        )
 
-        local empty_prefix = string.rep(" ", #param_prefix)
-
-        local result = ''
-        for i, v in ipairs(function_metadata.parameters[val].description) do
-          if i == 1 then
-            result = param_prefix .. v
-          else
-            result = result .. string.format("%s%s", empty_prefix, v)
-          end
-        end
-
-        return result
-      end, function_metadata.parameter_list),
-      "\n"
-    )
-
-    doc = doc .. "\n"
-    doc = doc .. parameter_header .. "\n"
-    doc = doc .. parameter_docs .. "\n"
-  end
+  -- Handle fields if used
+  doc = doc .. help.iter_parameter_field(function_metadata.fields,
+                                         function_metadata.field_list,
+                                         "Fields",
+                                         space_prefix
+                                        )
 
   local gen_misc_doc = function(identification, ins)
     if function_metadata[identification] then
@@ -260,21 +278,10 @@ help.format_function_metadata = function(function_metadata)
       if doc:sub(#doc, #doc) ~= '\n' then
         doc = doc .. '\n'
       end
-
-      doc = doc .. "\n"
-      doc = doc .. string.format("%s%s: ~", space_prefix, title) .. "\n"
-
-      local return_docs = table.concat(
-        map(function(val)
-          return doc_wrap(string.format(ins, val), {
-            prefix = space_prefix .. '    ',
-            width = 80,
-          })
-        end, function_metadata[identification]),
-        "\n"
-      )
-
-      doc = doc .. return_docs
+      doc = doc .. "\n" .. string.format("%s%s: ~", space_prefix, title) .. "\n"
+      for _, x in ipairs(function_metadata[identification]) do
+        doc = doc .. render({ string.format(ins, x) }, space_prefix .. space_prefix, 80) .. "\n"
+      end
     end
   end
 
