@@ -7,4 +7,9 @@ function x.hello(t)
   return t.name
 end
 
+--- Whats the node of this snippet
+x.bye = function()
+  return 5
+end
+
 return x
