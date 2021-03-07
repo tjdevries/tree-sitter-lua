@@ -228,10 +228,7 @@ function Text:is_empty()
          table.getn(self.enumerates) == 0
 end
 
-m.render = function(input, prefix, width)
-  assert(#prefix < width, "Please don't play games with me.")
-  assert(type(input) == 'table', "Input has to be a table")
-
+local get_text_from_input = function(input)
   local text = Text:new()
 
   for _, line in ipairs(vim.tbl_flatten(input)) do
@@ -239,6 +236,15 @@ m.render = function(input, prefix, width)
       text:handle_line(line)
     end
   end
+
+  return text
+end
+
+m.render = function(input, prefix, width)
+  assert(#prefix < width, "Please don't play games with me.")
+  assert(type(input) == 'table', "Input has to be a table")
+
+  local text = get_text_from_input(input)
 
   local output = {}
 
@@ -309,21 +315,15 @@ m.render = function(input, prefix, width)
   return table.concat(output, '\n')
 end
 
---- renderi is a paragraph only rendering and is used for prefix indentation,
+--- This is a paragraph only rendering and is used for prefix indentation,
 --- beginning second line.
 ---
 --- Used for parameters and field description
-m.renderi = function(input, prefix, width)
+m.render_without_first_line_prefix = function(input, prefix, width)
   assert(#prefix < width, "Please don't play games with me.")
   assert(type(input) == 'table', "Input has to be a table")
 
-  local text = Text:new()
-
-  for _, line in ipairs(vim.tbl_flatten(input)) do
-    if not text:is_empty() or line ~= '' then
-      text:handle_line(line)
-    end
-  end
+  local text = get_text_from_input(input)
 
   local output = {}
   for type, paragraph in text:iter() do

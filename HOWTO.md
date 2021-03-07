@@ -100,51 +100,20 @@ Available keys value pairs are:
   - `file_order` (default)
   - `ascending`
   - `descending`
+  - or it can accept a function. example: `function(tbl) table.sort(tbl, function(a, b) return a > b end) end`
   - If you have a typo it will do `file_order` sorting
 - `class_order`:
   - `file_order` (default)
   - `ascending`
   - `descending`
+  - or it can accept a function. example: `function(tbl) table.sort(tbl, function(a, b) return a > b end) end`
   - If you have a typo it will do `file_order` sorting
-<!----> TODO(conni2461): DO WE WANT THIS? IF YES IMPLEMENT IT
-<!-- - `field_order`: -->
-<!--   - `file_order` (default) -->
-<!--   - `ascending` -->
-<!--   - `descending` -->
-<!--   - If you have a typo it will do `file_order` sorting -->
-
-## Class
-
-You can define your own classes and types to give a better sense of the Input of another function.
-Another good usecase for this are structs defined by ffi.
-
-Input:
-
-```lua
----@class Array : Map @number indexed starting at 1
----@field count number: Always handy to have a count
----@field type string: Imagine having a type for an array
----@field begin function: It even has a begin()?! Is this cpp?
----@field end function: It even has an end()?! Get out of here cpp! Oh by the way did you know that fields are wrapping? I didn't and this should prove this.
-```
-
-Output:
-
-```
-Array : Map                                                            *Array*
-    number indexed starting at 1
-
-    Parents: ~
-        |Map|
-
-    Fields: ~
-        {count} (number)   Always handy to have a count
-        {type}  (string)   Imagine having a type for an array
-        {begin} (function) It even has a begin()?! Is this cpp?
-        {end}   (function) It even has an end()?! Get out of here cpp! Oh by
-                           the way did you know that fields are wrapping? I
-                           didn't and this should prove this.
-```
+- `field_order`:
+  - `file_order` (default)
+  - `ascending`
+  - `descending`
+  - or it can accept a function. example: `function(tbl) table.sort(tbl, function(a, b) return a > b end) end`
+  - If you have a typo it will do `file_order` sorting
 
 ## Function header
 
@@ -262,7 +231,7 @@ local math = {}
 ---@param a number: first number
 ---@param b number: second number
 ---@return number: bigger number
-math.max = function(a, b)
+function math.max = function(a, b)
   if a > b then
     return a
   end
@@ -294,12 +263,24 @@ Reference something else.
 ```lua
 local math = {}
 
+--- Will return the smaller number
+---@param a number: first number
+---@param b number: second number
+---@return number: smaller number
+---@see math.max
+function math.min(a, b)
+  if a < b then
+    return a
+  end
+  return b
+end
+
 --- Will return the bigger number
 ---@param a number: first number
 ---@param b number: second number
 ---@return number: bigger number
 ---@see math.min
-math.max = function(a, b)
+function math.max(a, b)
   if a > b then
     return a
   end
@@ -312,7 +293,21 @@ return math
 Output:
 
 ```
-math.max({a}, {b})                                     *math.load_extension()*
+math.min({a}, {b})                                               *math.min()*
+    Will return the smaller number
+
+
+    Parameters: ~
+        {a} (number)  first number
+        {b} (number)  second number
+
+    Return: ~
+        number: smaller number
+
+    See: ~
+        |x.max()|
+
+math.max({a}, {b})                                               *math.max()*
     Will return the bigger number
 
 
@@ -321,10 +316,68 @@ math.max({a}, {b})                                     *math.load_extension()*
         {b} (number)  second number
 
     Return: ~
-        table: bigger number
+        number: bigger number
 
     See: ~
-        |x.bye()|
+        |x.min()|
+```
+
+## Class
+
+You can define your own classes and types to give a better sense of the Input or Ouput of a function.
+Another good usecase for this are structs defined by ffi.
+
+This is a more complete (not functional) example where we define the documentation of the c struct
+`passwd` and return this struct with a function
+
+Input:
+
+```lua
+local m = {}
+
+---@class passwd @The passwd c struct
+---@field pw_name string: username
+---@field pw_name string: user password
+---@field pw_uid number: user id
+---@field pw_gid number: groupd id
+---@field pw_gecos string: user information
+---@field pw_dir string: user home directory
+---@field pw_shell string: user default shell
+
+--- Get user by id
+---@param id number: user id
+---@return passwd: returns a password table
+function m.get_user(id)
+  return ffi.C.getpwuid(id)
+end
+
+return m
+```
+
+Output:
+
+```
+passwd                                                                *passwd*
+    The passwd c struct
+
+    Fields: ~
+        {pw_name}  (string)  user password
+        {pw_uid}   (number)  user id
+        {pw_gid}   (number)  groupd id
+        {pw_gecos} (string)  user information
+        {pw_dir}   (string)  user home directory
+        {pw_shell} (string)  user default shell
+
+
+m.get_user({id})                                                *m.get_user()*
+    Get user by id
+
+
+    Parameters: ~
+        {id} (number)  user id
+
+    Return: ~
+        passwd: returns a password table
 ```
 
 ## Function class

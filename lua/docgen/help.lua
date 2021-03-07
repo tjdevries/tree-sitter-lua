@@ -1,7 +1,7 @@
 local log = require('docgen.log')
 local utils = require('docgen.utils')
 local render = require('docgen.renderer').render
-local renderi = require('docgen.renderer').renderi
+local render_without_first_line_prefix = require('docgen.renderer').render_without_first_line_prefix
 
 ---@brief [[
 --- All help formatting related utilties. Used to transform output from |docgen| into vim style documentation.
@@ -58,7 +58,9 @@ help.format = function(metadata)
   local metadata_classes = vim.deepcopy(metadata.class_list or {})
 
   if metadata.config then
-    if metadata.config.class_order == 'ascending' then
+    if type(metadata.config.class_order) == "function" then
+      metadata.config.class_order(metadata_classes)
+    elseif metadata.config.class_order == 'ascending' then
       table.sort(metadata_classes)
     elseif metadata.config.class_order == 'descending' then
       table.sort(metadata_classes, function(a, b) return a > b end)
@@ -67,7 +69,7 @@ help.format = function(metadata)
   for _, class_name in ipairs(metadata_classes) do
     local v = metadata.classes[class_name]
 
-    local result = help.format_class_metadata(v)
+    local result = help.format_class_metadata(v, metadata.config)
     if not result then error("Missing result") end
 
     add(result)
@@ -78,7 +80,9 @@ help.format = function(metadata)
   local metadata_keys = vim.deepcopy(metadata.function_list or {})
 
   if metadata.config then
-    if metadata.config.function_order == 'ascending' then
+    if type(metadata.config.function_order) == "function" then
+      metadata.config.function_order(metadata_keys)
+    elseif metadata.config.function_order == 'ascending' then
       table.sort(metadata_keys)
     elseif metadata.config.function_order == 'descending' then
       table.sort(metadata_keys, function(a, b) return a > b end)
@@ -103,7 +107,7 @@ help.format = function(metadata)
   for _, func_name in ipairs(metadata_keys) do
     local v = metadata.functions[func_name]
 
-    local result = help.format_function_metadata(v)
+    local result = help.format_function_metadata(v, config)
     if not result then error("Missing result") end
 
     add(result)
@@ -133,7 +137,7 @@ end
 
 help.format_parameter_field = function(input, space_prefix, max_name_width, align_width)
   local left_side = help.__left_side_parameter_field(input, max_name_width, space_prefix)
-  local right_side = renderi(input.description, string.rep(' ', align_width), 79)
+  local right_side = render_without_first_line_prefix(input.description, string.rep(' ', align_width), 79)
 
   local diff = align_width - #left_side
   assert(diff >= 0, "Otherwise we have a big error somewhere in docgen")
@@ -168,7 +172,7 @@ help.iter_parameter_field = function(input, list, name, space_prefix)
   return output
 end
 
-help.format_class_metadata = function(class)
+help.format_class_metadata = function(class, config)
   local space_prefix = string.rep(" ", 4)
 
   local doc = ""
@@ -191,7 +195,15 @@ help.format_class_metadata = function(class)
     doc = doc .. string.format('%s%s|%s|\n', space_prefix, space_prefix, class.parent)
   end
 
-
+  if config then
+    if type(config.field_order) == "function" then
+      config.field_order(class.field_list)
+    elseif config.field_order == 'ascending' then
+      table.sort(class.field_list)
+    elseif config.field_order == 'descending' then
+      table.sort(class.field_list, function(a, b) return a > b end)
+    end
+  end
   doc = doc .. help.iter_parameter_field(class.fields,
                                          class.field_list,
                                          "Fields",
@@ -201,7 +213,7 @@ help.format_class_metadata = function(class)
   return doc
 end
 
-help.format_function_metadata = function(function_metadata)
+help.format_function_metadata = function(function_metadata, config)
   local space_prefix = string.rep(" ", 4)
 
   local name = function_metadata.name
@@ -239,6 +251,15 @@ help.format_function_metadata = function(function_metadata)
                                          space_prefix
                                         )
 
+  if config then
+    if type(config.field_order) == "function" then
+      config.field_order(function_metadata.field_list)
+    elseif config.field_order == 'ascending' then
+      table.sort(function_metadata.field_list)
+    elseif config.field_order == 'descending' then
+      table.sort(function_metadata.field_list, function(a, b) return a > b end)
+    end
+  end
   -- Handle fields if used
   doc = doc .. help.iter_parameter_field(function_metadata.fields,
                                          function_metadata.field_list,

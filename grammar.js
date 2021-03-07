@@ -517,7 +517,7 @@ module.exports = grammar({
         //
         // Example:
         //
-        // ---@class transport @supper class
+        // ---@class transport @super class
         // ---@class car : transport @car class
         emmy_class: ($) =>
             seq(

@@ -314,6 +314,20 @@ describe('docgen', function()
               This function has documentation]])
       end)
 
+      it('should export this style as well function', function()
+        check_function_output([[
+          local x = {}
+
+          --- This function has documentation
+          x.hello = function()
+            return 5
+          end
+
+          return x]], [[
+          x.hello()                                                          *x.hello()*
+              This function has documentation]])
+      end)
+
       it('should export multiple functions in file order', function()
         check_function_output([[
           local x = {}
@@ -375,6 +389,36 @@ describe('docgen', function()
       it('should export multiple functions in descending order', function()
         check_function_output([[
           ---@config { ['function_order'] = "descending" }
+
+          local x = {}
+
+          --- This function has documentation
+          function x.ba() return 5 end
+
+          --- This function other documentation
+          function x.cb() return 5 end
+
+          --- This function no documentation
+          function x.ac() return 5 end
+
+          return x]], [[
+            x.cb()                                                                *x.cb()*
+                This function other documentation
+
+
+
+            x.ba()                                                                *x.ba()*
+                This function has documentation
+
+
+
+            x.ac()                                                                *x.ac()*
+                This function no documentation]])
+      end)
+
+      it('should export multiple functions in descending order', function()
+        check_function_output([[
+          ---@config { function_order = function(tbl) table.sort(tbl, function(a, b) return a > b end) end }
 
           local x = {}
 
@@ -737,6 +781,74 @@ describe('docgen', function()
         ]])
       end)
 
+      it('should generate the documentation of a class with fields ascending', function()
+        check_class_output([[
+          ---@config { field_order = 'ascending' }
+
+          ---@class Array @number indexed starting at 1
+          ---@field count number: Always handy to have a count
+          ---@field type string: Imagine having a type for an array
+          ---@field begin function: It even has a begin()?! Is this cpp?
+          ---@field end function: It even has an end()?! Get out of here cpp! Oh by the way did you know that fields are wrapping? I didn't and this should prove this. Please work :)
+        ]], [[
+          Array                                                                  *Array*
+              number indexed starting at 1
+
+              Fields: ~
+                  {begin} (function)  It even has a begin()?! Is this cpp?
+                  {count} (number)    Always handy to have a count
+                  {end}   (function)  It even has an end()?! Get out of here cpp! Oh by
+                                      the way did you know that fields are wrapping? I
+                                      didn't and this should prove this. Please work :)
+                  {type}  (string)    Imagine having a type for an array
+        ]])
+      end)
+
+      it('should generate the documentation of a class with fields descending', function()
+        check_class_output([[
+          ---@config { field_order = 'descending' }
+
+          ---@class Array @number indexed starting at 1
+          ---@field count number: Always handy to have a count
+          ---@field type string: Imagine having a type for an array
+          ---@field begin function: It even has a begin()?! Is this cpp?
+          ---@field end function: It even has an end()?! Get out of here cpp! Oh by the way did you know that fields are wrapping? I didn't and this should prove this. Please work :)
+        ]], [[
+          Array                                                                  *Array*
+              number indexed starting at 1
+
+              Fields: ~
+                  {type}  (string)    Imagine having a type for an array
+                  {end}   (function)  It even has an end()?! Get out of here cpp! Oh by
+                                      the way did you know that fields are wrapping? I
+                                      didn't and this should prove this. Please work :)
+                  {count} (number)    Always handy to have a count
+                  {begin} (function)  It even has a begin()?! Is this cpp?
+        ]])
+      end)
+
+      it('should generate the documentation of a class with fields with function', function()
+        check_class_output([[
+          ---@config { field_order = function(tbl) table.sort(tbl, function(a, b) return a > b end) end }
+
+          ---@class Array @number indexed starting at 1
+          ---@field count number: Always handy to have a count
+          ---@field type string: Imagine having a type for an array
+          ---@field begin function: It even has a begin()?! Is this cpp?
+          ---@field end function: It even has an end()?! Get out of here cpp! Oh by the way did you know that fields are wrapping? I didn't and this should prove this. Please work :)
+        ]], [[
+          Array                                                                  *Array*
+              number indexed starting at 1
+
+              Fields: ~
+                  {type}  (string)    Imagine having a type for an array
+                  {end}   (function)  It even has an end()?! Get out of here cpp! Oh by
+                                      the way did you know that fields are wrapping? I
+                                      didn't and this should prove this. Please work :)
+                  {count} (number)    Always handy to have a count
+                  {begin} (function)  It even has a begin()?! Is this cpp?
+        ]])
+      end)
 
       it('should generate the documentation of a sub class with fields', function()
         check_class_output([[
@@ -818,6 +930,27 @@ describe('docgen', function()
         ]])
       end)
 
+      it('should generate the documentation of multiple classes with function', function()
+        check_class_output([[
+          ---@config { class_order = function(tbl) table.sort(tbl, function(a, b) return a > b end) end }
+
+          ---@class Ba @desc
+          ---@class Cb @desc
+          ---@class Ac @desc
+        ]], [[
+            Cb                                                                        *Cb*
+                desc
+
+
+            Ba                                                                        *Ba*
+                desc
+
+
+            Ac                                                                        *Ac*
+                desc
+        ]])
+      end)
+
       -- TODO(conni2461): What are we generating here?!
       -- Does field describe the input table or the class
       it('should be able to generate function class', function()
@@ -843,6 +976,50 @@ describe('docgen', function()
 
               Fields: ~
                   {cmd} (string)  command]])
+      end)
+
+      it('works with a complex but complete example', function()
+        check_class_output([[
+          local m = {}
+
+          ---@class passwd @The passwd c struct
+          ---@field pw_name string: username
+          ---@field pw_name string: user password
+          ---@field pw_uid number: user id
+          ---@field pw_gid number: groupd id
+          ---@field pw_gecos string: user information
+          ---@field pw_dir string: user home directory
+          ---@field pw_shell string: user default shell
+
+          --- Get user by id
+          ---@param id number: user id
+          ---@return passwd: returns a password table
+          function m.get_user(id)
+            return ffi.C.getpwuid(id)
+          end
+
+          return m]], [[
+            passwd                                                                *passwd*
+                The passwd c struct
+
+                Fields: ~
+                    {pw_name}  (string)  user password
+                    {pw_uid}   (number)  user id
+                    {pw_gid}   (number)  groupd id
+                    {pw_gecos} (string)  user information
+                    {pw_dir}   (string)  user home directory
+                    {pw_shell} (string)  user default shell
+
+
+            m.get_user({id})                                                *m.get_user()*
+                Get user by id
+
+
+                Parameters: ~
+                    {id} (number)  user id
+
+                Return: ~
+                    passwd: returns a password table]])
       end)
     end)
   end)
