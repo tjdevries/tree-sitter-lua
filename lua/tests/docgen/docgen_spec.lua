@@ -816,7 +816,34 @@ describe('docgen', function()
             Ac                                                                        *Ac*
                 desc
         ]])
-       end)
+      end)
+
+      -- TODO(conni2461): What are we generating here?!
+      -- Does field describe the input table or the class
+      it('should be able to generate function class', function()
+        check_class_output([[
+          local Job = {}
+
+          --- HEADER
+          ---@class Job @desc
+          ---@field cmd string: command
+          ---@param o table: options
+          function Job:new(o)
+            return setmetatable(o, self)
+          end
+
+          return Job
+        ]], [[
+          Job:new({o})                                                       *Job:new()*
+              HEADER
+
+
+              Parameters: ~
+                  {o} (table)  options
+
+              Fields: ~
+                  {cmd} (string)  command]])
+      end)
     end)
   end)
 

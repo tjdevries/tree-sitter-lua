@@ -106,12 +106,12 @@ Available keys value pairs are:
   - `ascending`
   - `descending`
   - If you have a typo it will do `file_order` sorting
-  <!----> TODO(conni2461): DO WE WANT THIS? IF YES IMPLEMENT IT
-- `field_order`:
-  - `file_order` (default)
-  - `ascending`
-  - `descending`
-  - If you have a typo it will do `file_order` sorting
+<!----> TODO(conni2461): DO WE WANT THIS? IF YES IMPLEMENT IT
+<!-- - `field_order`: -->
+<!--   - `file_order` (default) -->
+<!--   - `ascending` -->
+<!--   - `descending` -->
+<!--   - If you have a typo it will do `file_order` sorting -->
 
 ## Class
 
@@ -138,12 +138,12 @@ Array : Map                                                            *Array*
         |Map|
 
     Fields: ~
-        {count} (number) Always handy to have a count
-        {type} (string) Imagine having a type for an array
+        {count} (number)   Always handy to have a count
+        {type}  (string)   Imagine having a type for an array
         {begin} (function) It even has a begin()?! Is this cpp?
-        {end} (function) It even has an end()?! Get out of here cpp! Oh by the
-                         way did you know that fields are wrapping? I didn't
-                         and this should prove this.
+        {end}   (function) It even has an end()?! Get out of here cpp! Oh by
+                           the way did you know that fields are wrapping? I
+                           didn't and this should prove this.
 ```
 
 ## Function header
@@ -216,6 +216,41 @@ math.max({a}, {b})                                     *math.load_extension()*
         {b} (number)  second number
 ```
 
+## Field
+
+Can be used to describe a parameter table.
+
+```lua
+local x = {}
+
+--- This function has documentation
+---@param t table: some input table
+---@field k1 number: first key of input table
+---@field key function: second key of input table
+---@field key3 table: third key of input table
+function x.hello(t)
+  return 0
+end
+
+return x
+```
+
+Output:
+
+```
+x.hello({t})                                                       *x.hello()*
+    This function has documentation
+
+
+    Parameters: ~
+        {t} (table)  some input table
+
+    Fields: ~
+        {k1}   (number)    first key of input table
+        {key}  (function)  second key of input table
+        {key3} (table)     third key of input table
+```
+
 ## Return
 
 You can specify a return parameter with `---@return type: desc`
@@ -251,6 +286,50 @@ math.max({a}, {b})                                     *math.load_extension()*
     Return: ~
         table: bigger number
 ```
+
+## See
+
+Reference something else.
+
+```lua
+local math = {}
+
+--- Will return the bigger number
+---@param a number: first number
+---@param b number: second number
+---@return number: bigger number
+---@see math.min
+math.max = function(a, b)
+  if a > b then
+    return a
+  end
+  return b
+end
+
+return math
+```
+
+Output:
+
+```
+math.max({a}, {b})                                     *math.load_extension()*
+    Will return the bigger number
+
+
+    Parameters: ~
+        {a} (number)  first number
+        {b} (number)  second number
+
+    Return: ~
+        table: bigger number
+
+    See: ~
+        |x.bye()|
+```
+
+## Function class
+
+WIP
 
 ## Eval
 
