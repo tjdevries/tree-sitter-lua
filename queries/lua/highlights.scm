@@ -133,6 +133,7 @@
 
 (emmy_header) @comment
 (emmy_ignore) @comment
+(documentation_brief) @comment
 
 (function_call
   [
