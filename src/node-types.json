@@ -68,11 +68,6 @@
     "fields": {}
   },
   {
-    "type": "class_description",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "comment",
     "named": true,
     "fields": {}
@@ -142,127 +137,9 @@
     "fields": {}
   },
   {
-    "type": "documentation_class",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "emmy_class",
-          "named": true
-        },
-        {
-          "type": "emmy_field",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "documentation_config",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "binary_operation",
-          "named": true
-        },
-        {
-          "type": "boolean",
-          "named": true
-        },
-        {
-          "type": "ellipsis",
-          "named": true
-        },
-        {
-          "type": "function",
-          "named": true
-        },
-        {
-          "type": "function_call",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "left_paren",
-          "named": true
-        },
-        {
-          "type": "nil",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "right_paren",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tableconstructor",
-          "named": true
-        },
-        {
-          "type": "unary_operation",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "documentation_tag",
     "named": true,
     "fields": {}
-  },
-  {
-    "type": "emmy_class",
-    "named": true,
-    "fields": {
-      "description": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "class_description",
-            "named": true
-          }
-        ]
-      },
-      "parent": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "emmy_type",
-            "named": true
-          }
-        ]
-      },
-      "type": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "emmy_type",
-            "named": true
-          }
-        ]
-      }
-    }
   },
   {
     "type": "emmy_documentation",
@@ -273,15 +150,7 @@
       "required": true,
       "types": [
         {
-          "type": "emmy_class",
-          "named": true
-        },
-        {
           "type": "emmy_eval",
-          "named": true
-        },
-        {
-          "type": "emmy_field",
           "named": true
         },
         {
@@ -380,42 +249,6 @@
           "named": true
         }
       ]
-    }
-  },
-  {
-    "type": "emmy_field",
-    "named": true,
-    "fields": {
-      "description": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "field_description",
-            "named": true
-          }
-        ]
-      },
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
-      "type": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "emmy_type",
-            "named": true
-          }
-        ]
-      }
     }
   },
   {
@@ -749,11 +582,6 @@
         ]
       }
     }
-  },
-  {
-    "type": "field_description",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "field_left_bracket",
@@ -1799,14 +1627,6 @@
         },
         {
           "type": "documentation_brief",
-          "named": true
-        },
-        {
-          "type": "documentation_class",
-          "named": true
-        },
-        {
-          "type": "documentation_config",
           "named": true
         },
         {

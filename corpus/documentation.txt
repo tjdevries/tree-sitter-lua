@@ -538,8 +538,23 @@ Multiline params
 ==================
 
 --- Get the diagnostics by line
----@param opts table|nil: Configuration keys
+---@param opts table: Configuration keys
 ---             - severity: (DiagnosticSeverity, default nil)
-function M.get_line_diagnostics(bufnr, line_nr, opts, client_id)
+---             - another line. please work.
+---@param last number: Last param
+function M.f()
 end
-)
+
+---
+
+(program
+ (function_statement
+  (emmy_documentation
+   (emmy_header)
+   (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description))
+   (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description)))
+   (function_start)
+   (function_name (identifier) (table_dot) (identifier))
+   (function_body_paren)
+   (function_body_paren)
+   (function_end)))
