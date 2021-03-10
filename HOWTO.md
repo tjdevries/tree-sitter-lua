@@ -36,11 +36,13 @@ Brief is used to describe a module. This is an example input:
 --- </pre>
 ---
 ---@brief ]]
-```
-
-Example output:
 
 ```
+
+Output:
+
+```
+================================================================================
 This will document a module and will be found at the top of each file. It uses
 an internal markdown renderer so you don't need to worry about formatting. It
 will wrap the lines into one paragraph and will make sure that the max line
@@ -70,31 +72,39 @@ We also support itemize and enumerate
 You can disable formatting with a
 pre block.
 This is useful if you want to draw a table or write some code
+
+
+
+
 ```
 
-## tag
+## Tag
 
 Add a tag to your module. This is suggested:
 
 ```lua
 ---@tag your_module
+
 ```
 
-This will result into this module header:
+Output:
+
 ```
 ================================================================================
                                                                    *your_module*
+
+
+
 ```
 
 ## Config
 
-You can configure docgen on file basis. For example you can define how `functions` or `classes`
-are sorted.
+You can configure docgen on file basis. For example you can define how `functions` or `classes` are sorted.
 
 ```lua
 ---@config { ['function_order'] = 'ascending', ['class_order'] = 'descending' }
-```
 
+```
 Available keys value pairs are:
 - `function_order`:
   - `file_order` (default)
@@ -115,9 +125,10 @@ Available keys value pairs are:
   - or it can accept a function. example: `function(tbl) table.sort(tbl, function(a, b) return a > b end) end`
   - If you have a typo it will do `file_order` sorting
 
-## Function header
+## Function Header
 
 You can describe your functions.
+
 Note: We will only generate documentation for functions that are exported with the module.
 
 ```lua
@@ -142,15 +153,22 @@ m.actual_func = function()
 end
 
 return m
+
 ```
 
 Output:
 
 ```
+================================================================================
 m.actual_func()                                              *m.actual_func()*
     The documentation for this function will be generated. The markdown
     renderer will be used again.
-    With the same set of features.
+    With the same set of features
+
+
+
+
+
 ```
 
 ## Parameter
@@ -171,18 +189,24 @@ math.max = function(a, b)
 end
 
 return math
+
 ```
 
 Output:
 
 ```
-math.max({a}, {b})                                     *math.load_extension()*
+================================================================================
+math.max({a}, {b})                                                *math.max()*
     Will return the bigger number
 
 
     Parameters: ~
         {a} (number)  first number
         {b} (number)  second number
+
+
+
+
 ```
 
 ## Field
@@ -202,11 +226,13 @@ function x.hello(t)
 end
 
 return x
+
 ```
 
 Output:
 
 ```
+================================================================================
 x.hello({t})                                                       *x.hello()*
     This function has documentation
 
@@ -218,6 +244,10 @@ x.hello({t})                                                       *x.hello()*
         {k1}   (number)    first key of input table
         {key}  (function)  second key of input table
         {key3} (table)     third key of input table
+
+
+
+
 ```
 
 ## Return
@@ -239,12 +269,14 @@ function math.max = function(a, b)
 end
 
 return math
+
 ```
 
 Output:
 
 ```
-math.max({a}, {b})                                     *math.load_extension()*
+================================================================================
+math.max({a}, {b})                                                *math.max()*
     Will return the bigger number
 
 
@@ -253,7 +285,11 @@ math.max({a}, {b})                                     *math.load_extension()*
         {b} (number)  second number
 
     Return: ~
-        table: bigger number
+        number: bigger number
+
+
+
+
 ```
 
 ## See
@@ -288,12 +324,14 @@ function math.max(a, b)
 end
 
 return math
+
 ```
 
 Output:
 
 ```
-math.min({a}, {b})                                               *math.min()*
+================================================================================
+math.min({a}, {b})                                                *math.min()*
     Will return the smaller number
 
 
@@ -305,9 +343,10 @@ math.min({a}, {b})                                               *math.min()*
         number: smaller number
 
     See: ~
-        |x.max()|
+        |math.max()|
 
-math.max({a}, {b})                                               *math.max()*
+
+math.max({a}, {b})                                                *math.max()*
     Will return the bigger number
 
 
@@ -319,7 +358,11 @@ math.max({a}, {b})                                               *math.max()*
         number: bigger number
 
     See: ~
-        |x.min()|
+        |math.min()|
+
+
+
+
 ```
 
 ## Class
@@ -328,16 +371,14 @@ You can define your own classes and types to give a better sense of the Input or
 Another good usecase for this are structs defined by ffi.
 
 This is a more complete (not functional) example where we define the documentation of the c struct
-`passwd` and return this struct with a function
-
-Input:
+`passwd` and return this struct with a function.
 
 ```lua
 local m = {}
 
 ---@class passwd @The passwd c struct
 ---@field pw_name string: username
----@field pw_name string: user password
+---@field pw_passwd string: user password
 ---@field pw_uid number: user id
 ---@field pw_gid number: groupd id
 ---@field pw_gecos string: user information
@@ -352,21 +393,24 @@ function m.get_user(id)
 end
 
 return m
+
 ```
 
 Output:
 
 ```
+================================================================================
 passwd                                                                *passwd*
     The passwd c struct
 
     Fields: ~
-        {pw_name}  (string)  user password
-        {pw_uid}   (number)  user id
-        {pw_gid}   (number)  groupd id
-        {pw_gecos} (string)  user information
-        {pw_dir}   (string)  user home directory
-        {pw_shell} (string)  user default shell
+        {pw_name}   (string)  username
+        {pw_passwd} (string)  user password
+        {pw_uid}    (number)  user id
+        {pw_gid}    (number)  groupd id
+        {pw_gecos}  (string)  user information
+        {pw_dir}    (string)  user home directory
+        {pw_shell}  (string)  user default shell
 
 
 m.get_user({id})                                                *m.get_user()*
@@ -378,16 +422,17 @@ m.get_user({id})                                                *m.get_user()*
 
     Return: ~
         passwd: returns a password table
+
+
+
+
 ```
-
-## Function class
-
-WIP
 
 ## Eval
 
 You can evaluate arbitrary code. For example if you have a static table you can
 do generate a table that will be part of the `description` output.
+
 
 ```lua
 local m = {}
@@ -407,7 +452,7 @@ local static_values = {
   'd',
 }
 
-m.__format_keys()
+m.__format_keys = function()
   -- we want to do formatting
   local table = { '<pre>', 'Static Values: ~' }
 
@@ -420,11 +465,13 @@ m.__format_keys()
 end
 
 return m
+
 ```
 
 Output:
 
 ```
+================================================================================
 m.actual_func()                                              *m.actual_func()*
     The documentation for this function will be generated. The markdown
     renderer will be used again.
@@ -436,3 +483,4 @@ m.actual_func()                                              *m.actual_func()*
         c
         d
 ```
+
