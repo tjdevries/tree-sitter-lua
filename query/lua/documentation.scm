@@ -1,5 +1,4 @@
 (
-
  [
   (variable_declaration
     documentation: (emmy_documentation) @func
@@ -10,9 +9,9 @@
     name: (function_name (identifier) @name)) @doc
  ]
 
-
  (module_return_statement (identifier) @exported)
- (#eq? @exported @name))
+ (#eq? @exported @name)
+)
 
 ; Get the briefs for the module
 (

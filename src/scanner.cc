@@ -5,6 +5,8 @@
 #include <cwctype>
 #include "tree_sitter/parser.h"
 
+#define WHILE_LINE(lexer, block) while(lexer->lookahead != '\n' && lexer->lookahead != '\0') block
+
 namespace {
 
   using std::iswspace;
@@ -12,10 +14,12 @@ namespace {
   enum TokenType {
     MULTI_COMMENT,
     MULTI_STRING,
+    MULTI_EMMY,
   };
 
   struct Scanner {
     static void skip(TSLexer *lexer) { lexer->advance(lexer, true); }
+    static void skip_whitespace(TSLexer *lexer) { while (iswspace(lexer->lookahead)) { skip(lexer); } }
 
     static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
@@ -101,7 +105,7 @@ namespace {
         }
 
         // Try to make a short literal string with single quote
-        if (lexer->lookahead == '\'') {
+        if (valid_symbols[MULTI_STRING] && lexer->lookahead == '\'') {
           lexer->result_symbol = MULTI_STRING;
 
           // Consume first appearance of '\''
@@ -138,7 +142,7 @@ namespace {
         }
 
         // Try to make a short literal string with double quote
-        else if (lexer->lookahead == '"') {
+        else if (valid_symbols[MULTI_STRING] && lexer->lookahead == '"') {
           lexer->result_symbol = MULTI_STRING;
 
           // Consume first appearance of '"'
@@ -205,9 +209,52 @@ namespace {
 
           return true;
         }
-
-        return false;
       }
+
+      if (valid_symbols[MULTI_EMMY]) {
+        lexer->result_symbol = MULTI_EMMY;
+
+        skip_whitespace(lexer);
+
+        // Always grab the first line.
+        WHILE_LINE(lexer, {
+          advance(lexer);
+        })
+
+        // Grab the end of line.
+        if (lexer->lookahead == '\n') {
+          advance(lexer);
+          lexer->mark_end(lexer);
+        }
+
+        // Skip any preceding whitespace.
+        skip_whitespace(lexer);
+
+        while (lexer->lookahead == '-') {
+          // Don't consume any of the --- at the start of the line. Just skip it.
+          while (lexer->lookahead == '-') {
+            skip(lexer);
+          }
+
+          // This would have mean that we actually found another directive.
+          //    This means we're done and we'll use the last end that we marked.
+          if (lexer->lookahead == '@') {
+            break;
+          }
+
+          WHILE_LINE(lexer, { advance(lexer); })
+          if (lexer->lookahead != '\0') { advance(lexer); }
+
+          // We've advanced as far as we're confident.
+          //    We will check again after this.
+          lexer->mark_end(lexer);
+
+          if (lexer->lookahead == '\n') { break; }
+        }
+
+        return true;
+      }
+
 
       return false;
     }

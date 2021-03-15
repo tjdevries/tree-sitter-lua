@@ -51,15 +51,8 @@
 ;;; Declare local function, error
 ; local function t.x() return 5 end
 (program
- (function_statement
-  (local)
-  (function_start)
-  (identifier)
-  (ERROR (UNEXPECTED 'x'))
-  (function_body_paren)
-  (function_body_paren)
-  (return_statement (number))
-  (function_end)))
+  (ERROR
+  (function_start) (identifier)))
 
 ;;; Declare function with an argument
 ; function f(x) end
@@ -79,8 +72,7 @@
   (function_start)
   (function_name (identifier))
   (function_body_paren)
-  (parameter_list (identifier))
-  (ERROR)
+  (parameter_list (identifier) (MISSING identifier))
   (function_body_paren)
   (function_end)))
 

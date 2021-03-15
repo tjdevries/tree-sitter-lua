@@ -251,10 +251,6 @@
       "type": "PATTERN",
       "value": "[0-9]+"
     },
-    "_inner_string": {
-      "type": "PATTERN",
-      "value": "[a-zA-Z0-9_ ]+"
-    },
     "ellipsis": {
       "type": "STRING",
       "value": "..."
@@ -1178,7 +1174,7 @@
         "members": [
           {
             "type": "STRING",
-            "value": "return"
+            "value": "return "
           },
           {
             "type": "CHOICE",
@@ -2206,8 +2202,8 @@
           }
         },
         {
-          "type": "STRING",
-          "value": ","
+          "type": "PATTERN",
+          "value": "\\s*,\\s*"
         },
         {
           "type": "FIELD",
@@ -2304,10 +2300,6 @@
               "type": "BLANK"
             }
           ]
-        },
-        {
-          "type": "PATTERN",
-          "value": "\\n\\s*"
         }
       ]
     },
@@ -2404,10 +2396,6 @@
               "type": "BLANK"
             }
           ]
-        },
-        {
-          "type": "PATTERN",
-          "value": "\\n\\s*"
         }
       ]
     },
@@ -2479,53 +2467,28 @@
               "type": "BLANK"
             }
           ]
-        },
-        {
-          "type": "PATTERN",
-          "value": "\\n\\s*"
         }
       ]
     },
-    "_multiline_emmy_string": {
-      "type": "PREC_RIGHT",
-      "value": 2,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "PATTERN",
-            "value": "[^\\n]+"
-          },
-          {
-            "type": "REPEAT",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "\\s*---[^\\n]*"
-                }
-              ]
-            }
-          }
-        ]
-      }
+    "_single_line": {
+      "type": "PATTERN",
+      "value": "[^\\n]*"
     },
     "class_description": {
       "type": "SYMBOL",
-      "name": "_multiline_emmy_string"
+      "name": "_multi_emmy"
     },
     "field_description": {
       "type": "SYMBOL",
-      "name": "_multiline_emmy_string"
+      "name": "_multi_emmy"
     },
     "parameter_description": {
       "type": "SYMBOL",
-      "name": "_multiline_emmy_string"
+      "name": "_multi_emmy"
     },
     "emmy_return_description": {
-      "type": "PATTERN",
-      "value": "[^\\n]*"
+      "type": "SYMBOL",
+      "name": "_multi_emmy"
     },
     "emmy_return": {
       "type": "SEQ",
@@ -2564,12 +2527,20 @@
           }
         },
         {
-          "type": "FIELD",
-          "name": "description",
-          "content": {
-            "type": "SYMBOL",
-            "name": "emmy_return_description"
-          }
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "description",
+              "content": {
+                "type": "SYMBOL",
+                "name": "emmy_return_description"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
@@ -2725,7 +2696,7 @@
             },
             {
               "type": "PATTERN",
-              "value": "[^-].*\\r?\\n"
+              "value": ".*\\n"
             }
           ]
         },
@@ -2769,6 +2740,10 @@
     {
       "type": "SYMBOL",
       "name": "string"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_multi_emmy"
     }
   ],
   "inline": [

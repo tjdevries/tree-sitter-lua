@@ -1,7 +1,4 @@
-ts := $(shell which tree-sitter 2> /dev/null)
-ifeq (, ${ts})
-	ts := $(shell which tree-sitter-cli 2> /dev/null)
-endif
+ts := ./node_modules/tree-sitter-cli/tree-sitter
 
 generate:
 	${ts} generate
@@ -19,7 +16,7 @@ test_docgen: generate
 		--headless \
 		--noplugin \
 		-u tests/minimal_init.vim \
-		-c "PlenaryBustedDirectory lua/tests/ {minimal_init = 'tests/minimal_init.vim'}"
+		-c "PlenaryBustedDirectory lua/tests/docgen {minimal_init = 'tests/minimal_init.vim'}"
 
 build_parser: generate
 	mkdir -p build

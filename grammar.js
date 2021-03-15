@@ -25,12 +25,10 @@ const PREC = {
     PROGRAM: 16,
 };
 
-EQUALS_LEVELS = 5;
-
 module.exports = grammar({
     name: "lua",
 
-    externals: ($) => [$._multi_comment, $.string],
+    externals: ($) => [$._multi_comment, $.string, $._multi_emmy],
 
     extras: ($) => [/[\s\n]/, /\s/, $.comment],
 
@@ -83,7 +81,6 @@ module.exports = grammar({
                         $.if_statement,
                         $.for_statement,
                         $.function_statement
-                        // $.comment
                     ),
                     optional(";")
                 )
@@ -115,21 +112,8 @@ module.exports = grammar({
 
         // Primitives {{{
         nil: (_) => "nil",
-
         boolean: (_) => choice("true", "false"),
-
         number: (_) => /[0-9]+/,
-
-        _inner_string: (_) => /[a-zA-Z0-9_ ]+/,
-
-        // string: ($) => prec.left($.multi_string),
-        // basic_string_style("'"),
-        // basic_string_style('"'),
-
-        // ...[...Array(EQUALS_LEVELS).keys()].map((level) =>
-        //     lua_string_level(level)
-        // )
-
         ellipsis: (_) => "...",
 
         function_name: ($) =>
@@ -274,7 +258,7 @@ module.exports = grammar({
         return_statement: ($) =>
             prec(
                 PREC.PRIORITY,
-                seq("return", optional(list_of($._expression, ",")))
+                seq("return ", optional(list_of($._expression, ",")))
             ),
 
         break_statement: (_) => "break",
@@ -482,7 +466,10 @@ module.exports = grammar({
 
         documentation_config: ($) => $._expression,
         _documentation_config_container: ($) =>
-            prec.right(PREC.PROGRAM, seq(/\s*---@config\s+/, $.documentation_config)),
+            prec.right(
+                PREC.PROGRAM,
+                seq(/\s*---@config\s+/, $.documentation_config)
+            ),
 
         documentation_brief: () => /[^\n]*/,
         _documentation_brief_container: ($) =>
@@ -501,12 +488,12 @@ module.exports = grammar({
 
         emmy_type_list: ($) => seq(field("type", $.emmy_type), "[]"),
         emmy_type_map: ($) =>
-            seq(
-                "table<",
-                field("key", $.emmy_type),
-                ",",
-                field("value", $.emmy_type),
-                ">"
+                seq(
+                    "table<",
+                    field("key", $.emmy_type),
+                    /\s*,\s*/,
+                    field("value", $.emmy_type),
+                    ">"
             ),
 
         emmy_type: ($) =>
@@ -523,20 +510,11 @@ module.exports = grammar({
             seq(
                 /\s*---@class\s+/,
                 field("type", $.emmy_type),
+                optional(seq(/\s*:\s*/, field("parent", $.emmy_type))),
                 optional(
-                    seq(
-                        /\s*:\s*/,
-                        field("parent", $.emmy_type)
-                    ),
-                ),
-                optional(
-                    seq(
-                        /\s*@\s*/,
-                        field("description", $.class_description)
-                    )
-                ),
-                /\n\s*/
-          ),
+                    seq(/\s*@\s*/, field("description", $.class_description))
+                )
+            ),
 
         documentation_class: ($) =>
             prec.right(
@@ -564,8 +542,7 @@ module.exports = grammar({
                         /\s*:\s*/,
                         field("description", $.parameter_description)
                     )
-                ),
-                /\n\s*/
+                )
             ),
 
         // Definition:
@@ -583,29 +560,16 @@ module.exports = grammar({
 
                 // TODO: How closely should we be to emmy...
                 optional(
-                    seq(
-                        /\s*:\s*/,
-                        field("description", $.field_description)
-                    )
-                ),
-                /\n\s*/
+                    seq(/\s*:\s*/, field("description", $.field_description))
+                )
             ),
 
-        _multiline_emmy_string: ($) =>
-            prec.right(
-                PREC.PRIORITY,
-                seq(/[^\n]+/, any_amount_of(/\s*---[^\n]*/))
-                // seq(/[^\n]*/, any_amount_of(/\n\s*---[^\n]*/))
-            ),
+        _single_line: (_) => /[^\n]*/,
 
-        class_description: ($) => $._multiline_emmy_string,
-        field_description: ($) => $._multiline_emmy_string,
-
-        // TODO(conni2461): Pretty sure that doesn't work as expected
-        parameter_description: ($) => $._multiline_emmy_string,
-
-        emmy_return_description: ($) => $._multiline_emmy_string,
-        emmy_return_description: ($) => /[^\n]*/,
+        class_description: ($) => $._multi_emmy,
+        field_description: ($) => $._multi_emmy,
+        parameter_description: ($) => $._multi_emmy,
+        emmy_return_description: ($) => $._multi_emmy,
 
         emmy_return: ($) =>
             seq(
@@ -613,7 +577,7 @@ module.exports = grammar({
                 field("type", list_of($.emmy_type, "|")),
                 // field("description", optional($.emmy_return_description))
                 // field("description", optional(/[^\n]+/))
-                field("description", $.emmy_return_description)
+                optional(field("description", $.emmy_return_description))
             ),
 
         emmy_eval: ($) => $._expression,
@@ -648,7 +612,8 @@ module.exports = grammar({
         // }}}
 
         // Comments {{{
-        comment: ($) => choice(seq("--", /[^-].*\r?\n/), $._multi_comment),
+        comment: ($) => choice(seq("--", /.*\n/), $._multi_comment),
+        // comment: ($) => choice(seq("--", /[^-].*\r?\n/), $._multi_comment),
         // }}}
     },
 });

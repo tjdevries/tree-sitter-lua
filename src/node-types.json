@@ -460,7 +460,7 @@
     "fields": {
       "description": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "emmy_return_description",
@@ -2616,7 +2616,7 @@
     "named": true
   },
   {
-    "type": "return",
+    "type": "return ",
     "named": false
   },
   {
