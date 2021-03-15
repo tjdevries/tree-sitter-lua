@@ -22,3 +22,11 @@
 (
  (documentation_tag) @tag
 )
+
+(
+ (documentation_config) @config
+)
+
+(
+ (documentation_class) @class
+)

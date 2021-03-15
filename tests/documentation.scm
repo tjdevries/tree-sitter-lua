@@ -1,3 +1,11 @@
+;;; Config
+; ---@config { ["FUNCTION_ORDER"] = "orig" }
+(program
+  (documentation_config
+    (tableconstructor
+      (fieldlist
+        (field (field_left_bracket) (string) (field_right_bracket) (string))))))
+
 ;;; Comments before function
 ; --  This is a comment
 ; function not_documented()
@@ -288,7 +296,7 @@
 ;;; Multiple params
 ;
 ; local x = {}
-; 
+;
 ; --- This function has documentation
 ; ---@param abc string: Docs for abc
 ;   ---@param def string: Other docs for def
@@ -296,7 +304,7 @@
 ; function x.hello(abc, def, bxy)
 ;   return abc .. def .. bxy
 ; end
-; 
+;
 ; return x
 (program
  (variable_declaration (local) (variable_declarator (identifier)) (tableconstructor))
@@ -315,6 +323,117 @@
    (binary_operation (identifier) (binary_operation (identifier) (identifier))))
   (function_end))
  (module_return_statement (identifier)))
+
+;;; Field
+; --- This function has documentation
+; ---@param t table: Some table
+; ---@field name string: name
+; function M.hello(t)
+;   return t.name
+; end
+(program
+ (function_statement
+  (emmy_documentation
+   (emmy_header)
+   (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description))
+   (emmy_field (identifier) (emmy_type (identifier)) (field_description)))
+  (function_start)
+  (function_name (identifier) (table_dot) (identifier))
+  (function_body_paren)
+  (parameter_list (identifier))
+  (function_body_paren)
+  (return_statement (identifier) (identifier))
+  (function_end)))
+
+;;; Class comment
+; ---@class Array @Numeric table
+(program
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
+)
+
+;;; Super class comment
+; ---@class Map @table table
+; ---@class Array : Map @Numeric table
+(program
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
+  (documentation_class (emmy_class (emmy_type (identifier)) (emmy_type (identifier)) (class_description)))
+)
+
+
+;;; Class with fields
+; ---@class sqlite @db connection
+;
+; ---@class Stmt @object to deal with sqlite statements
+; ---@field conn sqlite: connection to database
+(program
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
+  (documentation_class
+    (emmy_class (emmy_type (identifier)) (class_description))
+    (emmy_field (identifier) (emmy_type (identifier)) (field_description))
+  )
+)
+
+;;; Real world class
+; local Job = {}
+; --- HEADER
+; ---@class Job @desc
+; ---@field cmd string: comamnd
+; ---@param o table: options
+; function Job:new(o)
+;   return setmetatable({}, self)
+; end
+(program
+  (variable_declaration (local) (variable_declarator (identifier)) (tableconstructor))
+  (function_statement
+   (emmy_documentation
+    (emmy_header)
+    (emmy_class (emmy_type (identifier)) (class_description))
+    (emmy_field (identifier) (emmy_type (identifier)) (field_description))
+    (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description)))
+   (function_start)
+   (function_name (identifier) (table_colon) (identifier))
+   (function_body_paren)
+   (parameter_list (identifier))
+   (function_body_paren)
+   (return_statement
+    (function_call (identifier) (function_call_paren)
+     (function_arguments (tableconstructor) (identifier))
+   (function_call_paren)))
+  (function_end))
+)
+
+;;; Using classes as types
+; local Job = {}
+;
+; ---@class Map @table lie
+;
+; --- HEADER
+; ---@class Job @desc
+; ---@field cmd string: comamnd
+; ---@param o table: options
+; function Job:new(o)
+;   return setmetatable(o, self)
+; end
+(program
+  (variable_declaration (local) (variable_declarator (identifier)) (tableconstructor))
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
+  (function_statement
+   (emmy_documentation
+    (emmy_header)
+    (emmy_class (emmy_type (identifier)) (class_description))
+    (emmy_field (identifier) (emmy_type (identifier)) (field_description))
+    (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description)))
+   (function_start)
+   (function_name (identifier) (table_colon) (identifier))
+   (function_body_paren)
+   (parameter_list (identifier))
+   (function_body_paren)
+   (return_statement
+    (function_call (identifier) (function_call_paren)
+     (function_arguments (identifier) (identifier))
+   (function_call_paren)))
+  (function_end))
+)
 
 ;;; Multiline params
 ; --- Get the diagnostics by line

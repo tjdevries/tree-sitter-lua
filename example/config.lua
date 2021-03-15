@@ -1,0 +1,1 @@
+---@config { ['function_order'] = 'ascending', ['class_order'] = 'descending' }

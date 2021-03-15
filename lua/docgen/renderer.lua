@@ -228,9 +228,7 @@ function Text:is_empty()
          table.getn(self.enumerates) == 0
 end
 
-m.render = function(input, prefix, width)
-  assert(#prefix < width, "Please don't play games with me.")
-
+local get_text_from_input = function(input)
   local text = Text:new()
 
   for _, line in ipairs(vim.tbl_flatten(input)) do
@@ -238,6 +236,15 @@ m.render = function(input, prefix, width)
       text:handle_line(line)
     end
   end
+
+  return text
+end
+
+m.render = function(input, prefix, width)
+  assert(#prefix < width, "Please don't play games with me.")
+  assert(type(input) == 'table', "Input has to be a table")
+
+  local text = get_text_from_input(input)
 
   local output = {}
 
@@ -303,6 +310,41 @@ m.render = function(input, prefix, width)
       end
     else
       text:error()
+    end
+  end
+  return table.concat(output, '\n')
+end
+
+--- This is a paragraph only rendering and is used for prefix indentation,
+--- beginning second line.
+---
+--- Used for parameters and field description
+m.render_without_first_line_prefix = function(input, prefix, width)
+  assert(#prefix < width, "Please don't play games with me.")
+  assert(type(input) == 'table', "Input has to be a table")
+
+  local text = get_text_from_input(input)
+
+  local output = {}
+  for type, paragraph in text:iter() do
+    if type == states.PARAGRAPH then
+      local line = ""
+      for _, word in ipairs(vim.split(paragraph, ' ')) do
+        local inner_width = width
+        if table.getn(output) == 0 then
+          inner_width = inner_width - #prefix
+        end
+        if #append(line, word) <= inner_width then
+          line = append(line, word)
+        else
+          table.insert(output, line)
+          line = prefix .. word
+        end
+      end
+      if line:match('^%s+$') then line = '' end
+      table.insert(output, line)
+    else
+      error("Didn't i said paragraph only?! Read the friendly manual")
     end
   end
   return table.concat(output, '\n')

@@ -37,11 +37,15 @@ transformers._function = function(accumulator, str, node)
   if not accumulator.functions then
     accumulator.functions = {}
   end
+  if not accumulator.function_list then
+    accumulator.function_list = {}
+  end
 
   accumulator.functions[name] = {
     name = name,
     format = "function",
   }
+  table.insert(accumulator.function_list, name)
   call_transformer(accumulator.functions[name], str, documentation_node)
 end
 
@@ -59,6 +63,43 @@ transformers.documentation_brief = function(accumulator, str, node)
   table.insert(accumulator.brief, result)
 end
 
+transformers.documentation_class = function(accumulator, str, node)
+  if not accumulator.classes then
+    accumulator.classes = {}
+  end
+  if not accumulator.class_list then
+    accumulator.class_list = {}
+  end
+
+  local class_node = node:named_child(0)
+
+  local type_node = class_node:named_child(0)
+  local parent_or_desc = class_node:named_child(1)
+  local desc_node = class_node:named_child(2)
+
+  local class = {}
+  local name = get_node_text(type_node, str)
+  class.name = name
+
+  if desc_node == nil then
+    class.desc = { get_node_text(parent_or_desc, str) }
+  else
+    class.parent = get_node_text(parent_or_desc, str)
+    class.desc = { get_node_text(desc_node, str) }
+  end
+
+  class.fields = {}
+  class.field_list = {}
+
+  local named_children_count = node:named_child_count()
+  for child = 1, named_children_count - 1 do
+    transformers.emmy_field(class, str, node:named_child(child))
+  end
+
+  accumulator.classes[name] = class
+  table.insert(accumulator.class_list, name)
+end
+
 transformers.documentation_tag = function(accumulator, str, node)
   accumulator.tag = get_node_text(node, str)
 end
@@ -67,6 +108,11 @@ transformers.function_statement = transformers._function
 transformers.variable_declaration = transformers._function
 
 transformers.emmy_documentation = function(accumulator, str, node)
+  accumulator.class = {}
+
+  accumulator.fields = {}
+  accumulator.field_list = {}
+
   accumulator.parameters = {}
   accumulator.parameter_list = {}
 
@@ -108,6 +154,42 @@ transformers.emmy_comment = function(accumulator, str, node)
   end
 end
 
+transformers.emmy_class = function(accumulator, str, node)
+  local type_node = node:named_child(0)
+  local parent_or_desc = node:named_child(1)
+  local desc_node = node:named_child(2)
+
+  local name = get_node_text(type_node, str)
+  accumulator.class.name = name
+
+  if desc_node == nil then
+    accumulator.class.desc = { get_node_text(parent_or_desc, str) }
+  else
+    accumulator.class.parent = get_node_text(parent_or_desc, str)
+    accumulator.class.desc = { get_node_text(desc_node, str) }
+  end
+end
+
+transformers.emmy_field = function(accumulator, str, node)
+  local name_node = node:named_child(0)
+  assert(name_node, "Field must have a name")
+
+  local type_node = node:named_child(1)
+  local desc_node = node:named_child(2)
+
+  local name = get_node_text(name_node, str)
+
+  accumulator.fields[name] = {
+    name = name,
+    type = get_node_text(type_node, str),
+    description = {get_node_text(desc_node, str)},
+  }
+
+  if not vim.tbl_contains(accumulator.field_list, name) then
+    table.insert(accumulator.field_list, name)
+  end
+end
+
 transformers.emmy_parameter = function(accumulator, str, node)
   local name_node = node:named_child(0)
   assert(name_node, "Parameters must have a name")
@@ -135,7 +217,7 @@ local create_emmy_type_function = function(identifier)
       accumulator[identifier] = {}
     end
 
-    local text = get_node_text(node, str)
+    local text = vim.trim(get_node_text(node, str))
     text = text:gsub(string.format('---@%s ', identifier), '')
 
     table.insert(accumulator[identifier], text)
@@ -148,8 +230,7 @@ transformers.emmy_todo = create_emmy_type_function('todo')
 transformers.emmy_usage = create_emmy_type_function('usage')
 transformers.emmy_varargs = create_emmy_type_function('varargs')
 
---- transformers.emmy_eval = function(accumulator, str, node)
-function transformers.emmy_eval(accumulator, str, node)
+transformers.emmy_eval = function(accumulator, str, node)
   local ok, result = pcall(loadstring('return ' .. get_node_text(node, str)))
 
   if ok then
@@ -173,5 +254,20 @@ function transformers.emmy_eval(accumulator, str, node)
   end
 end
 
+transformers.documentation_config = function(accumulator, str, node)
+  local ok, result = pcall(loadstring('return ' .. get_node_text(node, str)))
+
+  if ok then
+    if type(result) == 'table' then
+      if not accumulator then
+        accumulator = {}
+      end
+
+      accumulator["config"] = result
+    end
+  else
+    print("ERR:", result)
+  end
+end
 
 return call_transformer

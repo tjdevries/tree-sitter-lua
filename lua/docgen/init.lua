@@ -83,6 +83,8 @@ function docgen.get_nodes(contents)
     function_statement = true,
     documentation_brief = true,
     documentation_tag = true,
+    documentation_config = true,
+    documentation_class = true
   }
 
   return docgen.transform_nodes(contents, query_name, toplevel_types)
