@@ -558,3 +558,63 @@ end
    (function_body_paren)
    (function_body_paren)
    (function_end)))
+
+==================
+Single line params from Conni
+==================
+
+local x = {}
+
+--- This function has documentation
+---@param abc string: Docs for abc
+---@param def string: Other docs for def
+---@param bxy string: Final docs
+function x.hello(abc, def, bxy)
+  return abc .. def .. bxy
+end
+
+return x
+
+---
+
+(program 
+  (variable_declaration 
+    (local) 
+    (variable_declarator 
+      (identifier)) 
+    (tableconstructor)) 
+  (function_statement 
+    (emmy_documentation 
+      (emmy_header) 
+      (emmy_parameter
+        (identifier)
+        (emmy_type (identifier)) 
+        (parameter_description)) 
+      (emmy_parameter 
+        (identifier) 
+        (emmy_type (identifier)) 
+        (parameter_description)) 
+      (emmy_parameter 
+        (identifier) 
+        (emmy_type (identifier)) 
+        (parameter_description))) 
+    (function_start) 
+    (function_name 
+      (identifier) 
+      (table_dot) 
+      (identifier)) 
+    (function_body_paren) 
+    (parameter_list 
+      (identifier) 
+      (identifier) 
+      (identifier)) 
+    (function_body_paren) 
+    (return_statement 
+      (binary_operation 
+        (identifier) 
+        (binary_operation 
+          (identifier) 
+          (identifier)))) 
+    (function_end)) 
+  (module_return_statement 
+    (identifier)))

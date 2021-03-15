@@ -243,10 +243,6 @@
       "type": "PATTERN",
       "value": "[0-9]+"
     },
-    "_inner_string": {
-      "type": "PATTERN",
-      "value": "[a-zA-Z0-9_ ]+"
-    },
     "ellipsis": {
       "type": "STRING",
       "value": "..."
@@ -1170,7 +1166,7 @@
         "members": [
           {
             "type": "STRING",
-            "value": "return"
+            "value": "return "
           },
           {
             "type": "CHOICE",
@@ -2480,7 +2476,7 @@
             },
             {
               "type": "PATTERN",
-              "value": "[^-].*\\r?\\n"
+              "value": ".*\\n"
             }
           ]
         },

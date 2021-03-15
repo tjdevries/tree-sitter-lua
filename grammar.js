@@ -25,8 +25,6 @@ const PREC = {
     PROGRAM: 16,
 };
 
-EQUALS_LEVELS = 5;
-
 module.exports = grammar({
     name: "lua",
 
@@ -81,7 +79,6 @@ module.exports = grammar({
                         $.if_statement,
                         $.for_statement,
                         $.function_statement
-                        // $.comment
                     ),
                     optional(";")
                 )
@@ -113,21 +110,8 @@ module.exports = grammar({
 
         // Primitives {{{
         nil: (_) => "nil",
-
         boolean: (_) => choice("true", "false"),
-
         number: (_) => /[0-9]+/,
-
-        _inner_string: (_) => /[a-zA-Z0-9_ ]+/,
-
-        // string: ($) => prec.left($.multi_string),
-        // basic_string_style("'"),
-        // basic_string_style('"'),
-
-        // ...[...Array(EQUALS_LEVELS).keys()].map((level) =>
-        //     lua_string_level(level)
-        // )
-
         ellipsis: (_) => "...",
 
         function_name: ($) =>
@@ -272,7 +256,7 @@ module.exports = grammar({
         return_statement: ($) =>
             prec(
                 PREC.PRIORITY,
-                seq("return", optional(list_of($._expression, ",")))
+                seq("return ", optional(list_of($._expression, ",")))
             ),
 
         break_statement: (_) => "break",
@@ -573,7 +557,7 @@ module.exports = grammar({
         // }}}
 
         // Comments {{{
-        comment: ($) => choice(seq("--", /[^-].*\r?\n/), $._multi_comment),
+        comment: ($) => choice(seq("--", /.*\n/), $._multi_comment),
         // }}}
     },
 });

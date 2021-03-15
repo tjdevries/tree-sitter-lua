@@ -12,7 +12,6 @@ local render_without_first_line_prefix = require('docgen.renderer').render_witho
 local help = {}
 
 local map = vim.tbl_map
-local values = vim.tbl_values
 
 local align_text = function(left, right, width)
   left = left or ''

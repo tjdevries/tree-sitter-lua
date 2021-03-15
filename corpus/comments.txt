@@ -46,3 +46,20 @@ more
 ---
 
 (program (comment))
+
+==================
+Can do comments with strings inside
+==================
+
+-- local description = table.concat(
+--   map(function(val)
+--     if val == '' then return '\n' end
+--     return val
+--   end, function_metadata.description or {}),
+--   ' '
+-- )
+-- print(vim.inspect(function_metadata.description))
+
+---
+
+(program (comment) (comment) (comment) (comment) (comment) (comment) (comment) (comment))

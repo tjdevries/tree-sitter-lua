@@ -16,7 +16,7 @@ test_docgen: generate
 		--headless \
 		--noplugin \
 		-u tests/minimal_init.vim \
-		-c "PlenaryBustedDirectory lua/tests/ {minimal_init = 'tests/minimal_init.vim'}"
+		-c "PlenaryBustedDirectory lua/tests/docgen {minimal_init = 'tests/minimal_init.vim'}"
 
 build_parser: generate
 	mkdir -p build

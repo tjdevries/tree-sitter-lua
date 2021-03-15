@@ -28,7 +28,6 @@ local docgen = {}
 docgen.debug = false
 
 function docgen._get_query_text(query_name)
-
   return read(vim.api.nvim_get_runtime_file(
     string.format('query/lua/%s.scm', query_name), false
   )[1])
@@ -42,7 +41,11 @@ end
 
 --- Get the string parser for some contents
 function docgen.get_parser(contents)
-  return vim.treesitter.get_string_parser(contents, "lua")
+  return vim.treesitter.get_string_parser(contents, "lua", {
+    queries = {
+      lua = ""
+    }
+  })
 end
 
 --- Run {cb} on each node from contents and query
