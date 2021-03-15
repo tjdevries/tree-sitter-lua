@@ -402,10 +402,58 @@
   (function_end))
 )
 
-;;; Using classes as types
+
+;;; Only a class
+; ---@class Map @table lie
+(program (documentation_class (emmy_class (emmy_type (identifier)) (class_description))))
+
+;;; Class with variable
 ; local Job = {}
 ;
 ; ---@class Map @table lie
+(program
+ (variable_declaration (local) (variable_declarator (identifier)) (tableconstructor))
+ (documentation_class (emmy_class (emmy_type (identifier)) (class_description))))
+
+;;; Class as part of header
+; local Job = {}
+;
+; --- HEADER
+; ---@class Job @desc
+; ---@field cmd string: comamnd
+; ---@param o table: options
+; function Job:new(o)
+;   return setmetatable(o, self)
+; end
+(program 
+  (variable_declaration 
+    (local) (variable_declarator (identifier)) (tableconstructor)) 
+  (function_statement 
+    (emmy_documentation 
+      (emmy_header) 
+      (emmy_class (emmy_type (identifier)) (class_description)) 
+      (emmy_field (identifier) (emmy_type (identifier)) (field_description)) 
+      (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description))) 
+    (function_start) 
+    (function_name (identifier) (table_colon) (identifier)) 
+    (function_body_paren) 
+    (parameter_list (identifier)) 
+    (function_body_paren) 
+    (return_statement 
+      (function_call 
+        (identifier) 
+        (function_call_paren) 
+        (function_arguments 
+          (identifier) 
+          (identifier)) 
+        (function_call_paren))) 
+    (function_end)))
+
+;;; Using classes as types
+;
+; ---@class Map @table lie
+;
+; local Job = {}
 ;
 ; --- HEADER
 ; ---@class Job @desc
@@ -415,8 +463,8 @@
 ;   return setmetatable(o, self)
 ; end
 (program
-  (variable_declaration (local) (variable_declarator (identifier)) (tableconstructor))
   (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
+  (variable_declaration (local) (variable_declarator (identifier)) (tableconstructor))
   (function_statement
    (emmy_documentation
     (emmy_header)

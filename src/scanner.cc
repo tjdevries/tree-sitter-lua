@@ -248,6 +248,8 @@ namespace {
           // We've advanced as far as we're confident.
           //    We will check again after this.
           lexer->mark_end(lexer);
+
+          if (lexer->lookahead == '\n') { break; }
         }
 
         return true;
