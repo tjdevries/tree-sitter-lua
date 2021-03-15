@@ -1,7 +1,4 @@
-ts := $(shell which tree-sitter 2> /dev/null)
-ifeq (, ${ts})
-	ts := $(shell which tree-sitter-cli 2> /dev/null)
-endif
+ts := ./node_modules/tree-sitter-cli/tree-sitter
 
 generate:
 	${ts} generate
