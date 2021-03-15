@@ -56,7 +56,9 @@ module.exports = grammar({
                         choice(
                             $._statement,
                             $._documentation_brief_container,
-                            $._documentation_tag_container
+                            $._documentation_tag_container,
+                            $._documentation_config_container,
+                            $.documentation_class,
                         )
                     ),
                     optional(
@@ -462,6 +464,10 @@ module.exports = grammar({
         _documentation_tag_container: ($) =>
             prec.right(PREC.PROGRAM, seq(/\s*---@tag\s+/, $.documentation_tag)),
 
+        documentation_config: ($) => $._expression,
+        _documentation_config_container: ($) =>
+            prec.right(PREC.PROGRAM, seq(/\s*---@config\s+/, $.documentation_config)),
+
         documentation_brief: () => /[^\n]*/,
         _documentation_brief_container: ($) =>
             prec.right(
@@ -491,6 +497,39 @@ module.exports = grammar({
             choice($.emmy_type_map, $.emmy_type_list, $.identifier),
 
         // Definition:
+        // ---@class MY_TYPE[:PARENT_TYPE] [@comment]
+        //
+        // Example:
+        //
+        // ---@class transport @super class
+        // ---@class car : transport @car class
+        emmy_class: ($) =>
+            seq(
+                /\s*---@class\s+/,
+                field("type", $.emmy_type),
+                optional(
+                    seq(
+                        /\s*:\s*/,
+                        field("parent", $.emmy_type)
+                    ),
+                ),
+                optional(
+                    seq(
+                        /\s*@\s*/,
+                        field("description", $.class_description)
+                    )
+                ),
+                /\n\s*/
+          ),
+
+        documentation_class: ($) =>
+            prec.right(
+                PREC.PROGRAM,
+                seq($.emmy_class, any_amount_of($.emmy_field))
+            ),
+
+
+        // Definition:
         // ---@param param_name MY_TYPE[|other_type] [@comment]
         //
         // I don't think this is needed (read this as: I hate it)
@@ -510,13 +549,37 @@ module.exports = grammar({
                         /\s*:\s*/,
                         field("description", $.parameter_description)
                     )
-                )
+                ),
+                /\n\s*/
             ),
 
-        parameter_description: ($) => $._multi_emmy,
+        // Definition:
+        // ---@field [public|protected|private] field_name MY_TYPE[|other_type] [@comment]
+        //
+        // I don't think [public|protected|private] is useful for us.
+        //
+        // ---@field example table hello
+        // ---@field example (table): hello
+        emmy_field: ($) =>
+            seq(
+                /\s*---@field\s+/,
+                field("name", $.identifier),
+                field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
+                // TODO: How closely should we be to emmy...
+                optional(
+                    seq(
+                        /\s*:\s*/,
+                        field("description", $.field_description)
+                    )
+                ),
+                /\n\s*/
+            ),
+
+        class_description: ($) => $._multi_emmy,
+        field_description: ($) => $._multi_emmy,
+        parameter_description: ($) => $._multi_emmy,
         emmy_return_description: ($) => $._multi_emmy,
-        emmy_return_description: ($) => /[^\n]*/,
 
         emmy_return: ($) =>
             seq(
@@ -544,7 +607,9 @@ module.exports = grammar({
                         choice(
                             $.emmy_ignore,
                             $._emmy_eval_container,
+                            $.emmy_class,
                             $.emmy_parameter,
+                            $.emmy_field,
                             $.emmy_see,
                             $.emmy_todo,
                             $.emmy_usage,
