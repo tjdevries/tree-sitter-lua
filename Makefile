@@ -1,4 +1,9 @@
-ts := $(shell which tree-sitter 2> /dev/null)
+ts := "./node_modules/tree-sitter-cli/tree-sitter"
+
+ifeq (, ${ts})
+	ts := $(shell which tree-sitter 2> /dev/null)
+endif
+
 ifeq (, ${ts})
 	ts := $(shell which tree-sitter-cli 2> /dev/null)
 endif
