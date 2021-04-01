@@ -293,6 +293,10 @@
           "named": true
         },
         {
+          "type": "emmy_note",
+          "named": true
+        },
+        {
           "type": "emmy_parameter",
           "named": true
         },
@@ -417,6 +421,11 @@
         ]
       }
     }
+  },
+  {
+    "type": "emmy_note",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "emmy_parameter",

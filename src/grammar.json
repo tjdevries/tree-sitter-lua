@@ -2590,6 +2590,19 @@
         }
       ]
     },
+    "emmy_note": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "---@note\\s+"
+        },
+        {
+          "type": "PATTERN",
+          "value": "[^\\n]*"
+        }
+      ]
+    },
     "emmy_see": {
       "type": "SEQ",
       "members": [
@@ -2603,12 +2616,12 @@
         }
       ]
     },
-    "emmy_usage": {
+    "emmy_todo": {
       "type": "SEQ",
       "members": [
         {
           "type": "PATTERN",
-          "value": "---@usage\\s+"
+          "value": "---@todo\\s+"
         },
         {
           "type": "PATTERN",
@@ -2616,12 +2629,12 @@
         }
       ]
     },
-    "emmy_todo": {
+    "emmy_usage": {
       "type": "SEQ",
       "members": [
         {
           "type": "PATTERN",
-          "value": "---@todo\\s+"
+          "value": "---@usage\\s+"
         },
         {
           "type": "PATTERN",
@@ -2684,6 +2697,10 @@
                     {
                       "type": "SYMBOL",
                       "name": "emmy_field"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "emmy_note"
                     },
                     {
                       "type": "SYMBOL",

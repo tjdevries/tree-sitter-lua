@@ -619,9 +619,10 @@ module.exports = grammar({
         emmy_eval: ($) => $._expression,
         _emmy_eval_container: ($) => seq(/---@eval\s+/, $.emmy_eval),
 
+        emmy_note: (_) => seq(/---@note\s+/, /[^\n]*/),
         emmy_see: (_) => seq(/---@see\s+/, /[^\n]*/),
-        emmy_usage: (_) => seq(/---@usage\s+/, /[^\n]*/),
         emmy_todo: (_) => seq(/---@todo\s+/, /[^\n]*/),
+        emmy_usage: (_) => seq(/---@usage\s+/, /[^\n]*/),
         emmy_varargs: (_) => seq(/---@varargs\s+/, /[^\n]*/),
 
         emmy_documentation: ($) =>
@@ -636,6 +637,7 @@ module.exports = grammar({
                             $.emmy_class,
                             $.emmy_parameter,
                             $.emmy_field,
+                            $.emmy_note,
                             $.emmy_see,
                             $.emmy_todo,
                             $.emmy_usage,
