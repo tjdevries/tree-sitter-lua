@@ -118,7 +118,42 @@ module.exports = grammar({
 
         boolean: (_) => choice("true", "false"),
 
-        number: (_) => /[0-9]+/,
+        number: ($) => {
+            const decimal_digits = /[0-9]+/;
+            const signed_integer = seq(
+                optional(choice("-", "+")),
+                decimal_digits
+            );
+            const decimal_exponent_part = seq(choice("e", "E"), signed_integer);
+
+            const decimal_integer_literal = choice(
+                "0",
+                seq(optional("0"), /[1-9]/, optional(decimal_digits))
+            );
+
+            const hex_digits = /[a-fA-F0-9]+/;
+            const hex_exponent_part = seq(choice("p", "P"), signed_integer);
+
+            const decimal_literal = choice(
+                seq(
+                    decimal_integer_literal,
+                    ".",
+                    optional(decimal_digits),
+                    optional(decimal_exponent_part)
+                ),
+                seq(".", decimal_digits, optional(decimal_exponent_part)),
+                seq(decimal_integer_literal, optional(decimal_exponent_part))
+            );
+
+            const hex_literal = seq(
+                choice("0x", "0X"),
+                hex_digits,
+                optional(seq(".", hex_digits)),
+                optional(hex_exponent_part)
+            );
+
+            return token(choice(decimal_literal, hex_literal));
+        },
 
         _inner_string: (_) => /[a-zA-Z0-9_ ]+/,
 
@@ -482,7 +517,10 @@ module.exports = grammar({
 
         documentation_config: ($) => $._expression,
         _documentation_config_container: ($) =>
-            prec.right(PREC.PROGRAM, seq(/\s*---@config\s+/, $.documentation_config)),
+            prec.right(
+                PREC.PROGRAM,
+                seq(/\s*---@config\s+/, $.documentation_config)
+            ),
 
         documentation_brief: () => /[^\n]*/,
         _documentation_brief_container: ($) =>
@@ -523,20 +561,12 @@ module.exports = grammar({
             seq(
                 /\s*---@class\s+/,
                 field("type", $.emmy_type),
+                optional(seq(/\s*:\s*/, field("parent", $.emmy_type))),
                 optional(
-                    seq(
-                        /\s*:\s*/,
-                        field("parent", $.emmy_type)
-                    ),
-                ),
-                optional(
-                    seq(
-                        /\s*@\s*/,
-                        field("description", $.class_description)
-                    )
+                    seq(/\s*@\s*/, field("description", $.class_description))
                 ),
                 /\n\s*/
-          ),
+            ),
 
         documentation_class: ($) =>
             prec.right(
@@ -583,10 +613,7 @@ module.exports = grammar({
 
                 // TODO: How closely should we be to emmy...
                 optional(
-                    seq(
-                        /\s*:\s*/,
-                        field("description", $.field_description)
-                    )
+                    seq(/\s*:\s*/, field("description", $.field_description))
                 ),
                 /\n\s*/
             ),
@@ -619,11 +646,11 @@ module.exports = grammar({
         emmy_eval: ($) => $._expression,
         _emmy_eval_container: ($) => seq(/---@eval\s+/, $.emmy_eval),
 
-        emmy_note: (_) => seq(/---@note\s+/, /[^\n]*/),
-        emmy_see: (_) => seq(/---@see\s+/, /[^\n]*/),
-        emmy_todo: (_) => seq(/---@todo\s+/, /[^\n]*/),
-        emmy_usage: (_) => seq(/---@usage\s+/, /[^\n]*/),
-        emmy_varargs: (_) => seq(/---@varargs\s+/, /[^\n]*/),
+        emmy_note: (_) => seq(/---@note.+/, /[^\n]*/),
+        emmy_see: (_) => seq(/---@see.+/, /[^\n]*/),
+        emmy_todo: (_) => seq(/---@todo.+/, /[^\n]*/),
+        emmy_usage: (_) => seq(/---@usage.+/, /[^\n]*/),
+        emmy_varargs: (_) => seq(/---@varargs.+/, /[^\n]*/),
 
         emmy_documentation: ($) =>
             prec.left(

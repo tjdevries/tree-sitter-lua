@@ -309,3 +309,7 @@
     (variable_declarator
       (identifier))
     (tableconstructor)))
+
+;;; Can do floats
+; local x = 0.8
+(program (variable_declaration (local) (variable_declarator (identifier)) (number)))

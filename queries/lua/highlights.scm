@@ -123,6 +123,9 @@
  (identifier) @parameter
  description: (_)? @comment) @comment
 
+(emmy_note) @comment
+(emmy_see) @comment
+
 ; TODO: Make the container so we can still highlight the beginning of the line
 ; (emmy_eval_container) @comment
 ; (_emmy_eval_container) @comment
