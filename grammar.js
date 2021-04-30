@@ -40,7 +40,7 @@ module.exports = grammar({
         $.field_separator,
         $.prefix_exp,
 
-        $.function_body,
+        $.function_impl,
         $._multi_comment,
     ],
 
@@ -173,18 +173,14 @@ module.exports = grammar({
                 optional(seq(alias(":", $.table_colon), $.identifier))
             ),
 
-        function: ($) =>
-            seq(
-                $.function_start,
-                $.function_body
-            ),
+        function: ($) => seq($.function_start, $.function_impl),
 
-        function_body: ($) =>
+        function_impl: ($) =>
             seq(
                 alias($.left_paren, $.function_body_paren),
                 optional($.parameter_list),
                 alias($.right_paren, $.function_body_paren),
-                field("body", optional($._block)),
+                alias(optional($._block), $.function_body),
                 alias("end", $.function_end)
             ),
 
@@ -192,7 +188,7 @@ module.exports = grammar({
             choice(
                 seq(
                     prec.left(PREC.COMMA, list_of($.identifier, /,\s*/, false)),
-                    optional(seq(/,\s*/, $.ellipsis)),
+                    optional(seq(/,\s*/, $.ellipsis))
                 ),
                 $.ellipsis
             ),
@@ -311,7 +307,11 @@ module.exports = grammar({
 
         // Blocks {{{
         do_statement: ($) =>
-            seq(alias("do", $.do_start), optional($._block), alias("end", $.do_end)),
+            seq(
+                alias("do", $.do_start),
+                optional($._block),
+                alias("end", $.do_end)
+            ),
 
         while_statement: ($) =>
             seq(
@@ -390,7 +390,7 @@ module.exports = grammar({
                     ),
                     seq($.function_start, /\s*/, field("name", $.function_name))
                 ),
-                $.function_body
+                $.function_impl
             ),
 
         // }}}

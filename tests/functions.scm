@@ -6,7 +6,7 @@
   name: (function_name (identifier))
   (function_body_paren)
   (function_body_paren)
-  body: (return_statement (number))
+  (function_body (return_statement (number)))
   (function_end)))
 
 ;;; Declare table function
@@ -17,7 +17,7 @@
   name: (function_name (identifier) (table_dot) (identifier))
   (function_body_paren)
   (function_body_paren)
-  body: (return_statement (number))
+  (function_body (return_statement (number)))
   (function_end)))
 
 ;;; Declare table function
@@ -28,7 +28,7 @@
   name: (function_name (identifier) (table_colon) (identifier))
   (function_body_paren)
   (function_body_paren)
-  body: (return_statement (number))
+  (function_body (return_statement (number)))
   (function_end)))
 
 ;;; Declare local function
@@ -40,12 +40,14 @@
   name: (identifier)
   (function_body_paren)
   (function_body_paren)
-  body: (function_call
-    prefix: (identifier)
-    (function_call_paren)
-    args: (function_arguments (string))
-    (function_call_paren))
-  body: (return_statement (number))
+  (function_body
+    (function_call
+      prefix: (identifier)
+      (function_call_paren)
+      args: (function_arguments (string))
+      (function_call_paren))
+
+    (return_statement (number)))
   (function_end)))
 
 ;;; Declare local function, error
@@ -58,7 +60,7 @@
   (ERROR (UNEXPECTED 'x'))
   (function_body_paren)
   (function_body_paren)
-  (return_statement (number))
+  (function_body (return_statement (number)))
   (function_end)))
 
 ;;; Declare function with an argument

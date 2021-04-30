@@ -728,11 +728,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "function_body"
+          "name": "function_impl"
         }
       ]
     },
-    "function_body": {
+    "function_impl": {
       "type": "SEQ",
       "members": [
         {
@@ -766,8 +766,7 @@
           "value": "function_body_paren"
         },
         {
-          "type": "FIELD",
-          "name": "body",
+          "type": "ALIAS",
           "content": {
             "type": "CHOICE",
             "members": [
@@ -779,7 +778,9 @@
                 "type": "BLANK"
               }
             ]
-          }
+          },
+          "named": true,
+          "value": "function_body"
         },
         {
           "type": "ALIAS",
@@ -2126,7 +2127,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "function_body"
+          "name": "function_impl"
         }
       ]
     },
@@ -3269,7 +3270,7 @@
     "_field_expression",
     "field_separator",
     "prefix_exp",
-    "function_body",
+    "function_impl",
     "_multi_comment"
   ],
   "supertypes": []
