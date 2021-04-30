@@ -32,7 +32,7 @@
     name: (function_name (identifier))
     (function_body_paren)
     (function_body_paren)
-    body: (return_statement (boolean))
+    (function_body (return_statement (boolean)))
     (function_end)))
 
 ;;; Return documentation with text
@@ -53,8 +53,8 @@
       (identifier))
     (function_body_paren)
     (function_body_paren)
-    body: (return_statement
-      (boolean))
+    (function_body (return_statement
+      (boolean)))
     (function_end)))
 
 ;;; Return documentation with todo
@@ -73,8 +73,8 @@
       (identifier))
     (function_body_paren)
     (function_body_paren)
-    body: (return_statement
-      (boolean))
+    (function_body (return_statement
+      (boolean)))
     (function_end)))
 
 ;;; Two lines of top level documentation
@@ -91,7 +91,7 @@
     name: (function_name (identifier))
     (function_body_paren)
     (function_body_paren)
-    body: (return_statement (boolean))
+    (function_body (return_statement (boolean)))
     (function_end)))
 
 ;;; Full documentation
@@ -128,7 +128,7 @@
     (parameter_list (identifier) (identifier))
     (function_body_paren)
 
-    body: (return_statement (boolean))
+    (function_body (return_statement (boolean)))
     (function_end)))
 
 
@@ -249,7 +249,7 @@
     (parameter_list
       (identifier) (identifier) (identifier))
     (function_body_paren)
-    (function_call
+    (function_body (function_call
       (identifier)
       (table_argument
         (fieldlist
@@ -271,7 +271,7 @@
               (fieldlist
                 (field (identifier))
                 (field (string))
-                (field (boolean))))))))
+                (field (boolean)))))))))
     (function_end)))
 
 ;;; Eval doc
@@ -319,8 +319,8 @@
   (function_body_paren)
   (parameter_list (identifier) (identifier) (identifier))
   (function_body_paren)
-  (return_statement
-   (binary_operation (identifier) (binary_operation (identifier) (identifier))))
+  (function_body (return_statement
+   (binary_operation (identifier) (binary_operation (identifier) (identifier)))))
   (function_end))
  (module_return_statement (identifier)))
 
@@ -342,7 +342,7 @@
   (function_body_paren)
   (parameter_list (identifier))
   (function_body_paren)
-  (return_statement (identifier) (identifier))
+  (function_body (return_statement (identifier) (identifier)))
   (function_end)))
 
 ;;; Class comment
@@ -395,10 +395,10 @@
    (function_body_paren)
    (parameter_list (identifier))
    (function_body_paren)
-   (return_statement
+   (function_body (return_statement
     (function_call (identifier) (function_call_paren)
      (function_arguments (tableconstructor) (identifier))
-   (function_call_paren)))
+   (function_call_paren))))
   (function_end))
 )
 
@@ -428,10 +428,10 @@
    (function_body_paren)
    (parameter_list (identifier))
    (function_body_paren)
-   (return_statement
+   (function_body (return_statement
     (function_call (identifier) (function_call_paren)
      (function_arguments (identifier) (identifier))
-   (function_call_paren)))
+   (function_call_paren))))
   (function_end))
 )
 

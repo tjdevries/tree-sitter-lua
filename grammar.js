@@ -40,7 +40,7 @@ module.exports = grammar({
         $.field_separator,
         $.prefix_exp,
 
-        $.function_body,
+        $.function_impl,
         $._multi_comment,
     ],
 
@@ -178,15 +178,15 @@ module.exports = grammar({
                 $.function_start,
                 // TODO: It's weird that we're capturing this white space in the name of functions.
                 /\s*/,
-                $.function_body
+                $.function_impl
             ),
 
-        function_body: ($) =>
+        function_impl: ($) =>
             seq(
                 alias($.left_paren, $.function_body_paren),
                 optional($.parameter_list),
                 alias($.right_paren, $.function_body_paren),
-                field("body", optional($._block)),
+                alias(optional($._block), $.function_body),
                 alias("end", $.function_end)
             ),
 
@@ -396,7 +396,7 @@ module.exports = grammar({
                     ),
                     seq($.function_start, /\s*/, field("name", $.function_name))
                 ),
-                $.function_body
+                $.function_impl
             ),
 
         // }}}
