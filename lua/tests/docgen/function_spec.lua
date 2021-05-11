@@ -163,6 +163,7 @@ describe('functions', function()
 
       eq(vim.trim(output), vim.trim(result))
     end
+
     it('should export documented function', function()
       check_function_output([[
         local x = {}
@@ -312,7 +313,7 @@ describe('functions', function()
     it('should not export local function', function()
       check_function_output([[
         --- This function has documentation
-        local hello()
+        local function hello()
           return 5
         end]], [[]], false)
     end)

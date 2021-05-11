@@ -120,7 +120,7 @@ describe('class', function()
       }, nodes)
     end)
 
-    it('should get the nodes of a parent and sub class', function()
+    it('should get the nodes of a function class', function()
       local nodes = get_dedented_nodes [=[
         local Job = {}
 

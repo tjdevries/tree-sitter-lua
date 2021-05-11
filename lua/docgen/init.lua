@@ -62,11 +62,11 @@ function docgen.foreach_node(contents, query_name, cb)
   end
 end
 
-function docgen.transform_nodes(contents, query_name, toplevel_types)
+function docgen.transform_nodes(contents, query_name, toplevel_types, return_module)
   local t = {}
   docgen.foreach_node(contents, query_name, function(id, node)
     if toplevel_types[node:type()] then
-      local ok, result = pcall(call_transformer, t, contents, node)
+      local ok, result = pcall(call_transformer, t, contents, node, return_module)
       if not ok then
         print("ERROR:", id, node, result)
       end
@@ -74,6 +74,17 @@ function docgen.transform_nodes(contents, query_name, toplevel_types)
   end)
 
   return t
+end
+
+local function find_return_module(contents)
+  local parser = docgen.get_parser(contents)
+  local query = vim.treesitter.parse_query("lua", "(module_return_statement (identifier) @exported)")
+
+  local tree = parser:parse()[1]
+
+  for _, node in query:iter_captures(tree:root(), contents, 0, -1) do
+    return require'vim.treesitter.query'.get_node_text(node, contents)
+  end
 end
 
 function docgen.get_nodes(contents)
@@ -87,7 +98,9 @@ function docgen.get_nodes(contents)
     documentation_class = true
   }
 
-  return docgen.transform_nodes(contents, query_name, toplevel_types)
+  local return_module = find_return_module(contents)
+
+  return docgen.transform_nodes(contents, query_name, toplevel_types, return_module)
 end
 
 function docgen.write(input_file, output_file_handle)

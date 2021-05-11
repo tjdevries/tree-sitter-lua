@@ -19,20 +19,22 @@ end
 local transformers = {}
 
 --- Takes any node and recursively transforms its children into the corresponding metadata required by |docgen|.
-local call_transformer = function(accumulator, str, node)
+local call_transformer = function(accumulator, str, node, return_module)
   if transformers[node:type()] then
-    return transformers[node:type()](accumulator, str, node)
+    return transformers[node:type()](accumulator, str, node, return_module)
   end
 end
 
-transformers._function = function(accumulator, str, node)
+transformers._function = function(accumulator, str, node, return_module)
+  if not return_module then return end
+
   local name_node = node:field("name")[1]
   local documentation_node = node:field("documentation")[1]
 
   assert(documentation_node, "Documentation must exist for this variable")
   assert(name_node, "Variable must have a name")
 
-  local name = get_node_text(name_node, str)
+  local name = vim.trim(get_node_text(name_node, str))
 
   if not accumulator.functions then
     accumulator.functions = {}
@@ -41,12 +43,18 @@ transformers._function = function(accumulator, str, node)
     accumulator.function_list = {}
   end
 
-  accumulator.functions[name] = {
-    name = name,
-    format = "function",
-  }
-  table.insert(accumulator.function_list, name)
-  call_transformer(accumulator.functions[name], str, documentation_node)
+  if not name:match(return_module .. "[.:].*") then
+    return
+  end
+
+  if accumulator.functions[name] == nil then
+    accumulator.functions[name] = {
+      name = name,
+      format = "function",
+    }
+    table.insert(accumulator.function_list, name)
+    call_transformer(accumulator.functions[name], str, documentation_node)
+  end
 end
 
 --- Transform briefs into the accumulator.brief
