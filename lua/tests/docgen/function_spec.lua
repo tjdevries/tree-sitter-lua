@@ -163,6 +163,7 @@ describe('functions', function()
 
       eq(vim.trim(output), vim.trim(result))
     end
+
     it('should export documented function', function()
       check_function_output([[
         local x = {}
@@ -312,7 +313,7 @@ describe('functions', function()
     it('should not export local function', function()
       check_function_output([[
         --- This function has documentation
-        local hello()
+        local function hello()
           return 5
         end]], [[]], false)
     end)
@@ -471,6 +472,26 @@ describe('functions', function()
 
             See: ~
                 |x.bye()|]])
+    end)
+
+    it('should only return documentation for returned module', function()
+      check_function_output([[
+        local a = {}
+        local b = {}
+
+        --- Documentation for a
+        a.fun = function()
+          return b.fun()
+        end
+
+        --- Documentation for b
+        b.fun = function()
+          return "Hello, World!"
+        end
+
+        return a]], [[
+        a.fun()                                                              *a.fun()*
+            Documentation for a]])
     end)
   end)
 end)
