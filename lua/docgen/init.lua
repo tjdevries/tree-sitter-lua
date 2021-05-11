@@ -78,6 +78,9 @@ end
 
 local function find_return_module(contents)
   local parser = docgen.get_parser(contents)
+  -- Its better to just have one query here. That way i know as soon as i found the
+  -- module return statement i am done. Its bad for performance that i am parsing the
+  -- file twice now but its no performance critical thing, so nvm
   local query = vim.treesitter.parse_query("lua", "(module_return_statement (identifier) @exported)")
 
   local tree = parser:parse()[1]
@@ -98,6 +101,8 @@ function docgen.get_nodes(contents)
     documentation_class = true
   }
 
+  -- Can be nil here. That way it still works if the file only has a brief.
+  -- I do the nil check in the transformer _function
   local return_module = find_return_module(contents)
 
   return docgen.transform_nodes(contents, query_name, toplevel_types, return_module)

@@ -47,6 +47,9 @@ transformers._function = function(accumulator, str, node, return_module)
     return
   end
 
+  -- If we already have the function skip
+  -- Can happen now with function_statement and variable_declaration
+  -- (but we still need to match both queries)
   if accumulator.functions[name] == nil then
     accumulator.functions[name] = {
       name = name,

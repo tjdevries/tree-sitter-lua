@@ -6,7 +6,7 @@
   documentation: (emmy_documentation) @func
   name: (function_name (identifier) @name)) @doc
 
-(module_return_statement (identifier) @exported)
+; (module_return_statement (identifier) @exported)
 
 ; Get the briefs for the module
 (
