@@ -1189,62 +1189,15 @@
   {
     "type": "function",
     "named": true,
-    "fields": {
-      "body": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": ";",
-            "named": false
-          },
-          {
-            "type": "break_statement",
-            "named": true
-          },
-          {
-            "type": "do_statement",
-            "named": true
-          },
-          {
-            "type": "for_statement",
-            "named": true
-          },
-          {
-            "type": "function_call",
-            "named": true
-          },
-          {
-            "type": "function_statement",
-            "named": true
-          },
-          {
-            "type": "if_statement",
-            "named": true
-          },
-          {
-            "type": "repeat_statement",
-            "named": true
-          },
-          {
-            "type": "return_statement",
-            "named": true
-          },
-          {
-            "type": "variable_declaration",
-            "named": true
-          },
-          {
-            "type": "while_statement",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "function_body",
+          "named": true
+        },
         {
           "type": "function_body_paren",
           "named": true
@@ -1322,6 +1275,57 @@
         },
         {
           "type": "unary_operation",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "function_body",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "break_statement",
+          "named": true
+        },
+        {
+          "type": "do_statement",
+          "named": true
+        },
+        {
+          "type": "for_statement",
+          "named": true
+        },
+        {
+          "type": "function_call",
+          "named": true
+        },
+        {
+          "type": "function_statement",
+          "named": true
+        },
+        {
+          "type": "if_statement",
+          "named": true
+        },
+        {
+          "type": "repeat_statement",
+          "named": true
+        },
+        {
+          "type": "return_statement",
+          "named": true
+        },
+        {
+          "type": "variable_declaration",
+          "named": true
+        },
+        {
+          "type": "while_statement",
           "named": true
         }
       ]
@@ -1466,56 +1470,6 @@
     "type": "function_statement",
     "named": true,
     "fields": {
-      "body": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": ";",
-            "named": false
-          },
-          {
-            "type": "break_statement",
-            "named": true
-          },
-          {
-            "type": "do_statement",
-            "named": true
-          },
-          {
-            "type": "for_statement",
-            "named": true
-          },
-          {
-            "type": "function_call",
-            "named": true
-          },
-          {
-            "type": "function_statement",
-            "named": true
-          },
-          {
-            "type": "if_statement",
-            "named": true
-          },
-          {
-            "type": "repeat_statement",
-            "named": true
-          },
-          {
-            "type": "return_statement",
-            "named": true
-          },
-          {
-            "type": "variable_declaration",
-            "named": true
-          },
-          {
-            "type": "while_statement",
-            "named": true
-          }
-        ]
-      },
       "documentation": {
         "multiple": false,
         "required": false,
@@ -1545,6 +1499,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "function_body",
+          "named": true
+        },
         {
           "type": "function_body_paren",
           "named": true
