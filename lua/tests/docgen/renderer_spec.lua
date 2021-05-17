@@ -108,6 +108,52 @@ describe('renderer', function()
       )
     end)
 
+    it('works with br', function()
+      eq(dedent[[
+        - 0 <= number < 1
+          This means total width as a percentage.
+        - 1 <= number
+          This means total width as a fixed number.]], renderer.render({
+        '- 0 <= number < 1 <br>',
+        '  This means total width as a percentage.',
+        '- 1 <= number <br>',
+        '  This means total width as a fixed number.'
+      }, '', 80))
+    end)
+
+    it('works with br and wrap', function()
+      eq(dedent[[
+        - key idea of point one
+          A very long and detailed explanation about point one that is longer than the
+          width of the docs file.
+        - key idea of point two
+          An even longer and more detailed explanation about point two that would be far
+          too long for use in a docs file without a break somewhere.]], renderer.render({
+        '- key idea of point one <br>',
+        '  A very long and detailed explanation about point one that is longer than the width of the docs file.',
+        '- key idea of point two <br>',
+        '  An even longer and more detailed explanation about point two that would be far too long for',
+        '  use in a docs file without a break somewhere.'
+      }, '', 80))
+    end)
+
+    it('works with multiple brs', function()
+      eq(dedent[[
+        - 0 <= number < 1
+          This means total width as a percentage.
+          This means total width as a percentage.
+        - 1 <= number
+          This means total width as a fixed number. This means total width as a fixed
+          number.]], renderer.render({
+        '- 0 <= number < 1 <br>',
+        '  This means total width as a percentage.<br>',
+        '  This means total width as a percentage.<br>',
+        '- 1 <= number <br>',
+        '  This means total width as a fixed number.',
+        '  This means total width as a fixed number.',
+      }, '', 80))
+    end)
+
     it('works with nested itemize', function()
       eq('- item 1\n  - item 1.1\n    - item 1.1.1\n  - item 1.2\n- item 2',
         renderer.render({
@@ -304,6 +350,52 @@ describe('renderer', function()
       eq('    1. item\n  100. item\n   10. item',
         renderer.render({ '1. item', '100. item', '10. item' }, '  ', 12)
       )
+    end)
+
+    it('works with br', function()
+      eq(dedent[[
+        1. 0 <= number < 1
+           This means total width as a percentage.
+        2. 1 <= number
+           This means total width as a fixed number.]], renderer.render({
+        '1. 0 <= number < 1 <br>',
+        '   This means total width as a percentage.',
+        '2. 1 <= number <br>',
+        '   This means total width as a fixed number.'
+      }, '', 80))
+    end)
+
+    it('works with br and wrap', function()
+      eq(dedent[[
+        1. key idea of point one
+           A very long and detailed explanation about point one that is longer than the
+           width of the docs file.
+        2. key idea of point two
+           An even longer and more detailed explanation about point two that would be
+           far too long for use in a docs file without a break somewhere.]], renderer.render({
+        '1. key idea of point one <br>',
+        '   A very long and detailed explanation about point one that is longer than the width of the docs file.',
+        '2. key idea of point two <br>',
+        '   An even longer and more detailed explanation about point two that would be far too long for',
+        '   use in a docs file without a break somewhere.'
+      }, '', 80))
+    end)
+
+    it('works with multiple brs', function()
+      eq(dedent[[
+        1. 0 <= number < 1
+           This means total width as a percentage.
+           This means total width as a percentage.
+        2. 1 <= number
+           This means total width as a fixed number. This means total width as a fixed
+           number.]], renderer.render({
+        '1. 0 <= number < 1 <br>',
+        '   This means total width as a percentage.<br>',
+        '   This means total width as a percentage.<br>',
+        '2. 1 <= number <br>',
+        '   This means total width as a fixed number.',
+        '   This means total width as a fixed number.',
+      }, '', 80))
     end)
 
     it('works with nested enumerate', function()

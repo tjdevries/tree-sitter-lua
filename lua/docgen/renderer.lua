@@ -53,7 +53,11 @@ local dispatch_state = {
   [states.ENUMERATE] = function(self, line) return self:add_to_enumerate(line) end,
 }
 
-local append = function(l, r)
+local trim_trailing = function(str)
+  return str:gsub('%s*$', '')
+end
+
+local real_append = function(l, r)
   if #l == 0 then
     return r
   end
@@ -64,8 +68,18 @@ local append = function(l, r)
   end
 end
 
-local trim_trailing = function(str)
-  return str:gsub('%s*$', '')
+local append = function(l, r)
+  if type(l) == "table" then
+    if r:match('<br>$') then
+      r = trim_trailing(r:gsub('<br>$', ''))
+      l[#l] = real_append(l[#l], r)
+      table.insert(l, '')
+    else
+      l[#l] = real_append(l[#l], r)
+    end
+    return l
+  end
+  return real_append(l, r)
 end
 
 function Text:error()
@@ -98,7 +112,7 @@ function Text:handle_line(line)
     self.state = nil
   elseif self.state == states.NEWLINE and new_state == states.PARAGRAPH then
     -- From newline into new Paragraph
-    if self.order[table.getn(self.order)] == states.IGNORE then
+    if self.order[#self.order] == states.IGNORE then
       -- If prev state was IGNORE add a newline on top
       table.insert(self.order, new_state)
     end
@@ -139,7 +153,7 @@ end
 function Text:iter()
   local i = 0
   local i_s = { paragraph = 0, itemize = 0, enumerate = 0, ignore = 0 }
-  local n = table.getn(self.order)
+  local n = #self.order
   return function()
     i = i + 1
     if i <= n then
@@ -160,8 +174,8 @@ function Text:iter()
 end
 
 function Text:start_new_paragraph(line)
-  if table.getn(self.paragraphs) > 0 then
-    self.paragraphs[table.getn(self.paragraphs)] = trim_trailing(self.paragraphs[table.getn(self.paragraphs)])
+  if #self.paragraphs > 0 then
+    self.paragraphs[#self.paragraphs] = trim_trailing(self.paragraphs[#self.paragraphs])
   end
   table.insert(self.paragraphs, "")
   table.insert(self.order, states.PARAGRAPH)
@@ -193,39 +207,49 @@ end
 
 function Text:add_to_paragraph(str)
   if str:match('<br>$') then
-    self.paragraphs[table.getn(self.paragraphs)] = append(self.paragraphs[table.getn(self.paragraphs)], str:gsub('<br>$', ''))
+    self.paragraphs[#self.paragraphs] = append(self.paragraphs[#self.paragraphs], str:gsub('<br>$', ''))
     self:start_new_paragraph()
   else
-    self.paragraphs[table.getn(self.paragraphs)] = append(self.paragraphs[table.getn(self.paragraphs)], str)
+    self.paragraphs[#self.paragraphs] = append(self.paragraphs[#self.paragraphs], str)
   end
 end
 
 function Text:add_to_itemize(str)
-  table.insert(self.itemizes[table.getn(self.itemizes)], str)
+  if str:match('<br>$') then
+    str = trim_trailing(str:gsub('<br>$', ''))
+    table.insert(self.itemizes[#self.itemizes], { str, '' })
+  else
+    table.insert(self.itemizes[#self.itemizes], str)
+  end
 end
 
 function Text:add_to_enumerate(str)
-  table.insert(self.enumerates[table.getn(self.enumerates)], str)
+  if str:match('<br>$') then
+    str = trim_trailing(str:gsub('<br>$', ''))
+    table.insert(self.enumerates[#self.enumerates], { str, '' })
+  else
+    table.insert(self.enumerates[#self.enumerates], str)
+  end
 end
 
 function Text:add_to_ignore(str)
-  table.insert(self.ignores[table.getn(self.ignores)], str)
+  table.insert(self.ignores[#self.ignores], str)
 end
 
 function Text:append_to_itemize(str)
-  local last_itemize = self.itemizes[table.getn(self.itemizes)]
-  self.itemizes[table.getn(self.itemizes)][table.getn(last_itemize)] = append(last_itemize[table.getn(last_itemize)], str)
+  local last_itemize = self.itemizes[#self.itemizes]
+  self.itemizes[#self.itemizes][#last_itemize] = append(last_itemize[#last_itemize], str)
 end
 
 function Text:append_to_enumerate(str)
-  local last_enumerate = self.enumerates[table.getn(self.enumerates)]
-  self.enumerates[table.getn(self.enumerates)][table.getn(last_enumerate)] = append(last_enumerate[table.getn(last_enumerate)], str)
+  local last_enumerate = self.enumerates[#self.enumerates]
+  self.enumerates[#self.enumerates][#last_enumerate] = append(last_enumerate[#last_enumerate], str)
 end
 
 function Text:is_empty()
-  return table.getn(self.paragraphs) == 0 and
-         table.getn(self.itemizes) == 0 and
-         table.getn(self.enumerates) == 0
+  return #self.paragraphs == 0 and
+         #self.itemizes == 0 and
+         #self.enumerates == 0
 end
 
 local get_text_from_input = function(input)
@@ -253,32 +277,53 @@ m.render = function(input, prefix, width)
 
     local line = prefix .. additional_prefix[1]
     local current_prefix = prefix .. additional_prefix[2]
-    for _, word in ipairs(vim.split(string, ' ')) do
-      if #append(line, word) <= width then
-        line = append(line, word)
-      else
+    if type(string) ~= "table" then
+      string = { string }
+    end
+    for idx, lstring in ipairs(string) do
+      for _, word in ipairs(vim.split(lstring, ' ')) do
+        if #append(line, word) <= width then
+          line = append(line, word)
+        else
+          table.insert(output, line)
+          line = current_prefix .. word
+        end
+      end
+      if string[idx + 1] ~= nil and string[idx + 1] ~= '' then
+        line = trim_trailing(line)
         table.insert(output, line)
-        line = current_prefix .. word
+        line = current_prefix
       end
     end
     if line:match('^%s+$') then line = '' end
+    line = trim_trailing(line)
     table.insert(output, line)
   end
 
-  for type, paragraph in text:iter() do
-    if type == states.PARAGRAPH then
+  for typ, paragraph in text:iter() do
+    if typ == states.PARAGRAPH then
       handle(paragraph)
-    elseif type == states.ITEMIZE then
+    elseif typ == states.ITEMIZE then
       for _, str in ipairs(paragraph) do
-        local str_start, _ = str:find('-')
+        local str_start, _ = (function()
+          if type(str) == "table" then
+            return str[1]:find('-')
+          end
+          return str:find('-')
+        end)()
         local base = string.rep(' ', (str_start - 1))
         local additional_prefix = { base, base .. '  ' }
         handle(str, additional_prefix)
       end
-    elseif type == states.ENUMERATE then
+    elseif typ == states.ENUMERATE then
       local max, maxc = {}, {}
       for _, str in ipairs(paragraph) do
-        local indent_level, newc = str:find('[0-9.]+%. ')
+        local indent_level, newc = (function()
+          if type(str) == "table" then
+            return str[1]:find('[0-9.]+%. ')
+          end
+          return str:find('[0-9.]+%. ')
+        end)()
         indent_level = indent_level - 1
         newc = newc - indent_level
         if not newc then
@@ -296,14 +341,24 @@ m.render = function(input, prefix, width)
         max[k] = string.rep(' ', v)
       end
       for _, str in ipairs(paragraph) do
-        local str_start, _ = str:find('[0-9.]+%. ')
-        local _, str_end = str:gsub('^%s*', ''):find('[0-9]+. ')
+        local str_start, str_end = (function()
+          local left, right
+          if type(str) == "table" then
+            left, _ = str[1]:find('[0-9.]+%. ')
+            _, right = str[1]:gsub('^%s*', ''):find('[0-9]+. ')
+          else
+            left, _ = str:find('[0-9.]+%. ')
+            _, right = str:gsub('^%s*', ''):find('[0-9]+. ')
+          end
+          return left, right
+        end)()
+
         local base = string.rep(' ', (str_start - 1))
         local diff = string.rep(' ', (maxc[str_start - 1] - str_end))
         local additional_prefix = { base .. diff, base .. max[str_start - 1] }
         handle(str, additional_prefix)
       end
-    elseif type == states.IGNORE then
+    elseif typ == states.IGNORE then
       for _, str in ipairs(paragraph) do
         local construct = trim_trailing(prefix .. str)
         table.insert(output, construct)
@@ -331,7 +386,7 @@ m.render_without_first_line_prefix = function(input, prefix, width)
       local line = ""
       for _, word in ipairs(vim.split(paragraph, ' ')) do
         local inner_width = width
-        if table.getn(output) == 0 then
+        if #output == 0 then
           inner_width = inner_width - #prefix
         end
         if #append(line, word) <= inner_width then
