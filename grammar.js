@@ -155,16 +155,6 @@ module.exports = grammar({
             return token(choice(decimal_literal, hex_literal));
         },
 
-        _inner_string: (_) => /[a-zA-Z0-9_ ]+/,
-
-        // string: ($) => prec.left($.multi_string),
-        // basic_string_style("'"),
-        // basic_string_style('"'),
-
-        // ...[...Array(EQUALS_LEVELS).keys()].map((level) =>
-        //     lua_string_level(level)
-        // )
-
         ellipsis: (_) => "...",
 
         function_name: ($) =>
@@ -192,7 +182,6 @@ module.exports = grammar({
                 ),
                 $.ellipsis
             ),
-
         // }}}
 
         _expression_list: ($) => list_of($._expression, ","),

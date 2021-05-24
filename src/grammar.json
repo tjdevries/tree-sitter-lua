@@ -650,10 +650,6 @@
         ]
       }
     },
-    "_inner_string": {
-      "type": "PATTERN",
-      "value": "[a-zA-Z0-9_ ]+"
-    },
     "ellipsis": {
       "type": "STRING",
       "value": "..."

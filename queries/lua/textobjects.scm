@@ -7,6 +7,7 @@
 (while_statement) @loop.outer
 (repeat_statement) @loop.outer
 
+; TODO: @conditional.inner
 (if_statement) @conditional.outer
 
 (function_call (function_arguments) @call.inner)
@@ -16,6 +17,11 @@
 (parameter_list (_) @parameter.inner)
 
 (comment) @comment.outer
+
+(field) @element
+
+;; TODO: It would be cool to figure out how to make variables good
+; (variable_declaration) @variable
 
 ; ((function
 ;   . (function_name) . (parameters) . (_) @_start
