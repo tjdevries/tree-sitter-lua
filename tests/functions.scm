@@ -106,7 +106,7 @@
   (function_body_paren)
   (function_end)))
 
-;;; Declare function with args and ellipsis
+;;; Declare function with one arg and ellipsis
 ; function f(x, ...) end
 (program
  (function_statement
@@ -114,6 +114,17 @@
   (function_name (identifier))
   (function_body_paren)
   (parameter_list (identifier) (ellipsis))
+  (function_body_paren)
+  (function_end)))
+
+;;; Declare function with multiple args and ellipsis
+; function f(x, y, z, ...) end
+(program
+ (function_statement
+  (function_start)
+  (function_name (identifier))
+  (function_body_paren)
+  (parameter_list (identifier) (identifier) (identifier) (ellipsis))
   (function_body_paren)
   (function_end)))
 

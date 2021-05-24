@@ -130,6 +130,26 @@
     (function_call_paren))
   (for_end)))
 
+;;; Can handle for loops with no body
+; for _, x in ipairs(mylist) do
+; end
+(program
+ (for_statement
+  (for_start)
+  (for_generic
+   (identifier_list
+    (identifier)
+    (identifier))
+   (for_in)
+   (function_call
+    (identifier)
+    (function_call_paren)
+    (function_arguments
+     (identifier))
+    (function_call_paren)))
+  (for_do)
+  (for_end)))
+
 ;;; Returns from if statement with no values
 ; if not diagnostics then return end
 (program

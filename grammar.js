@@ -32,7 +32,7 @@ module.exports = grammar({
 
     externals: ($) => [$._multi_comment, $.string],
 
-    extras: ($) => [/[\s\n]/, /\s/, $.comment],
+    extras: ($) => [/[\n]/, /\s/, $.comment],
 
     inline: ($) => [
         $._expression,
@@ -176,8 +176,6 @@ module.exports = grammar({
         function: ($) =>
             seq(
                 $.function_start,
-                // TODO: It's weird that we're capturing this white space in the name of functions.
-                /\s*/,
                 $.function_body
             ),
 
@@ -193,11 +191,8 @@ module.exports = grammar({
         parameter_list: ($) =>
             choice(
                 seq(
-                    $._identifier_list,
-                    // TODO: Why does the regex work here,
-                    // but when we use the literal string and ellipsis,
-                    // it just gives us an error?
-                    alias(optional(/\s*,\s*\.\.\./), $.ellipsis)
+                    prec.left(PREC.COMMA, list_of($.identifier, /,\s*/, false)),
+                    optional(seq(/,\s*/, $.ellipsis)),
                 ),
                 $.ellipsis
             ),
@@ -304,7 +299,7 @@ module.exports = grammar({
         var_list: ($) => list_of($._var, ",", false),
 
         _identifier_list: ($) =>
-            prec.right(PREC.COMMA, list_of($.identifier, ",", false)),
+            prec.right(PREC.COMMA, list_of($.identifier, /,\s*/, false)),
 
         return_statement: ($) =>
             prec(
@@ -316,21 +311,21 @@ module.exports = grammar({
 
         // Blocks {{{
         do_statement: ($) =>
-            seq(alias("do", $.do_start), $._block, alias("end", $.do_end)),
+            seq(alias("do", $.do_start), optional($._block), alias("end", $.do_end)),
 
         while_statement: ($) =>
             seq(
                 alias("while", $.while_start),
                 $._expression,
                 alias("do", $.while_do),
-                $._block,
+                optional($._block),
                 alias("end", $.while_end)
             ),
 
         repeat_statement: ($) =>
             seq(
                 alias("repeat", $.repeat_start),
-                $._block,
+                optional($._block),
                 alias("until", $.repeat_until),
                 $._expression
             ),
@@ -340,16 +335,16 @@ module.exports = grammar({
                 alias("if", $.if_start),
                 $._expression,
                 alias("then", $.if_then),
-                $._block,
+                optional($._block),
                 any_amount_of(
                     seq(
                         alias("elseif", $.if_elseif),
                         $._expression,
                         alias("then", $.if_then),
-                        $._block
+                        optional($._block)
                     )
                 ),
-                optional(seq(alias("else", $.if_else), $._block)),
+                optional(seq(alias("else", $.if_else), optional($._block))),
                 alias("end", $.if_end)
             ),
 
@@ -358,7 +353,7 @@ module.exports = grammar({
                 alias("for", $.for_start),
                 choice($.for_numeric, $.for_generic),
                 alias("do", $.for_do),
-                $._block,
+                optional($._block),
                 alias("end", $.for_end)
             ),
 
@@ -391,7 +386,6 @@ module.exports = grammar({
                     seq(
                         alias("local", $.local),
                         $.function_start,
-                        /\s*/,
                         field("name", $.identifier)
                     ),
                     seq($.function_start, /\s*/, field("name", $.function_name))
