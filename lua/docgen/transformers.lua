@@ -185,15 +185,28 @@ transformers.emmy_field = function(accumulator, str, node)
   local name_node = node:named_child(0)
   assert(name_node, "Field must have a name")
 
-  local type_node = node:named_child(1)
-  local desc_node = node:named_child(2)
+  local types = {}
+  local desc
+  for i = 1, node:named_child_count() - 1 do
+    if node:named_child(i):type() == "emmy_type" then
+      table.insert(types, get_node_text(node:named_child(i), str))
+    elseif node:named_child(i):type() == "field_description" then
+      if desc ~= nil then
+        print("[docgen] [Error]: We should not be here")
+      else
+        desc = get_node_text(node:named_child(i), str)
+      end
+    else
+      print("[docgen] [Error]: We should not be here")
+    end
+  end
 
   local name = get_node_text(name_node, str)
 
   accumulator.fields[name] = {
     name = name,
-    type = get_node_text(type_node, str),
-    description = {get_node_text(desc_node, str)},
+    type = types,
+    description = { desc },
   }
 
   if not vim.tbl_contains(accumulator.field_list, name) then
@@ -205,16 +218,28 @@ transformers.emmy_parameter = function(accumulator, str, node)
   local name_node = node:named_child(0)
   assert(name_node, "Parameters must have a name")
 
-  local type_node = node:named_child(1)
-  local desc_node = node:named_child(2)
+  local types = {}
+  local desc
+  for i = 1, node:named_child_count() - 1 do
+    if node:named_child(i):type() == "emmy_type" then
+      table.insert(types, get_node_text(node:named_child(i), str))
+    elseif node:named_child(i):type() == "parameter_description" then
+      if desc ~= nil then
+        print("[docgen] [Error]: We should not be here")
+      else
+        desc = get_node_text(node:named_child(i), str)
+      end
+    else
+      print("[docgen] [Error]: We should not be here")
+    end
+  end
 
   local name = get_node_text(name_node, str)
 
-  -- TODO: Handle getting the parameter BEFORE we do this.
   accumulator.parameters[name] = {
     name = name,
-    type = get_node_text(type_node, str),
-    description = {get_node_text(desc_node, str)},
+    type = types,
+    description = { desc },
   }
 
   if not vim.tbl_contains(accumulator.parameter_list, name) then
