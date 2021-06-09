@@ -3,28 +3,7 @@ local docgen_help = require('docgen.help')
 
 local eq = assert.are.same
 
-local dedent = function(str, leave_indent)
-  -- find minimum common indent across lines
-  local indent = nil
-  for line in str:gmatch('[^\n]+') do
-    local line_indent = line:match('^%s+') or ''
-    if indent == nil or #line_indent < #indent then
-      indent = line_indent
-    end
-  end
-  if indent == nil or #indent == 0 then
-    -- no minimum common indent
-    return str
-  end
-  local left_indent = (' '):rep(leave_indent or 0)
-  -- create a pattern for the indent
-  indent = indent:gsub('%s', '[ \t]')
-  -- strip it from the first line
-  str = str:gsub('^'..indent, left_indent)
-  -- strip it from the remaining lines
-  str = str:gsub('[\n]'..indent, '\n' .. left_indent)
-  return str
-end
+local dedent = require("plenary.strings").dedent
 
 local dedent_trim = function(x)
   return vim.trim(dedent(x))
@@ -69,10 +48,34 @@ describe('class', function()
           name = 'Array',
           desc = { 'number indexed starting at 1' },
           fields = {
-            count = { description = { "Always handy to have a count" }, name = "count", type = "number", },
-            type = { description = { "Imagine having a type for an array" }, name = "type", type = "string", },
-            begin = { description = { "It even has a begin()?! Is this cpp?" }, name = "begin", type = "function", },
-            ["end"] = { description = { "It even has an end()?! Get out of here cpp!" }, name = "end", type = "function", },
+            count = { description = { "Always handy to have a count" }, name = "count", type = { "number" }, },
+            type = { description = { "Imagine having a type for an array" }, name = "type", type = { "string" }, },
+            begin = { description = { "It even has a begin()?! Is this cpp?" }, name = "begin", type = { "function" }, },
+            ["end"] = { description = { "It even has an end()?! Get out of here cpp!" }, name = "end", type = { "function" }, },
+          },
+          field_list = { "count", "type", "begin", "end" },
+        } },
+        class_list = { 'Array' },
+      }, nodes)
+    end)
+
+    it('should get the fields of a simple class as well with multitypes', function()
+      local nodes = get_dedented_nodes [=[
+        ---@class Array @number indexed starting at 1
+        ---@field count number: Always handy to have a count
+        ---@field type string|number: Imagine having a type for an array
+        ---@field begin function|table|nil: It even has a begin()?! Is this cpp?
+        ---@field end function: It even has an end()?! Get out of here cpp!
+      ]=]
+      eq({
+        classes = { ["Array"] = {
+          name = 'Array',
+          desc = { 'number indexed starting at 1' },
+          fields = {
+            count = { description = { "Always handy to have a count" }, name = "count", type = { "number" }, },
+            type = { description = { "Imagine having a type for an array" }, name = "type", type = { "string", "number" }, },
+            begin = { description = { "It even has a begin()?! Is this cpp?" }, name = "begin", type = { "function", "table", "nil" }, },
+            ["end"] = { description = { "It even has an end()?! Get out of here cpp!" }, name = "end", type = { "function" }, },
           },
           field_list = { "count", "type", "begin", "end" },
         } },
@@ -141,14 +144,14 @@ describe('class', function()
             class = { desc = { "desc" }, name = "Job" },
             description = { "", "HEADER", "" },
             fields = {
-              cmd = { description = { "command" }, name = "cmd", type = "string", }
+              cmd = { description = { "command" }, name = "cmd", type = { "string" } }
             },
             field_list = { "cmd" },
             format = "function",
             name = "Job:new",
             parameter_list = { "o" },
             parameters = {
-              o = { description = { "options" }, name = "o", type = "table" }
+              o = { description = { "options" }, name = "o", type = { "table" } }
             }
           }
         },
@@ -205,6 +208,28 @@ describe('class', function()
                 {end}   (function)  It even has an end()?! Get out of here cpp! Oh by
                                     the way did you know that fields are wrapping? I
                                     didn't and this should prove this. Please work :)
+      ]])
+    end)
+
+    it('should generate the documentation of a class with fields and multitypes', function()
+      check_class_output([[
+        ---@class Array @number indexed starting at 1
+        ---@field count number: Always handy to have a count
+        ---@field type string|number: Imagine having a type for an array
+        ---@field begin function: It even has a begin()?! Is this cpp?
+        ---@field end function: It even has an end()?! Get out of here cpp! Oh by the way did you know that fields are wrapping? I didn't and this should prove this. Please work :)
+      ]], [[
+        Array                                                                  *Array*
+            number indexed starting at 1
+
+            Fields: ~
+                {count} (number)         Always handy to have a count
+                {type}  (string|number)  Imagine having a type for an array
+                {begin} (function)       It even has a begin()?! Is this cpp?
+                {end}   (function)       It even has an end()?! Get out of here cpp! Oh
+                                         by the way did you know that fields are
+                                         wrapping? I didn't and this should prove this.
+                                         Please work :)
       ]])
     end)
 

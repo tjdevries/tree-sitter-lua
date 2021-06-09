@@ -3,28 +3,7 @@ local docgen_help = require('docgen.help')
 
 local eq = assert.are.same
 
-local dedent = function(str, leave_indent)
-  -- find minimum common indent across lines
-  local indent = nil
-  for line in str:gmatch('[^\n]+') do
-    local line_indent = line:match('^%s+') or ''
-    if indent == nil or #line_indent < #indent then
-      indent = line_indent
-    end
-  end
-  if indent == nil or #indent == 0 then
-    -- no minimum common indent
-    return str
-  end
-  local left_indent = (' '):rep(leave_indent or 0)
-  -- create a pattern for the indent
-  indent = indent:gsub('%s', '[ \t]')
-  -- strip it from the first line
-  str = str:gsub('^'..indent, left_indent)
-  -- strip it from the remaining lines
-  str = str:gsub('[\n]'..indent, '\n' .. left_indent)
-  return str
-end
+local dedent = require("plenary.strings").dedent
 
 local dedent_trim = function(x)
   return vim.trim(dedent(x))
@@ -144,9 +123,39 @@ describe('functions', function()
             name = "x.hello",
             ["parameter_list"] = { "abc", "def", "bxy" },
             parameters = {
-              ["abc"] = { description = { "Docs for abc" }, name = "abc", type = "string" },
-              ["def"] = { description = { "Other docs for def" }, name = "def", type = "string" },
-              ["bxy"] = { description = { "Final docs" }, name = "bxy", type = "number" },
+              ["abc"] = { description = { "Docs for abc" }, name = "abc", type = { "string" } },
+              ["def"] = { description = { "Other docs for def" }, name = "def", type = { "string" } },
+              ["bxy"] = { description = { "Final docs" }, name = "bxy", type = { "number" } },
+            }
+          }
+        }
+      }, nodes)
+    end)
+
+    it('should get the nodes of a complex exported function with multitypes', function()
+      local nodes = get_dedented_nodes [[
+        local x = {}
+
+        --- This function has documentation
+        ---@param a string|number: doc
+        function x.hello(a)
+          return a
+        end
+
+        return x
+      ]]
+      eq({
+        ["function_list"] = { "x.hello" },
+        functions = {
+          ["x.hello"] = {
+            class = {},
+            description = { "", "This function has documentation", "" },
+            ["field_list"] = {}, fields = {},
+            format = "function",
+            name = "x.hello",
+            ["parameter_list"] = { "a" },
+            parameters = {
+              ["a"] = { description = { "doc" }, name = "a", type = { "string", "number" } },
             }
           }
         }
@@ -353,23 +362,46 @@ describe('functions', function()
                 {bxy} (string)  Final docs]])
     end)
 
+    it('should work with param and multitypes', function()
+      check_function_output([[
+        local x = {}
+
+        --- This function has documentation
+        ---@param abc string|number: Docs for abc
+        ---@param def string: Other docs for def
+        ---@param bxy string|function: Final docs
+        function x.hello(abc, def, bxy)
+          return abx .. def .. bxy
+        end
+
+        return x]], [[
+        x.hello({abc}, {def}, {bxy})                                       *x.hello()*
+            This function has documentation
+
+
+            Parameters: ~
+                {abc} (string|number)    Docs for abc
+                {def} (string)           Other docs for def
+                {bxy} (string|function)  Final docs]])
+    end)
+
     it('should work with long param', function()
       check_function_output([[
         local x = {}
 
         --- This function has documentation
-        ---@param x string: This is some documentation for a pretty long param. This means that this description needs to be wrapped. Comon wrap.
-        function x.hello(abc, def, bxy)
+        ---@param a string: This is some documentation for a pretty long param. This means that this description needs to be wrapped. Comon wrap.
+        function x.hello(a)
           return abc .. def .. bxy
         end
 
         return x]], [[
-        x.hello({x})                                                       *x.hello()*
+        x.hello({a})                                                       *x.hello()*
             This function has documentation
 
 
             Parameters: ~
-                {x} (string)  This is some documentation for a pretty long param. This
+                {a} (string)  This is some documentation for a pretty long param. This
                               means that this description needs to be wrapped. Comon
                               wrap.]])
     end)
@@ -445,6 +477,33 @@ describe('functions', function()
                 {k1}   (number)    first key of input table
                 {key}  (function)  second key of input table
                 {key3} (table)     third key of input table]])
+    end)
+
+    it('should work with field and multitypes', function()
+      check_function_output([[
+        local x = {}
+
+        --- This function has documentation
+        ---@param t table: some input table
+        ---@field k1 string|number: first key of input table
+        ---@field key function: second key of input table
+        ---@field key3 table: third key of input table
+        function x.hello(t)
+          return 0
+        end
+
+        return x]], [[
+        x.hello({t})                                                       *x.hello()*
+            This function has documentation
+
+
+            Parameters: ~
+                {t} (table)  some input table
+
+            Fields: ~
+                {k1}   (string|number)  first key of input table
+                {key}  (function)       second key of input table
+                {key3} (table)          third key of input table]])
     end)
 
     it('should work with see, param and return', function()

@@ -107,7 +107,7 @@ help.format = function(metadata)
   for _, func_name in ipairs(metadata_keys) do
     local v = metadata.functions[func_name]
 
-    local result = help.format_function_metadata(v, config)
+    local result = help.format_function_metadata(v, metadata.config)
     if not result then error("Missing result") end
 
     add(result)
@@ -132,7 +132,7 @@ help.__left_side_parameter_field = function(input, max_name_width, space_prefix)
   )
   local diff = max_name_width - #input.name
 
-  return string.format("%s%s(%s)  ", name, string.rep(' ', diff), input.type)
+  return string.format("%s%s(%s)  ", name, string.rep(' ', diff), table.concat(input.type, '|'))
 end
 
 help.format_parameter_field = function(input, space_prefix, max_name_width, align_width)
