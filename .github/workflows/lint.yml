@@ -17,3 +17,16 @@ jobs:
 
       - name: Lint
         run: sudo make lualint
+  stylua:
+    name: Stylua
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare stylua
+        run: |
+          curl -sLJO https://github.com/JohnnyMorganz/StyLua/releases/download/v0.9.0/stylua-0.9.0-linux.zip
+          unzip stylua-0.9.0-linux.zip
+          rm stylua-0.9.0-linux.zip
+          chmod +x stylua
+      - name: Style check
+        run: ./stylua --color always -c --glob "**/*.lua" -- lua
