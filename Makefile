@@ -33,6 +33,10 @@ build_parser: generate
 gen_howto:
 	nvim --headless --noplugin -u tests/minimal_init.vim -c "luafile ./scratch/gen_howto.lua" -c 'qa'
 
+
+lualint:
+	luacheck lua/docgen
+
 wasm: build_parser
 	${ts} build-wasm
 

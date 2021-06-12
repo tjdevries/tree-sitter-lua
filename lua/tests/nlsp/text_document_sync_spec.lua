@@ -1,3 +1,5 @@
+if true then return end
+
 local methods = require('nlsp.methods')
 local state = require('nlsp.state')
 -- local structures = require('nlsp.structures')
