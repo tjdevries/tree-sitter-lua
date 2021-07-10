@@ -2,9 +2,13 @@
 ; -- hello world
 (program (comment))
 
+;;; Can do simple separator
+; --
+(program (comment))
+
 ;;; Can do EOL comments
 ; local x = 1 -- hello world
-(program 
+(program
  (variable_declaration (local) (variable_declarator (identifier)) (number))
  (comment))
 

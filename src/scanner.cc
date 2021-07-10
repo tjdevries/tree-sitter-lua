@@ -10,8 +10,8 @@ namespace {
   using std::iswspace;
 
   enum TokenType {
-    MULTI_COMMENT,
-    MULTI_STRING,
+    COMMENT,
+    MULTI_STRING
   };
 
   struct Scanner {
@@ -95,7 +95,7 @@ namespace {
     }
 
     bool scan(TSLexer *lexer, const bool *valid_symbols) {
-      if (valid_symbols[MULTI_COMMENT] || valid_symbols[MULTI_STRING]) {
+      if (valid_symbols[COMMENT] || valid_symbols[MULTI_STRING]) {
         while (iswspace(lexer->lookahead)) {
           skip(lexer);
         }
@@ -178,16 +178,23 @@ namespace {
         // --[[
         // stuff
         // --]]
+        // or
+        // --
         else if (scan_sequence(lexer, "--")) {
-          if (lexer->lookahead != '[') {
-            return false;
+          // so if we have exactly 3 - then false, if we have 4 or more, for example for a separator
+          // then its fine
+          if (lexer->lookahead == '-') {
+            advance(lexer);
+            if (lexer->lookahead != '-') {
+              return false;
+            }
           }
 
           while (iswspace(lexer->lookahead) && lexer->lookahead != '\n' && lexer->lookahead != 0) {
             advance(lexer);
           }
 
-          lexer->result_symbol = MULTI_COMMENT;
+          lexer->result_symbol = COMMENT;
 
           if (!scan_multiline_content(lexer)) {
             while (lexer->lookahead != '\n' && lexer->lookahead != 0) {

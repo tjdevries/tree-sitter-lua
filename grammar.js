@@ -30,7 +30,7 @@ EQUALS_LEVELS = 5;
 module.exports = grammar({
     name: "lua",
 
-    externals: ($) => [$._multi_comment, $.string],
+    externals: ($) => [$.comment, $.string],
 
     extras: ($) => [/[\n]/, /\s/, $.comment],
 
@@ -41,7 +41,6 @@ module.exports = grammar({
         $.prefix_exp,
 
         $.function_impl,
-        $._multi_comment,
     ],
 
     conflicts: ($) => [
@@ -657,10 +656,6 @@ module.exports = grammar({
                     )
                 )
             ),
-        // }}}
-
-        // Comments {{{
-        comment: ($) => choice(seq("--", /[^-].*\r?\n/), $._multi_comment),
         // }}}
     },
 });

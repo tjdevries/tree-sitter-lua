@@ -73,11 +73,6 @@
     "fields": {}
   },
   {
-    "type": "comment",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "do_statement",
     "named": true,
     "fields": {},
@@ -2391,10 +2386,6 @@
     "named": false
   },
   {
-    "type": "--",
-    "named": false
-  },
-  {
     "type": ".",
     "named": false
   },
@@ -2468,6 +2459,10 @@
   },
   {
     "type": "break_statement",
+    "named": true
+  },
+  {
+    "type": "comment",
     "named": true
   },
   {
