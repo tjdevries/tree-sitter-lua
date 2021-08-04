@@ -137,7 +137,7 @@ end
 
 help.format_parameter_field = function(input, space_prefix, max_name_width, align_width)
   local left_side = help.__left_side_parameter_field(input, max_name_width, space_prefix)
-  local right_side = render_without_first_line_prefix(input.description, string.rep(' ', align_width), 79)
+  local right_side = render_without_first_line_prefix(input.description, string.rep(' ', align_width), 78)
 
   local diff = align_width - #left_side
   assert(diff >= 0, "Otherwise we have a big error somewhere in docgen")
@@ -276,7 +276,7 @@ help.format_function_metadata = function(function_metadata, config)
       end
       doc = doc .. "\n" .. string.format("%s%s: ~", space_prefix, title) .. "\n"
       for _, x in ipairs(function_metadata[identification]) do
-        doc = doc .. render({ string.format(ins, x) }, space_prefix .. space_prefix, 80) .. "\n"
+        doc = doc .. render({ string.format(ins, x) }, space_prefix .. space_prefix, 78) .. "\n"
       end
     end
   end
