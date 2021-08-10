@@ -14,6 +14,10 @@ local help = {}
 local map = vim.tbl_map
 local values = vim.tbl_values
 
+local trim_trailing = function(str)
+  return str:gsub('%s*$', '')
+end
+
 local align_text = function(left, right, width)
   left = left or ''
   right = right or ''
@@ -138,6 +142,9 @@ end
 help.format_parameter_field = function(input, space_prefix, max_name_width, align_width)
   local left_side = help.__left_side_parameter_field(input, max_name_width, space_prefix)
   local right_side = render_without_first_line_prefix(input.description, string.rep(' ', align_width), 78)
+  if right_side == "" then
+    return trim_trailing(left_side) .. '\n'
+  end
 
   local diff = align_width - #left_side
   assert(diff >= 0, "Otherwise we have a big error somewhere in docgen")

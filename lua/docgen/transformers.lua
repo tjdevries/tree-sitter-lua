@@ -92,11 +92,15 @@ transformers.documentation_class = function(accumulator, str, node)
   local name = get_node_text(type_node, str)
   class.name = name
 
-  if desc_node == nil then
-    class.desc = { get_node_text(parent_or_desc, str) }
+  if parent_or_desc ~= nil then
+    if desc_node == nil then
+      class.desc = { get_node_text(parent_or_desc, str) }
+    else
+      class.parent = get_node_text(parent_or_desc, str)
+      class.desc = { get_node_text(desc_node, str) }
+    end
   else
-    class.parent = get_node_text(parent_or_desc, str)
-    class.desc = { get_node_text(desc_node, str) }
+    class.desc = {}
   end
 
   class.fields = {}

@@ -178,6 +178,14 @@ describe('class', function()
       ]])
     end)
 
+    it('should generate the documentation of a class without description, thanks tami :sob:', function()
+      check_class_output([[
+        ---@class TestMap
+      ]], [[
+        TestMap                                                              *TestMap*
+      ]])
+    end)
+
     it('should generate the documentation of a sub class', function()
       check_class_output([[
         ---@class TestArray : TestMap @array
@@ -211,6 +219,19 @@ describe('class', function()
       ]])
     end)
 
+    it('should generate the documentation of a class with fields without description, thanks again tami :sob:', function()
+      check_class_output([[
+        ---@class Array
+        ---@field count number
+      ]], [[
+        Array                                                                  *Array*
+
+
+            Fields: ~
+                {count} (number)
+      ]])
+    end)
+
     it('should generate the documentation of a class with fields and multitypes', function()
       check_class_output([[
         ---@class Array @number indexed starting at 1
@@ -226,10 +247,10 @@ describe('class', function()
                 {count} (number)         Always handy to have a count
                 {type}  (string|number)  Imagine having a type for an array
                 {begin} (function)       It even has a begin()?! Is this cpp?
-                {end}   (function)       It even has an end()?! Get out of here cpp! Oh
-                                         by the way did you know that fields are
-                                         wrapping? I didn't and this should prove this.
-                                         Please work :)
+                {end}   (function)       It even has an end()?! Get out of here cpp!
+                                         Oh by the way did you know that fields are
+                                         wrapping? I didn't and this should prove
+                                         this. Please work :)
       ]])
     end)
 
