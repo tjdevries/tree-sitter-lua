@@ -3202,28 +3202,6 @@
           }
         ]
       }
-    },
-    "comment": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "--"
-            },
-            {
-              "type": "PATTERN",
-              "value": "[^-].*\\r?\\n"
-            }
-          ]
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_multi_comment"
-        }
-      ]
     }
   },
   "extras": [
@@ -3254,7 +3232,7 @@
   "externals": [
     {
       "type": "SYMBOL",
-      "name": "_multi_comment"
+      "name": "comment"
     },
     {
       "type": "SYMBOL",
@@ -3266,8 +3244,7 @@
     "_field_expression",
     "field_separator",
     "prefix_exp",
-    "function_impl",
-    "_multi_comment"
+    "function_impl"
   ],
   "supertypes": []
 }
