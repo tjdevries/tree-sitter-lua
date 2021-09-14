@@ -558,6 +558,41 @@ describe('renderer', function()
     end)
   end)
 
+  describe('code', function()
+    it('works with simple example', function()
+      eq('>\nHello World\n<', renderer.render({'<code>', 'Hello World', '</code>' }, '', 80))
+    end)
+
+    it('works with complex example', function()
+      eq('>\nSteps\n Hello\n  World\n<', renderer.render({'<code>', 'Steps', ' Hello', '  World', '</code>' }, '', 80))
+    end)
+
+    it('combination with Paragraph', function()
+      eq(dedent[[
+        This is a long paragraph that will be wrapped after that we expect a pre block
+        that will ignore stuff
+
+        >
+        Steps
+         Hello
+          World
+        <
+
+        End paragraph just for the LULW s. Please just work.]],
+        renderer.render({
+          'This is a long paragraph that will be wrapped after that we expect a pre block that will ignore stuff',
+          '',
+          '<code>',
+          'Steps',
+          ' Hello',
+          '  World',
+          '</code>',
+          '',
+          'End paragraph just for the LULW s. Please just work.',
+        }, '', 80))
+    end)
+  end)
+
   describe('pre with prefix', function()
     it('can ignore simple blocks', function()
       eq('    Hello World', renderer.render({'<pre>', 'Hello World', '</pre>' }, '    ', 80))
