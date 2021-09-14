@@ -1,9 +1,9 @@
-local log = require('nlsp.log')
-local rpc = require('nlsp.rpc')
-local state = require('nlsp.state')
+local log = require "nlsp.log"
+local rpc = require "nlsp.rpc"
+local state = require "nlsp.state"
 
 -- TODO: This shouldn't be called from here directly, it should be a layer that we call.
-local ts = require('nlsp.ts')
+local ts = require "nlsp.ts"
 
 local protocol = vim.lsp.protocol
 
@@ -13,10 +13,10 @@ local methods = {}
 
 function methods.initialize(params, id)
   if Initialized then
-    error("already initialized!")
+    error "already initialized!"
   end
 
-  Config.root  = params.rootPath or params.rootUri
+  Config.root = params.rootPath or params.rootUri
 
   log.info("Config.root = %q", Config.root)
 
@@ -53,7 +53,7 @@ function methods.initialize(params, id)
       --documentFormattingProvider = false,
       --documentRangeFormattingProvider = false,
       --renameProvider = false,
-    }
+    },
   })
 end
 
@@ -85,7 +85,6 @@ methods["textDocument/didClose"] = function(params)
   state.textDocument.close(params.textDocument)
 end
 
-
 -- interface TextDocumentPositionParams {
 --   textDocument: TextDocumentIdentifier
 --   position: Position
@@ -95,7 +94,7 @@ methods["textDocument/definition"] = function(params)
 
   -- Send result
   rpc.respond(nil, {
-    position = ts.node_to_position(definiton)
+    position = ts.node_to_position(definiton),
   })
 end
 

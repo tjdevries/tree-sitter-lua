@@ -1,9 +1,9 @@
-R('plenary')
+R "plenary"
 
-local plenary_debug = require('plenary.debug_utils')
+local plenary_debug = require "plenary.debug_utils"
 
-local Path = require('plenary.path')
-local Iter = require('plenary.iterators')
+local Path = require "plenary.path"
+local Iter = require "plenary.iterators"
 
 local ts_lua_dir = vim.fn.fnamemodify(plenary_debug.sourced_filepath(), ":h:h:h")
 
@@ -17,12 +17,13 @@ M.setup = function(opts)
     local queries = Iter.iter(vim.fn.glob(queries_dir:absolute() .. "/*", false, true))
 
     queries
-      :map(function(v) return Path:new(v) end)
-      :for_each(function(query) 
+      :map(function(v)
+        return Path:new(v)
+      end)
+      :for_each(function(query)
         print(query.stem)
         -- vim.treesitter.set_query("lua", query:head()
       end)
-
   end
 end
 

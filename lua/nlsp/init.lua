@@ -1,5 +1,5 @@
-local log = require('nlsp.log')
-local rpc = require('nlsp.rpc')
+local log = require "nlsp.log"
+local rpc = require "nlsp.rpc"
 
 local M = {}
 
@@ -9,7 +9,7 @@ Shutdown = Shutdown or false
 local method_handlers = {}
 
 M.start = function()
-  print("We started")
+  print "We started"
 
   while not Shutdown do
     -- header
@@ -20,7 +20,9 @@ M.start = function()
     -- end
 
     if data == nil then
-      if err == "eof" then return os.exit(1) end
+      if err == "eof" then
+        return os.exit(1)
+      end
       error(err)
     elseif data.method then
       -- request
@@ -54,6 +56,5 @@ M.start = function()
 
   os.exit(0)
 end
-
 
 return M

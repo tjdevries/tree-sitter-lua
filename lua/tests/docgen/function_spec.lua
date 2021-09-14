@@ -1,5 +1,5 @@
-local docgen = require('docgen')
-local docgen_help = require('docgen.help')
+local docgen = require "docgen"
+local docgen_help = require "docgen.help"
 
 local eq = assert.are.same
 
@@ -18,9 +18,9 @@ local get_dedented_nodes = function(source)
   return docgen.get_nodes(dedent(source))
 end
 
-describe('functions', function()
-  describe('transform', function()
-    it('should get the nodes of a simple exported function', function()
+describe("functions", function()
+  describe("transform", function()
+    it("should get the nodes of a simple exported function", function()
       local nodes = get_dedented_nodes [[
         local x = {}
 
@@ -37,16 +37,18 @@ describe('functions', function()
           ["x.hello"] = {
             class = {},
             description = { "", "This function has documentation", "" },
-            ["field_list"] = {}, fields = {},
+            ["field_list"] = {},
+            fields = {},
             format = "function",
             name = "x.hello",
-            ["parameter_list"] = {}, parameters = {}
-          }
-        }
+            ["parameter_list"] = {},
+            parameters = {},
+          },
+        },
       }, nodes)
     end)
 
-    it('should get the nodes of multiple simple functions', function()
+    it("should get the nodes of multiple simple functions", function()
       local nodes = get_dedented_nodes [[
         local x = {}
 
@@ -73,32 +75,38 @@ describe('functions', function()
           ["x.hello"] = {
             class = {},
             description = { "", "This function has documentation", "" },
-            ["field_list"] = {}, fields = {},
+            ["field_list"] = {},
+            fields = {},
             format = "function",
             name = "x.hello",
-            ["parameter_list"] = {}, parameters = {}
+            ["parameter_list"] = {},
+            parameters = {},
           },
           ["x.bye"] = {
             class = {},
             description = { "", "This function no documentation", "" },
-            ["field_list"] = {}, fields = {},
+            ["field_list"] = {},
+            fields = {},
             format = "function",
             name = "x.bye",
-            ["parameter_list"] = {}, parameters = {}
+            ["parameter_list"] = {},
+            parameters = {},
           },
           ["x.good_evening"] = {
             class = {},
             description = { "", "This function some documentation", "" },
-            ["field_list"] = {}, fields = {},
+            ["field_list"] = {},
+            fields = {},
             format = "function",
             name = "x.good_evening",
-            ["parameter_list"] = {}, parameters = {}
-          }
-        }
+            ["parameter_list"] = {},
+            parameters = {},
+          },
+        },
       }, nodes)
     end)
 
-    it('should get the nodes of a complex exported function', function()
+    it("should get the nodes of a complex exported function", function()
       local nodes = get_dedented_nodes [[
         local x = {}
 
@@ -118,7 +126,8 @@ describe('functions', function()
           ["x.hello"] = {
             class = {},
             description = { "", "This function has documentation", "" },
-            ["field_list"] = {}, fields = {},
+            ["field_list"] = {},
+            fields = {},
             format = "function",
             name = "x.hello",
             ["parameter_list"] = { "abc", "def", "bxy" },
@@ -126,13 +135,13 @@ describe('functions', function()
               ["abc"] = { description = { "Docs for abc" }, name = "abc", type = { "string" } },
               ["def"] = { description = { "Other docs for def" }, name = "def", type = { "string" } },
               ["bxy"] = { description = { "Final docs" }, name = "bxy", type = { "number" } },
-            }
-          }
-        }
+            },
+          },
+        },
       }, nodes)
     end)
 
-    it('should get the nodes of a complex exported function with multitypes', function()
+    it("should get the nodes of a complex exported function with multitypes", function()
       local nodes = get_dedented_nodes [[
         local x = {}
 
@@ -150,31 +159,33 @@ describe('functions', function()
           ["x.hello"] = {
             class = {},
             description = { "", "This function has documentation", "" },
-            ["field_list"] = {}, fields = {},
+            ["field_list"] = {},
+            fields = {},
             format = "function",
             name = "x.hello",
             ["parameter_list"] = { "a" },
             parameters = {
               ["a"] = { description = { "doc" }, name = "a", type = { "string", "number" } },
-            }
-          }
-        }
+            },
+          },
+        },
       }, nodes)
     end)
   end)
 
-  describe('help output', function()
+  describe("help output", function()
     local function check_function_output(input, output, block)
-      local nodes = require('docgen').get_nodes(input)
+      local nodes = require("docgen").get_nodes(input)
       local result = docgen_help.format(nodes)
       block = block == nil and true or block
-      output = block and help_block(output) or ''
+      output = block and help_block(output) or ""
 
       eq(vim.trim(output), vim.trim(result))
     end
 
-    it('should export documented function', function()
-      check_function_output([[
+    it("should export documented function", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -182,13 +193,16 @@ describe('functions', function()
           return 5
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello()                                                          *x.hello()*
-            This function has documentation]])
+            This function has documentation]]
+      )
     end)
 
-    it('should export this style as well function', function()
-      check_function_output([[
+    it("should export this style as well function", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -196,13 +210,16 @@ describe('functions', function()
           return 5
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello()                                                          *x.hello()*
-            This function has documentation]])
+            This function has documentation]]
+      )
     end)
 
-    it('should export multiple functions in file order', function()
-      check_function_output([[
+    it("should export multiple functions in file order", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -214,7 +231,8 @@ describe('functions', function()
         --- This function no documentation
         function x.ac() return 5 end
 
-        return x]], [[
+        return x]],
+        [[
           x.ba()                                                                *x.ba()*
               This function has documentation
 
@@ -226,11 +244,13 @@ describe('functions', function()
 
 
           x.ac()                                                                *x.ac()*
-              This function no documentation]])
+              This function no documentation]]
+      )
     end)
 
-    it('should export multiple functions in ascending order', function()
-      check_function_output([[
+    it("should export multiple functions in ascending order", function()
+      check_function_output(
+        [[
         ---@config { ['function_order'] = "ascending" }
 
         local x = {}
@@ -244,7 +264,8 @@ describe('functions', function()
         --- This function no documentation
         function x.a() return 5 end
 
-        return x]], [[
+        return x]],
+        [[
           x.a()                                                                  *x.a()*
               This function no documentation
 
@@ -256,11 +277,13 @@ describe('functions', function()
 
 
           x.c()                                                                  *x.c()*
-              This function other documentation]])
+              This function other documentation]]
+      )
     end)
 
-    it('should export multiple functions in descending order', function()
-      check_function_output([[
+    it("should export multiple functions in descending order", function()
+      check_function_output(
+        [[
         ---@config { ['function_order'] = "descending" }
 
         local x = {}
@@ -274,7 +297,8 @@ describe('functions', function()
         --- This function no documentation
         function x.ac() return 5 end
 
-        return x]], [[
+        return x]],
+        [[
           x.cb()                                                                *x.cb()*
               This function other documentation
 
@@ -286,11 +310,13 @@ describe('functions', function()
 
 
           x.ac()                                                                *x.ac()*
-              This function no documentation]])
+              This function no documentation]]
+      )
     end)
 
-    it('should export multiple functions in descending order', function()
-      check_function_output([[
+    it("should export multiple functions in descending order", function()
+      check_function_output(
+        [[
         ---@config { function_order = function(tbl) table.sort(tbl, function(a, b) return a > b end) end }
 
         local x = {}
@@ -304,7 +330,8 @@ describe('functions', function()
         --- This function no documentation
         function x.ac() return 5 end
 
-        return x]], [[
+        return x]],
+        [[
           x.cb()                                                                *x.cb()*
               This function other documentation
 
@@ -316,19 +343,25 @@ describe('functions', function()
 
 
           x.ac()                                                                *x.ac()*
-              This function no documentation]])
+              This function no documentation]]
+      )
     end)
 
-    it('should not export local function', function()
-      check_function_output([[
+    it("should not export local function", function()
+      check_function_output(
+        [[
         --- This function has documentation
         local function hello()
           return 5
-        end]], [[]], false)
+        end]],
+        [[]],
+        false
+      )
     end)
 
-    it('should not export hidden functions', function()
-      check_function_output([[
+    it("should not export hidden functions", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -336,11 +369,14 @@ describe('functions', function()
           return 5
         end
 
-        return x]], [[]])
+        return x]],
+        [[]]
+      )
     end)
 
-    it('should work with param', function()
-      check_function_output([[
+    it("should work with param", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -351,7 +387,8 @@ describe('functions', function()
           return abc .. def .. bxy
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello({abc}, {def}, {bxy})                                       *x.hello()*
             This function has documentation
 
@@ -359,11 +396,13 @@ describe('functions', function()
             Parameters: ~
                 {abc} (string)  Docs for abc
                 {def} (string)  Other docs for def
-                {bxy} (string)  Final docs]])
+                {bxy} (string)  Final docs]]
+      )
     end)
 
-    it('should work with param and multitypes', function()
-      check_function_output([[
+    it("should work with param and multitypes", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -374,7 +413,8 @@ describe('functions', function()
           return abx .. def .. bxy
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello({abc}, {def}, {bxy})                                       *x.hello()*
             This function has documentation
 
@@ -382,11 +422,13 @@ describe('functions', function()
             Parameters: ~
                 {abc} (string|number)    Docs for abc
                 {def} (string)           Other docs for def
-                {bxy} (string|function)  Final docs]])
+                {bxy} (string|function)  Final docs]]
+      )
     end)
 
-    it('should work with long param', function()
-      check_function_output([[
+    it("should work with long param", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -395,7 +437,8 @@ describe('functions', function()
           return abc .. def .. bxy
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello({a})                                                       *x.hello()*
             This function has documentation
 
@@ -403,11 +446,13 @@ describe('functions', function()
             Parameters: ~
                 {a} (string)  This is some documentation for a pretty long param. This
                               means that this description needs to be wrapped. Comon
-                              wrap.]])
+                              wrap.]]
+      )
     end)
 
-    it('should work with return', function()
-      check_function_output([[
+    it("should work with return", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -419,7 +464,8 @@ describe('functions', function()
           return abc .. def .. bxy
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello({abc}, {def}, {bxy})                                       *x.hello()*
             This function has documentation
 
@@ -430,11 +476,13 @@ describe('functions', function()
                 {bxy} (string)  Final docs
 
             Return: ~
-                string: concat]])
+                string: concat]]
+      )
     end)
 
-    it('should work with see', function()
-      check_function_output([[
+    it("should work with see", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -443,17 +491,20 @@ describe('functions', function()
           return 0
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello()                                                          *x.hello()*
             This function has documentation
 
 
             See: ~
-                |x.bye()|]])
+                |x.bye()|]]
+      )
     end)
 
-    it('should work with field', function()
-      check_function_output([[
+    it("should work with field", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -465,7 +516,8 @@ describe('functions', function()
           return 0
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello({t})                                                       *x.hello()*
             This function has documentation
 
@@ -476,11 +528,13 @@ describe('functions', function()
             Fields: ~
                 {k1}   (number)    first key of input table
                 {key}  (function)  second key of input table
-                {key3} (table)     third key of input table]])
+                {key3} (table)     third key of input table]]
+      )
     end)
 
-    it('should work with field and multitypes', function()
-      check_function_output([[
+    it("should work with field and multitypes", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -492,7 +546,8 @@ describe('functions', function()
           return 0
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello({t})                                                       *x.hello()*
             This function has documentation
 
@@ -503,11 +558,13 @@ describe('functions', function()
             Fields: ~
                 {k1}   (string|number)  first key of input table
                 {key}  (function)       second key of input table
-                {key3} (table)          third key of input table]])
+                {key3} (table)          third key of input table]]
+      )
     end)
 
-    it('should work with see, param and return', function()
-      check_function_output([[
+    it("should work with see, param and return", function()
+      check_function_output(
+        [[
         local x = {}
 
         --- This function has documentation
@@ -518,7 +575,8 @@ describe('functions', function()
           return a
         end
 
-        return x]], [[
+        return x]],
+        [[
         x.hello({a})                                                       *x.hello()*
             This function has documentation
 
@@ -530,11 +588,13 @@ describe('functions', function()
                 string: hello
 
             See: ~
-                |x.bye()|]])
+                |x.bye()|]]
+      )
     end)
 
-    it('should only return documentation for returned module', function()
-      check_function_output([[
+    it("should only return documentation for returned module", function()
+      check_function_output(
+        [[
         local a = {}
         local b = {}
 
@@ -548,9 +608,11 @@ describe('functions', function()
           return "Hello, World!"
         end
 
-        return a]], [[
+        return a]],
+        [[
         a.fun()                                                              *a.fun()*
-            Documentation for a]])
+            Documentation for a]]
+      )
     end)
   end)
 end)

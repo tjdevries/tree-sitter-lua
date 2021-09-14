@@ -1,4 +1,3 @@
-
 local utils = {}
 
 local NIL = vim.NIL
@@ -8,7 +7,9 @@ local NIL = vim.NIL
 --@param v (any) Argument
 --@returns (any)
 function utils.convert_NIL(v)
-  if v == NIL then return nil end
+  if v == NIL then
+    return nil
+  end
   return v
 end
 
@@ -18,7 +19,7 @@ end
 --@returns (bool)
 function utils.is_dir(filename)
   local stat = vim.loop.fs_stat(filename)
-  return stat and stat.type == 'directory' or false
+  return stat and stat.type == "directory" or false
 end
 
 return utils

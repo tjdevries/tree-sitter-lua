@@ -1,8 +1,6 @@
-
 local treesitter = vim.treesitter
 
 local storage = {}
-
 
 local state = {}
 

@@ -36,7 +36,7 @@ local interpret_state = function(line)
     return states.NEWLINE
   elseif vim.startswith(vim.trim(line), "-") then
     return states.ITEMIZE
-  elseif vim.trim(line):match("^[0-9]") then
+  elseif vim.trim(line):match "^[0-9]" then
     return states.ENUMERATE
   elseif line == "<code>" then
     return states.CODE
@@ -81,7 +81,7 @@ end
 
 local append = function(l, r)
   if type(l) == "table" then
-    if r:match("<br>$") then
+    if r:match "<br>$" then
       r = trim_trailing(r:gsub("<br>$", ""))
       l[#l] = real_append(l[#l], r)
       table.insert(l, "")
@@ -231,7 +231,7 @@ function Text:start_new_ignore(code)
 end
 
 function Text:add_to_paragraph(str)
-  if str:match("<br>$") then
+  if str:match "<br>$" then
     self.paragraphs[#self.paragraphs] = append(self.paragraphs[#self.paragraphs], str:gsub("<br>$", ""))
     self:start_new_paragraph()
   else
@@ -240,7 +240,7 @@ function Text:add_to_paragraph(str)
 end
 
 function Text:add_to_itemize(str)
-  if str:match("<br>$") then
+  if str:match "<br>$" then
     str = trim_trailing(str:gsub("<br>$", ""))
     table.insert(self.itemizes[#self.itemizes], { str, "" })
   else
@@ -249,7 +249,7 @@ function Text:add_to_itemize(str)
 end
 
 function Text:add_to_enumerate(str)
-  if str:match("<br>$") then
+  if str:match "<br>$" then
     str = trim_trailing(str:gsub("<br>$", ""))
     table.insert(self.enumerates[#self.enumerates], { str, "" })
   else
@@ -318,7 +318,7 @@ m.render = function(input, prefix, width)
         line = current_prefix
       end
     end
-    if line:match("^%s+$") then
+    if line:match "^%s+$" then
       line = ""
     end
     line = trim_trailing(line)
@@ -332,9 +332,9 @@ m.render = function(input, prefix, width)
       for _, str in ipairs(paragraph) do
         local str_start, _ = (function()
           if type(str) == "table" then
-            return str[1]:find("-")
+            return str[1]:find "-"
           end
-          return str:find("-")
+          return str:find "-"
         end)()
         local base = string.rep(" ", (str_start - 1))
         local additional_prefix = { base, base .. "  " }
@@ -345,14 +345,14 @@ m.render = function(input, prefix, width)
       for _, str in ipairs(paragraph) do
         local indent_level, newc = (function()
           if type(str) == "table" then
-            return str[1]:find("[0-9.]+%. ")
+            return str[1]:find "[0-9.]+%. "
           end
-          return str:find("[0-9.]+%. ")
+          return str:find "[0-9.]+%. "
         end)()
         indent_level = indent_level - 1
         newc = newc - indent_level
         if not newc then
-          error("Invalid enumerate. Enumerates have to end with `dot`. Example: `1. Item` or `1.1. Item`")
+          error "Invalid enumerate. Enumerates have to end with `dot`. Example: `1. Item` or `1.1. Item`"
         end
         if not maxc[indent_level] then
           maxc[indent_level] = newc
@@ -369,11 +369,11 @@ m.render = function(input, prefix, width)
         local str_start, str_end = (function()
           local left, right
           if type(str) == "table" then
-            left, _ = str[1]:find("[0-9.]+%. ")
-            _, right = str[1]:gsub("^%s*", ""):find("[0-9]+. ")
+            left, _ = str[1]:find "[0-9.]+%. "
+            _, right = str[1]:gsub("^%s*", ""):find "[0-9]+. "
           else
-            left, _ = str:find("[0-9.]+%. ")
-            _, right = str:gsub("^%s*", ""):find("[0-9]+. ")
+            left, _ = str:find "[0-9.]+%. "
+            _, right = str:gsub("^%s*", ""):find "[0-9]+. "
           end
           return left, right
         end)()
@@ -424,12 +424,12 @@ m.render_without_first_line_prefix = function(input, prefix, width)
           line = prefix .. word
         end
       end
-      if line:match("^%s+$") then
+      if line:match "^%s+$" then
         line = ""
       end
       table.insert(output, line)
     else
-      error("Didn't i said paragraph only?! Read the friendly manual")
+      error "Didn't i said paragraph only?! Read the friendly manual"
     end
   end
   return table.concat(output, "\n")
