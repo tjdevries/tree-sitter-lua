@@ -15,31 +15,34 @@ function Text:new()
 end
 
 local states = setmetatable({
-  NEWLINE = 'newline',
-  ITEMIZE = 'itemize',
-  ENUMERATE = 'enumerate',
-  IGNORE = 'ignore',
-  ENDIGNORE = 'endignore',
-  PARAGRAPH = 'paragraph'
+  NEWLINE = "newline",
+  ITEMIZE = "itemize",
+  ENUMERATE = "enumerate",
+  IGNORE = "ignore",
+  CODE = "code",
+  ENDIGNORE = "endignore",
+  PARAGRAPH = "paragraph",
 }, {
   __index = function(_, k)
-    error(k .. ' is not a valid state!')
+    error(k .. " is not a valid state!")
   end,
   __newindex = function(_, k, _)
-    error('Not allowed to update ' .. k .. '!')
-  end
+    error("Not allowed to update " .. k .. "!")
+  end,
 })
 
 local interpret_state = function(line)
-  if line == '' then
+  if line == "" then
     return states.NEWLINE
-  elseif vim.startswith(vim.trim(line), '-') then
+  elseif vim.startswith(vim.trim(line), "-") then
     return states.ITEMIZE
-  elseif vim.trim(line):match('^[0-9]') then
+  elseif vim.trim(line):match("^[0-9]") then
     return states.ENUMERATE
-  elseif line == '<pre>' then
+  elseif line == "<code>" then
+    return states.CODE
+  elseif line == "<pre>" then
     return states.IGNORE
-  elseif line == '</pre>' then
+  elseif line == "</pre>" or line == "</code>" then
     return states.ENDIGNORE
   else
     return states.PARAGRAPH
@@ -47,33 +50,41 @@ local interpret_state = function(line)
 end
 
 local dispatch_state = {
-  [states.PARAGRAPH] = function(self, line) return self:add_to_paragraph(line) end,
-  [states.NEWLINE] = function(self) self:start_new_paragraph() end,
-  [states.ITEMIZE] = function(self, line) return self:add_to_itemize(line) end,
-  [states.ENUMERATE] = function(self, line) return self:add_to_enumerate(line) end,
+  [states.PARAGRAPH] = function(self, line)
+    return self:add_to_paragraph(line)
+  end,
+  [states.NEWLINE] = function(self)
+    self:start_new_paragraph()
+  end,
+  [states.ITEMIZE] = function(self, line)
+    return self:add_to_itemize(line)
+  end,
+  [states.ENUMERATE] = function(self, line)
+    return self:add_to_enumerate(line)
+  end,
 }
 
 local trim_trailing = function(str)
-  return str:gsub('%s*$', '')
+  return str:gsub("%s*$", "")
 end
 
 local real_append = function(l, r)
   if #l == 0 then
     return r
   end
-  if l:sub(#l, #l) == ' ' then
+  if l:sub(#l, #l) == " " then
     return l .. r
   else
-    return l .. ' ' .. r
+    return l .. " " .. r
   end
 end
 
 local append = function(l, r)
   if type(l) == "table" then
-    if r:match('<br>$') then
-      r = trim_trailing(r:gsub('<br>$', ''))
+    if r:match("<br>$") then
+      r = trim_trailing(r:gsub("<br>$", ""))
       l[#l] = real_append(l[#l], r)
-      table.insert(l, '')
+      table.insert(l, "")
     else
       l[#l] = real_append(l[#l], r)
     end
@@ -84,7 +95,8 @@ end
 
 function Text:error()
   error(
-    string.format('Error while rendering things. Order: %s, paragraphs: %s, itemizes: %s, enumerates: %s, ignores: %s',
+    string.format(
+      "Error while rendering things. Order: %s, paragraphs: %s, itemizes: %s, enumerates: %s, ignores: %s",
       vim.inspect(self.order),
       vim.inspect(self.paragraphs),
       vim.inspect(self.itemizes),
@@ -100,6 +112,10 @@ function Text:handle_line(line)
   if new_state == self.state then
     -- Happens when we didn't have a change in state
     dispatch_state[new_state](self, line)
+  elseif new_state == states.CODE then
+    -- Start new Ignore block
+    self:start_new_ignore(true)
+    self.state = states.IGNORE
   elseif new_state == states.IGNORE then
     -- Start new Ignore block
     self:start_new_ignore()
@@ -136,10 +152,15 @@ function Text:handle_line(line)
     -- Start a new paragraph
     self:start_new_paragraph(line)
     self.state = new_state
-  elseif new_state == states.NEWLINE and (self.state == states.ITEMIZE or
-         self.state == states.ENUMERATE or
-         self.state == states.PARAGRAPH or
-         self.state == nil) then
+  elseif
+    new_state == states.NEWLINE
+    and (
+      self.state == states.ITEMIZE
+      or self.state == states.ENUMERATE
+      or self.state == states.PARAGRAPH
+      or self.state == nil
+    )
+  then
     -- After a itemize have a empty line or
     -- Insert newline when Paragraph or
     -- Newline after a prev block was closed (pre)
@@ -185,7 +206,7 @@ function Text:start_new_paragraph(line)
 end
 
 function Text:start_new_itemize(line)
-  table.insert(self.itemizes, { })
+  table.insert(self.itemizes, {})
   table.insert(self.order, states.ITEMIZE)
   if line then
     self:add_to_itemize(line)
@@ -193,21 +214,25 @@ function Text:start_new_itemize(line)
 end
 
 function Text:start_new_enumerate(line)
-  table.insert(self.enumerates, { })
+  table.insert(self.enumerates, {})
   table.insert(self.order, states.ENUMERATE)
   if line then
     self:add_to_enumerate(line)
   end
 end
 
-function Text:start_new_ignore()
-  table.insert(self.ignores, { })
+function Text:start_new_ignore(code)
+  if code then
+    table.insert(self.ignores, { ">" })
+  else
+    table.insert(self.ignores, {})
+  end
   table.insert(self.order, states.IGNORE)
 end
 
 function Text:add_to_paragraph(str)
-  if str:match('<br>$') then
-    self.paragraphs[#self.paragraphs] = append(self.paragraphs[#self.paragraphs], str:gsub('<br>$', ''))
+  if str:match("<br>$") then
+    self.paragraphs[#self.paragraphs] = append(self.paragraphs[#self.paragraphs], str:gsub("<br>$", ""))
     self:start_new_paragraph()
   else
     self.paragraphs[#self.paragraphs] = append(self.paragraphs[#self.paragraphs], str)
@@ -215,18 +240,18 @@ function Text:add_to_paragraph(str)
 end
 
 function Text:add_to_itemize(str)
-  if str:match('<br>$') then
-    str = trim_trailing(str:gsub('<br>$', ''))
-    table.insert(self.itemizes[#self.itemizes], { str, '' })
+  if str:match("<br>$") then
+    str = trim_trailing(str:gsub("<br>$", ""))
+    table.insert(self.itemizes[#self.itemizes], { str, "" })
   else
     table.insert(self.itemizes[#self.itemizes], str)
   end
 end
 
 function Text:add_to_enumerate(str)
-  if str:match('<br>$') then
-    str = trim_trailing(str:gsub('<br>$', ''))
-    table.insert(self.enumerates[#self.enumerates], { str, '' })
+  if str:match("<br>$") then
+    str = trim_trailing(str:gsub("<br>$", ""))
+    table.insert(self.enumerates[#self.enumerates], { str, "" })
   else
     table.insert(self.enumerates[#self.enumerates], str)
   end
@@ -247,16 +272,14 @@ function Text:append_to_enumerate(str)
 end
 
 function Text:is_empty()
-  return #self.paragraphs == 0 and
-         #self.itemizes == 0 and
-         #self.enumerates == 0
+  return #self.paragraphs == 0 and #self.itemizes == 0 and #self.enumerates == 0
 end
 
 local get_text_from_input = function(input)
   local text = Text:new()
 
   for _, line in ipairs(vim.tbl_flatten(input)) do
-    if not text:is_empty() or line ~= '' then
+    if not text:is_empty() or line ~= "" then
       text:handle_line(line)
     end
   end
@@ -266,14 +289,14 @@ end
 
 m.render = function(input, prefix, width)
   assert(#prefix < width, "Please don't play games with me.")
-  assert(type(input) == 'table', "Input has to be a table")
+  assert(type(input) == "table", "Input has to be a table")
 
   local text = get_text_from_input(input)
 
   local output = {}
 
   local handle = function(string, additional_prefix)
-    additional_prefix = additional_prefix or { '', '' }
+    additional_prefix = additional_prefix or { "", "" }
 
     local line = prefix .. additional_prefix[1]
     local current_prefix = prefix .. additional_prefix[2]
@@ -281,7 +304,7 @@ m.render = function(input, prefix, width)
       string = { string }
     end
     for idx, lstring in ipairs(string) do
-      for _, word in ipairs(vim.split(lstring, ' ')) do
+      for _, word in ipairs(vim.split(lstring, " ")) do
         if #append(line, word) <= width then
           line = append(line, word)
         else
@@ -289,13 +312,15 @@ m.render = function(input, prefix, width)
           line = current_prefix .. word
         end
       end
-      if string[idx + 1] ~= nil and string[idx + 1] ~= '' then
+      if string[idx + 1] ~= nil and string[idx + 1] ~= "" then
         line = trim_trailing(line)
         table.insert(output, line)
         line = current_prefix
       end
     end
-    if line:match('^%s+$') then line = '' end
+    if line:match("^%s+$") then
+      line = ""
+    end
     line = trim_trailing(line)
     table.insert(output, line)
   end
@@ -307,12 +332,12 @@ m.render = function(input, prefix, width)
       for _, str in ipairs(paragraph) do
         local str_start, _ = (function()
           if type(str) == "table" then
-            return str[1]:find('-')
+            return str[1]:find("-")
           end
-          return str:find('-')
+          return str:find("-")
         end)()
-        local base = string.rep(' ', (str_start - 1))
-        local additional_prefix = { base, base .. '  ' }
+        local base = string.rep(" ", (str_start - 1))
+        local additional_prefix = { base, base .. "  " }
         handle(str, additional_prefix)
       end
     elseif typ == states.ENUMERATE then
@@ -320,14 +345,14 @@ m.render = function(input, prefix, width)
       for _, str in ipairs(paragraph) do
         local indent_level, newc = (function()
           if type(str) == "table" then
-            return str[1]:find('[0-9.]+%. ')
+            return str[1]:find("[0-9.]+%. ")
           end
-          return str:find('[0-9.]+%. ')
+          return str:find("[0-9.]+%. ")
         end)()
         indent_level = indent_level - 1
         newc = newc - indent_level
         if not newc then
-          error('Invalid enumerate. Enumerates have to end with `dot`. Example: `1. Item` or `1.1. Item`')
+          error("Invalid enumerate. Enumerates have to end with `dot`. Example: `1. Item` or `1.1. Item`")
         end
         if not maxc[indent_level] then
           maxc[indent_level] = newc
@@ -338,23 +363,23 @@ m.render = function(input, prefix, width)
         end
       end
       for k, v in pairs(maxc) do
-        max[k] = string.rep(' ', v)
+        max[k] = string.rep(" ", v)
       end
       for _, str in ipairs(paragraph) do
         local str_start, str_end = (function()
           local left, right
           if type(str) == "table" then
-            left, _ = str[1]:find('[0-9.]+%. ')
-            _, right = str[1]:gsub('^%s*', ''):find('[0-9]+. ')
+            left, _ = str[1]:find("[0-9.]+%. ")
+            _, right = str[1]:gsub("^%s*", ""):find("[0-9]+. ")
           else
-            left, _ = str:find('[0-9.]+%. ')
-            _, right = str:gsub('^%s*', ''):find('[0-9]+. ')
+            left, _ = str:find("[0-9.]+%. ")
+            _, right = str:gsub("^%s*", ""):find("[0-9]+. ")
           end
           return left, right
         end)()
 
-        local base = string.rep(' ', (str_start - 1))
-        local diff = string.rep(' ', (maxc[str_start - 1] - str_end))
+        local base = string.rep(" ", (str_start - 1))
+        local diff = string.rep(" ", (maxc[str_start - 1] - str_end))
         local additional_prefix = { base .. diff, base .. max[str_start - 1] }
         handle(str, additional_prefix)
       end
@@ -363,11 +388,14 @@ m.render = function(input, prefix, width)
         local construct = trim_trailing(prefix .. str)
         table.insert(output, construct)
       end
+      if paragraph[1] == ">" then
+        table.insert(output, "<")
+      end
     else
       text:error()
     end
   end
-  return table.concat(output, '\n')
+  return table.concat(output, "\n")
 end
 
 --- This is a paragraph only rendering and is used for prefix indentation,
@@ -376,7 +404,7 @@ end
 --- Used for parameters and field description
 m.render_without_first_line_prefix = function(input, prefix, width)
   assert(#prefix < width, "Please don't play games with me.")
-  assert(type(input) == 'table', "Input has to be a table")
+  assert(type(input) == "table", "Input has to be a table")
 
   local text = get_text_from_input(input)
 
@@ -384,7 +412,7 @@ m.render_without_first_line_prefix = function(input, prefix, width)
   for type, paragraph in text:iter() do
     if type == states.PARAGRAPH then
       local line = ""
-      for _, word in ipairs(vim.split(paragraph, ' ')) do
+      for _, word in ipairs(vim.split(paragraph, " ")) do
         local inner_width = width
         if #output == 0 then
           inner_width = inner_width - #prefix
@@ -396,13 +424,15 @@ m.render_without_first_line_prefix = function(input, prefix, width)
           line = prefix .. word
         end
       end
-      if line:match('^%s+$') then line = '' end
+      if line:match("^%s+$") then
+        line = ""
+      end
       table.insert(output, line)
     else
       error("Didn't i said paragraph only?! Read the friendly manual")
     end
   end
-  return table.concat(output, '\n')
+  return table.concat(output, "\n")
 end
 
 return m
