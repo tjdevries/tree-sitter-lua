@@ -1,5 +1,3 @@
-local log = require('docgen.log')
-local utils = require('docgen.utils')
 local render = require('docgen.renderer').render
 local render_without_first_line_prefix = require('docgen.renderer').render_without_first_line_prefix
 
@@ -10,9 +8,6 @@ local render_without_first_line_prefix = require('docgen.renderer').render_witho
 
 ---@tag docgen-help-formatter
 local help = {}
-
-local map = vim.tbl_map
-local values = vim.tbl_values
 
 local trim_trailing = function(str)
   return str:gsub('%s*$', '')
@@ -228,7 +223,7 @@ help.format_function_metadata = function(function_metadata, config)
   local left_side = string.format(
     "%s(%s)",
     name,
-    table.concat(map(
+    table.concat(vim.tbl_map(
       function(val) return string.format("{%s}", function_metadata.parameters[val].name) end,
       function_metadata.parameter_list
     ), ", ")

@@ -85,7 +85,7 @@ local function find_return_module(contents)
 
   local tree = parser:parse()[1]
 
-  for _, node in query:iter_captures(tree:root(), contents, 0, -1) do
+  for _, node in query:iter_captures(tree:root(), contents, 0, -1) do -- luacheck: ignore
     return require'vim.treesitter.query'.get_node_text(node, contents)
   end
 end
