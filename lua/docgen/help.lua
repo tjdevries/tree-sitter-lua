@@ -32,14 +32,14 @@ help.format = function(metadata)
   local formatted = ""
 
   local add = function(text, no_nl)
-    formatted = formatted .. (text or "") .. (no_nl and "" or "\n")
+    formatted = string.format("%s%s%s", formatted, (text or ""), (no_nl and "" or "\n"))
   end
 
   -- TODO: Make top level
 
   add(string.rep("=", 80))
   if metadata.tag then
-    add(align_text(nil, "*" .. metadata.tag .. "*", 80))
+    add(align_text(nil, string.format("*%s*", metadata.tag, "*"), 80))
     add()
   end
 
@@ -144,19 +144,19 @@ help.format_parameter_field = function(input, space_prefix, max_name_width, alig
   local left_side = help.__left_side_parameter_field(input, max_name_width, space_prefix)
   local right_side = render_without_first_line_prefix(input.description, string.rep(" ", align_width), 78)
   if right_side == "" then
-    return trim_trailing(left_side) .. "\n"
+    return string.format("%s\n", trim_trailing(left_side))
   end
 
   local diff = align_width - #left_side
   assert(diff >= 0, "Otherwise we have a big error somewhere in docgen")
 
-  return left_side .. string.rep(" ", diff) .. right_side .. "\n"
+  return string.format("%s%s%s\n", left_side, string.rep(" ", diff), right_side)
 end
 
 help.iter_parameter_field = function(input, list, name, space_prefix)
   local output = ""
   if list and table.getn(list) > 0 then
-    output = output .. "\n" .. space_prefix .. name .. ": ~" .. "\n"
+    output = string.format("%s\n%s%s: ~\n", output, space_prefix, name)
     local max_name_width = 0
     for _, e in ipairs(list) do
       local width = #input[e].name
@@ -174,46 +174,53 @@ help.iter_parameter_field = function(input, list, name, space_prefix)
     end
 
     for _, e in ipairs(list) do
-      output = output .. help.format_parameter_field(input[e], space_prefix, max_name_width, left_width)
+      output = string.format(
+        "%s%s",
+        output,
+        help.format_parameter_field(input[e], space_prefix, max_name_width, left_width)
+      )
     end
   end
   return output
 end
 
 help.format_class_metadata = function(class, config)
+  config = config or {}
   local space_prefix = string.rep(" ", 4)
 
   local doc = ""
   local left_side = class.parent and string.format("%s : %s", class.name, class.parent) or class.name
 
   local header = align_text(left_side, string.format("*%s*", class.name), 78)
-  doc = doc .. header .. "\n"
+  doc = string.format("%s%s\n", doc, header)
 
   local description = render(class.desc, space_prefix, 79)
-  doc = doc .. description .. "\n"
+  doc = string.format("%s%s\n", doc, description)
 
   if class.parent then
-    doc = doc .. "\n" .. space_prefix .. "Parents: ~" .. "\n"
-    doc = doc .. string.format("%s%s|%s|\n", space_prefix, space_prefix, class.parent)
+    doc = string.format("%s\n%sParents: ~\n%s%s|%s|\n", doc, space_prefix, space_prefix, space_prefix, class.parent)
   end
 
-  if config then
-    if type(config.field_order) == "function" then
-      config.field_order(class.field_list)
-    elseif config.field_order == "ascending" then
-      table.sort(class.field_list)
-    elseif config.field_order == "descending" then
-      table.sort(class.field_list, function(a, b)
-        return a > b
-      end)
-    end
+  if type(config.field_order) == "function" then
+    config.field_order(class.field_list)
+  elseif config.field_order == "ascending" then
+    table.sort(class.field_list)
+  elseif config.field_order == "descending" then
+    table.sort(class.field_list, function(a, b)
+      return a > b
+    end)
   end
-  doc = doc .. help.iter_parameter_field(class.fields, class.field_list, "Fields", space_prefix)
+  doc = string.format(
+    "%s%s",
+    doc,
+    help.iter_parameter_field(class.fields, class.field_list, config.field_heading or "Fields", space_prefix)
+  )
 
   return doc
 end
 
 help.format_function_metadata = function(function_metadata, config)
+  config = config or {}
   local space_prefix = string.rep(" ", 4)
 
   local name = function_metadata.name
@@ -235,46 +242,56 @@ help.format_function_metadata = function(function_metadata, config)
   local header = align_text(left_side, right_side, 78)
 
   local doc = ""
-  doc = doc .. header .. "\n"
+  doc = string.format("%s%s\n", doc, header)
 
   local description = render(function_metadata.description, space_prefix, 79)
-  doc = doc .. description .. "\n"
+  doc = string.format("%s%s\n", doc, description)
 
   -- TODO(conni2461): CLASS
 
   -- Handles parameter if used
-  doc = doc
-    .. help.iter_parameter_field(
+  doc = string.format(
+    "%s%s",
+    doc,
+    help.iter_parameter_field(
       function_metadata.parameters,
       function_metadata.parameter_list,
       "Parameters",
       space_prefix
     )
+  )
 
-  if config then
-    if type(config.field_order) == "function" then
-      config.field_order(function_metadata.field_list)
-    elseif config.field_order == "ascending" then
-      table.sort(function_metadata.field_list)
-    elseif config.field_order == "descending" then
-      table.sort(function_metadata.field_list, function(a, b)
-        return a > b
-      end)
-    end
+  if type(config.field_order) == "function" then
+    config.field_order(function_metadata.field_list)
+  elseif config.field_order == "ascending" then
+    table.sort(function_metadata.field_list)
+  elseif config.field_order == "descending" then
+    table.sort(function_metadata.field_list, function(a, b)
+      return a > b
+    end)
   end
   -- Handle fields if used
-  doc = doc .. help.iter_parameter_field(function_metadata.fields, function_metadata.field_list, "Fields", space_prefix)
+  doc = string.format(
+    "%s%s",
+    doc,
+    help.iter_parameter_field(
+      function_metadata.fields,
+      function_metadata.field_list,
+      config.field_heading or "Fields",
+      space_prefix
+    )
+  )
 
   local gen_misc_doc = function(identification, ins)
     if function_metadata[identification] then
-      local title = identification:sub(1, 1):upper() .. identification:sub(2, -1)
+      local title = string.format("%s%s", identification:sub(1, 1):upper(), identification:sub(2, -1))
 
       if doc:sub(#doc, #doc) ~= "\n" then
-        doc = doc .. "\n"
+        doc = string.format("%s\n", doc)
       end
-      doc = doc .. "\n" .. string.format("%s%s: ~", space_prefix, title) .. "\n"
+      doc = string.format("%s\n%s%s: ~\n", doc, space_prefix, title)
       for _, x in ipairs(function_metadata[identification]) do
-        doc = doc .. render({ string.format(ins, x) }, space_prefix .. space_prefix, 78) .. "\n"
+        doc = string.format("%s%s\n", doc, render({ string.format(ins, x) }, string.rep(space_prefix, 2), 78))
       end
     end
   end
