@@ -1,6 +1,6 @@
-local get_node_text = require('vim.treesitter.query').get_node_text
+local get_node_text = require("vim.treesitter.query").get_node_text
 
-local log = require('docgen.log')
+local log = require "docgen.log"
 
 local for_each_child = function(node, cb)
   local named_children_count = node:named_child_count()
@@ -9,7 +9,6 @@ local for_each_child = function(node, cb)
     cb(child_node)
   end
 end
-
 
 ---@brief [[
 --- Transforms generated tree from tree sitter -> metadata nodes that we can use for the project.
@@ -26,7 +25,9 @@ local call_transformer = function(accumulator, str, node, return_module)
 end
 
 transformers._function = function(accumulator, str, node, return_module)
-  if not return_module then return end
+  if not return_module then
+    return
+  end
 
   local name_node = node:field("name")[1]
   local documentation_node = node:field("documentation")[1]
@@ -156,7 +157,7 @@ transformers.emmy_comment = function(accumulator, str, node)
   end
 
   for _, line in ipairs(raw_lines) do
-    local start, finish = line:find("^%s*---")
+    local start, finish = line:find "^%s*---"
     if start then
       line = line:sub(finish + 3)
     end
@@ -196,12 +197,12 @@ transformers.emmy_field = function(accumulator, str, node)
       table.insert(types, get_node_text(node:named_child(i), str))
     elseif node:named_child(i):type() == "field_description" then
       if desc ~= nil then
-        print("[docgen] [Error]: We should not be here")
+        print "[docgen] [Error]: We should not be here"
       else
         desc = get_node_text(node:named_child(i), str)
       end
     else
-      print("[docgen] [Error]: We should not be here")
+      print "[docgen] [Error]: We should not be here"
     end
   end
 
@@ -229,12 +230,12 @@ transformers.emmy_parameter = function(accumulator, str, node)
       table.insert(types, get_node_text(node:named_child(i), str))
     elseif node:named_child(i):type() == "parameter_description" then
       if desc ~= nil then
-        print("[docgen] [Error]: We should not be here")
+        print "[docgen] [Error]: We should not be here"
       else
         desc = get_node_text(node:named_child(i), str)
       end
     else
-      print("[docgen] [Error]: We should not be here")
+      print "[docgen] [Error]: We should not be here"
     end
   end
 
@@ -258,23 +259,23 @@ local create_emmy_type_function = function(identifier)
     end
 
     local text = vim.trim(get_node_text(node, str))
-    text = text:gsub(string.format('---@%s ', identifier), '')
+    text = text:gsub(string.format("---@%s ", identifier), "")
 
     table.insert(accumulator[identifier], text)
   end
 end
 
-transformers.emmy_return = create_emmy_type_function('return')
-transformers.emmy_see = create_emmy_type_function('see')
-transformers.emmy_todo = create_emmy_type_function('todo')
-transformers.emmy_usage = create_emmy_type_function('usage')
-transformers.emmy_varargs = create_emmy_type_function('varargs')
+transformers.emmy_return = create_emmy_type_function "return"
+transformers.emmy_see = create_emmy_type_function "see"
+transformers.emmy_todo = create_emmy_type_function "todo"
+transformers.emmy_usage = create_emmy_type_function "usage"
+transformers.emmy_varargs = create_emmy_type_function "varargs"
 
 transformers.emmy_eval = function(accumulator, str, node)
-  local ok, result = pcall(loadstring('return ' .. get_node_text(node, str)))
+  local ok, result = pcall(loadstring("return " .. get_node_text(node, str)))
 
   if ok then
-    if type(result) == 'table' then
+    if type(result) == "table" then
       for k, v in pairs(result) do
         -- assert(type(v) == 'string', "Not implemented to be nested tables yet." .. vim.inspect(accumulator))
         -- local current_accumulator = accumulator
@@ -286,7 +287,7 @@ transformers.emmy_eval = function(accumulator, str, node)
           accumulator[k] = {}
         end
 
-        table.insert(accumulator[k],  v)
+        table.insert(accumulator[k], v)
       end
     end
   else
@@ -295,10 +296,10 @@ transformers.emmy_eval = function(accumulator, str, node)
 end
 
 transformers.documentation_config = function(accumulator, str, node)
-  local ok, result = pcall(loadstring('return ' .. get_node_text(node, str)))
+  local ok, result = pcall(loadstring("return " .. get_node_text(node, str)))
 
   if ok then
-    if type(result) == 'table' then
+    if type(result) == "table" then
       if not accumulator then
         accumulator = {}
       end

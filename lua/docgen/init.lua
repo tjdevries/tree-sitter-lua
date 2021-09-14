@@ -1,6 +1,6 @@
-local call_transformer = require('docgen.transformers')
-local log = require('docgen.log')
-local utils = require('docgen.utils')
+local call_transformer = require "docgen.transformers"
+local log = require "docgen.log"
+local utils = require "docgen.utils"
 
 local read = utils.read
 
@@ -28,10 +28,7 @@ local docgen = {}
 docgen.debug = false
 
 function docgen._get_query_text(query_name)
-
-  return read(vim.api.nvim_get_runtime_file(
-    string.format('query/lua/%s.scm', query_name), false
-  )[1])
+  return read(vim.api.nvim_get_runtime_file(string.format("query/lua/%s.scm", query_name), false)[1])
 end
 
 --- Get the query for a tree sitter query, loaded from query directory.
@@ -85,20 +82,20 @@ local function find_return_module(contents)
 
   local tree = parser:parse()[1]
 
-  for _, node in query:iter_captures(tree:root(), contents, 0, -1) do
-    return require'vim.treesitter.query'.get_node_text(node, contents)
+  for _, node in query:iter_captures(tree:root(), contents, 0, -1) do -- luacheck: ignore
+    return require("vim.treesitter.query").get_node_text(node, contents)
   end
 end
 
 function docgen.get_nodes(contents)
-  local query_name = 'documentation'
+  local query_name = "documentation"
   local toplevel_types = {
     variable_declaration = true,
     function_statement = true,
     documentation_brief = true,
     documentation_tag = true,
     documentation_config = true,
-    documentation_class = true
+    documentation_class = true,
   }
 
   -- Can be nil here. That way it still works if the file only has a brief.
@@ -113,9 +110,11 @@ function docgen.write(input_file, output_file_handle)
   local contents = read(input_file)
   local resulting_nodes = docgen.get_nodes(contents)
 
-  if docgen.debug then print("Resulting Nodes:", vim.inspect(resulting_nodes)) end
+  if docgen.debug then
+    print("Resulting Nodes:", vim.inspect(resulting_nodes))
+  end
 
-  local result = require('docgen.help').format(resulting_nodes)
+  local result = require("docgen.help").format(resulting_nodes)
   output_file_handle:write(result)
 end
 
@@ -141,7 +140,7 @@ function docgen.test()
     docgen.write(input_file, output_file_handle)
   end
 
-  output_file_handle:write(" vim:tw=78:ts=8:ft=help:norl:")
+  output_file_handle:write " vim:tw=78:ts=8:ft=help:norl:"
   output_file_handle:close()
   vim.cmd [[checktime]]
 end
@@ -164,6 +163,5 @@ end
     }
   }
 --]]
-
 
 return docgen
