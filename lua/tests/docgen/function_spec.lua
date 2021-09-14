@@ -614,5 +614,35 @@ describe("functions", function()
             Documentation for a]]
       )
     end)
+
+    it("should be able to rename field heading", function()
+      check_function_output(
+        [[
+        local builtin = {}
+
+        ---@config { ['field_heading'] = "Options" }
+
+        --- Search for a string and get results live as you type (respecting .gitignore)
+        ---@param opts table: options to pass to the picker
+        ---@field cwd string: root dir to search from (default: cwd, use utils.buffer_dir() to search relative to open buffer)
+        builtin.live_grep = function()
+          return 5
+        end
+
+        return builtin]],
+        [[
+        builtin.live_grep({opts})                                *builtin.live_grep()*
+            Search for a string and get results live as you type (respecting
+            .gitignore)
+
+
+            Parameters: ~
+                {opts} (table)  options to pass to the picker
+
+            Options: ~
+                {cwd} (string)  root dir to search from (default: cwd, use
+                                utils.buffer_dir() to search relative to open buffer)]]
+      )
+    end)
   end)
 end)
