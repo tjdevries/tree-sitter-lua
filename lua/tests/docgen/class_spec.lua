@@ -53,7 +53,11 @@ describe("class", function()
             fields = {
               count = { description = { "Always handy to have a count" }, name = "count", type = { "number" } },
               type = { description = { "Imagine having a type for an array" }, name = "type", type = { "string" } },
-              begin = { description = { "It even has a begin()?! Is this cpp?" }, name = "begin", type = { "function" } },
+              begin = {
+                description = { "It even has a begin()?! Is this cpp?" },
+                name = "begin",
+                type = { "function" },
+              },
               ["end"] = {
                 description = { "It even has an end()?! Get out of here cpp!" },
                 name = "end",
