@@ -565,10 +565,11 @@ module.exports = grammar({
         //
         // ---@param example table hello
         // ---@param example (table): hello
+        // ---@param ... vararg: hello
         emmy_parameter: ($) =>
             seq(
                 /\s*---@param\s+/,
-                field("name", $.identifier),
+                field("name", choice($.identifier, $.ellipsis)),
                 field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
                 // TODO: How closely should we be to emmy...
