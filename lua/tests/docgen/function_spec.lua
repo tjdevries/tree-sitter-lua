@@ -450,6 +450,32 @@ describe("functions", function()
       )
     end)
 
+    it("should create help tag in case of long function signature", function()
+      check_function_output(
+        [[
+        local x = {}
+
+        --- This function has documentation
+        ---@param very_long_parameter_1 number: Very long parameter 1.
+        ---@param very_long_parameter_2 number: Very long parameter 2.
+        ---@param very_long_parameter_3 number: Very long parameter 3.
+        function x.normal_function(very_long_parameter_1, very_long_parameter_2, very_long_parameter_3)
+          return true
+        end
+
+        return x]],
+        [[
+        x.normal_function({very_long_parameter_1}, {very_long_parameter_2}, {very_long_parameter_3}) *x.normal_function()*
+            This function has documentation
+
+
+            Parameters: ~
+                {very_long_parameter_1} (number)  Very long parameter 1.
+                {very_long_parameter_2} (number)  Very long parameter 2.
+                {very_long_parameter_3} (number)  Very long parameter 3.]]
+      )
+    end)
+
     it("should work with return", function()
       check_function_output(
         [[
