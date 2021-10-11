@@ -400,6 +400,28 @@ describe("functions", function()
       )
     end)
 
+    it("should work with ellipsis param", function()
+      check_function_output(
+        [[
+        local x = {}
+
+        --- This function has documentation
+        ---@param ... vararg: Any number of arguments.
+        function x.hello(...)
+          return true
+        end
+
+        return x]],
+        [[
+        x.hello({...})                                                     *x.hello()*
+            This function has documentation
+
+
+            Parameters: ~
+                {...} (vararg)  Any number of arguments.]]
+      )
+    end)
+
     it("should work with param and multitypes", function()
       check_function_output(
         [[

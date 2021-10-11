@@ -167,6 +167,34 @@ end
     (function_end)))
 
 ==================
+Ellipsis as parameter
+==================
+
+--- A function description
+---@param ... vararg: param value
+function cool_function(...)
+  return true
+end
+
+---
+
+(program
+  (function_statement
+    documentation: (emmy_documentation
+                     (emmy_header)
+                     (emmy_parameter
+                       name: (ellipsis)
+                       type: (emmy_type (identifier))
+                       description: (parameter_description)))
+    (function_start)
+    name: (function_name (identifier))
+    (function_body_paren)
+    (parameter_list (ellipsis))
+    (function_body_paren)
+    (function_body (return_statement (boolean)))
+    (function_end)))
+
+==================
 Multiple types with spaces
 ==================
 
