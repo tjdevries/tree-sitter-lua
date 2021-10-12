@@ -236,7 +236,8 @@ help.format_function_metadata = function(function_metadata, config)
     )
   )
 
-  local right_side = string.format("*%s()*", name)
+  -- Add single whitespace on the left to ensure that it reads as help tag
+  local right_side = string.format(" *%s()*", name)
 
   -- TODO(conni2461): LONG function names break this thing
   local header = align_text(left_side, right_side, 78)
