@@ -2,8 +2,7 @@ local M = {}
 
 --- Example of my_func
 ---@param y string: Y description
-M.my_func = function(y)
-end
+M.my_func = function(y) end
 
 --- This is a description of the function
 ---@param x table: X description

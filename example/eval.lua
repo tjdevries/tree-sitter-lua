@@ -9,21 +9,21 @@ m.actual_func = function()
 end
 
 local static_values = {
-  'a',
-  'b',
-  'c',
-  'd',
+  "a",
+  "b",
+  "c",
+  "d",
 }
 
 m.__format_keys = function()
   -- we want to do formatting
-  local table = { '<pre>', 'Static Values: ~' }
+  local table = { "<pre>", "Static Values: ~" }
 
   for _, v in ipairs(static_values) do
-    table.insert(table, '    ' .. v)
+    table.insert(table, "    " .. v)
   end
 
-  table.insert(table, '</pre>')
+  table.insert(table, "</pre>")
   return table
 end
 

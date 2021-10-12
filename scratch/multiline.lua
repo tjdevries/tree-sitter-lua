@@ -1,7 +1,5 @@
 -- This is driving me crazy
 
-
-
 --- Function
 ---@param a number: line 1
 ---line 1.1

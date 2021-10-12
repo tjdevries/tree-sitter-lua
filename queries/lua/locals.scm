@@ -17,3 +17,9 @@
   (while_statement)
   (do_statement)
 ] @scope
+
+;; References
+[
+  (identifier)
+  ; (property_identifier)
+] @reference

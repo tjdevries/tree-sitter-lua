@@ -1,11 +1,10 @@
+local Job = require "plenary.job"
 
-local Job = require("plenary.job")
-
-local rpc = require('nlsp.rpc')
+local rpc = require "nlsp.rpc"
 
 local j = Job:new {
-  command = 'nvim',
-  args = {'--headless', '-c', 'lua require("nlsp").start()'}
+  command = "nvim",
+  args = { "--headless", "-c", 'lua require("nlsp").start()' },
 }
 
 j:start()

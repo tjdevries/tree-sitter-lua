@@ -31,11 +31,9 @@ end
 --- Cooler function, with no params
 ---@eval { ["return"] = 'Docs generated at: ' .. os.date() }
 ---@return nil
-function M:even_cooler()
-end
+function M:even_cooler() end
 
-M.not_documented = function()
-end
+M.not_documented = function() end
 
 -- TODO: Figure out how to exclude the not exported stuff.
 --local NotExported = {}

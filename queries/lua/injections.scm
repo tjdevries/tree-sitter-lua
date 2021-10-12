@@ -16,3 +16,25 @@
   args: (string_argument) @lua)
 
  (#eq? @_prefix_1 "exec_lua"))
+
+(
+  (variable_declaration
+   name: (variable_declarator) @_id
+   value: (string) @graphql)
+
+  (#match? @_id ".*GraphQL")
+)
+
+(comment) @comment
+
+(
+ (function_call 
+    prefix: (
+        (identifier) @_prefix_1
+        (identifier) @_prefix_2
+    )
+    args: (string_argument) @vim)
+
+ (#eq? @_prefix_1 "vim")
+ (#eq? @_prefix_2 "cmd")
+)

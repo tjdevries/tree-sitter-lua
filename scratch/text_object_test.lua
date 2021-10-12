@@ -1,5 +1,4 @@
-
 local x = function()
-  print("hello")
+  print "hello"
   return 5
 end
