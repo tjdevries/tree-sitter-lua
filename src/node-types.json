@@ -446,6 +446,10 @@
         "required": true,
         "types": [
           {
+            "type": "ellipsis",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           }
