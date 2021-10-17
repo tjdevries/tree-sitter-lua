@@ -39,7 +39,12 @@ help.format = function(metadata)
 
   add(string.rep("=", 80))
   if metadata.tag then
-    add(align_text(nil, string.format("*%s*", metadata.tag, "*"), 80))
+    -- Support multiple tags
+    local tags = vim.tbl_map(function(x)
+      return string.format("*%s*", x)
+    end, vim.split(metadata.tag, "%s+"))
+
+    add(align_text(nil, table.concat(tags, " "), 80))
     add()
   end
 
