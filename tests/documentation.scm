@@ -352,7 +352,7 @@
 ;;; Field
 ; --- This function has documentation
 ; ---@param t table: Some table
-; ---@field name string: name
+; ---@field public name string: name
 ; function M.hello(t)
 ;   return t.name
 ; end
@@ -361,7 +361,7 @@
   (emmy_documentation
    (emmy_header)
    (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description))
-   (emmy_field (identifier) (emmy_type (identifier)) (field_description)))
+   (emmy_field (emmy_visibility) (identifier) (emmy_type (identifier)) (field_description)))
   (function_start)
   (function_name (identifier) (table_dot) (identifier))
   (function_body_paren)

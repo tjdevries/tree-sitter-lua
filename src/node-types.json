@@ -419,6 +419,16 @@
             "named": true
           }
         ]
+      },
+      "visibility": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "emmy_visibility",
+            "named": true
+          }
+        ]
       }
     }
   },
@@ -584,6 +594,11 @@
   },
   {
     "type": "emmy_varargs",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "emmy_visibility",
     "named": true,
     "fields": {}
   },
@@ -2576,6 +2591,18 @@
   },
   {
     "type": "or",
+    "named": false
+  },
+  {
+    "type": "private",
+    "named": false
+  },
+  {
+    "type": "protected",
+    "named": false
+  },
+  {
+    "type": "public",
     "named": false
   },
   {

@@ -100,18 +100,20 @@ module.exports = grammar({
         _block: ($) => $._chunk,
 
         _expression: ($) =>
-            prec.left(choice(
-                $.nil,
-                $.boolean,
-                $.number,
-                $.string,
-                $.ellipsis,
-                $.function,
-                $.prefix_exp,
-                $.tableconstructor,
-                $.binary_operation,
-                $.unary_operation
-            )),
+            prec.left(
+                choice(
+                    $.nil,
+                    $.boolean,
+                    $.number,
+                    $.string,
+                    $.ellipsis,
+                    $.function,
+                    $.prefix_exp,
+                    $.tableconstructor,
+                    $.binary_operation,
+                    $.unary_operation
+                )
+            ),
 
         // Primitives {{{
         nil: (_) => "nil",
@@ -592,6 +594,7 @@ module.exports = grammar({
         emmy_field: ($) =>
             seq(
                 /\s*---@field\s+/,
+                optional(field("visibility", $.emmy_visibility)),
                 field("name", $.identifier),
                 field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
@@ -601,6 +604,8 @@ module.exports = grammar({
                 ),
                 /\n\s*/
             ),
+
+        emmy_visibility: () => choice("public", "protected", "private"),
 
         _multiline_emmy_string: ($) =>
             prec.right(
