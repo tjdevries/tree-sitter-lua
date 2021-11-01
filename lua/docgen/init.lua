@@ -61,6 +61,9 @@ end
 
 function docgen.transform_nodes(contents, query_name, toplevel_types, return_module)
   local t = {}
+
+  t.return_module = return_module
+
   docgen.foreach_node(contents, query_name, function(id, node)
     if toplevel_types[node:type()] then
       local ok, result = pcall(call_transformer, t, contents, node, return_module)

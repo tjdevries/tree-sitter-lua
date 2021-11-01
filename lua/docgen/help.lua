@@ -99,7 +99,18 @@ help.format = function(metadata)
         return a > b
       end)
     end
+
+    -- config.module:
+    --   Replace the module return name with this.
+    if metadata.config.module then
+      if type(metadata.return_module) == "string" then
+        metadata.config.transform_name = function(_, name)
+          return (string.gsub(name, metadata.return_module, metadata.config.module, 1))
+        end
+      end
+    end
   end
+
   metadata_keys = vim.tbl_filter(function(func_name)
     if string.find(func_name, ".__", 1, true) then
       return false
@@ -229,6 +240,7 @@ help.format_function_metadata = function(function_metadata, config)
   local space_prefix = string.rep(" ", 4)
 
   local name = function_metadata.name
+  local tag = config.transform_name and config.transform_name(function_metadata, name) or name
 
   local left_side = string.format(
     "%s(%s)",
@@ -242,7 +254,7 @@ help.format_function_metadata = function(function_metadata, config)
   )
 
   -- Add single whitespace on the left to ensure that it reads as help tag
-  local right_side = string.format(" *%s()*", name)
+  local right_side = string.format(" *%s()*", tag)
 
   -- TODO(conni2461): LONG function names break this thing
   local header = align_text(left_side, right_side, 78)
