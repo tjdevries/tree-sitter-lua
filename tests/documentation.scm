@@ -467,3 +467,10 @@
 ; function M.get_line_diagnostics(bufnr, line_nr, opts, client_id)
 ; end
 ;()
+
+
+;;; Brief with embedded strings
+; ---@brief [[
+; --- "a string"
+; ---@brief ]]
+(program (documentation_brief))
