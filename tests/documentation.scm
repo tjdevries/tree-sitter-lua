@@ -345,7 +345,7 @@
   (parameter_list (identifier) (identifier) (identifier))
   (function_body_paren)
   (function_body (return_statement
-   (binary_operation (identifier) (binary_operation (identifier) (identifier)))))
+   (binary_operation (binary_operation (identifier) (identifier)) (identifier) )))
   (function_end))
  (module_return_statement (identifier)))
 

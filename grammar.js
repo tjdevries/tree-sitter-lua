@@ -100,7 +100,7 @@ module.exports = grammar({
         _block: ($) => $._chunk,
 
         _expression: ($) =>
-            choice(
+            prec.left(choice(
                 $.nil,
                 $.boolean,
                 $.number,
@@ -111,7 +111,7 @@ module.exports = grammar({
                 $.tableconstructor,
                 $.binary_operation,
                 $.unary_operation
-            ),
+            )),
 
         // Primitives {{{
         nil: (_) => "nil",

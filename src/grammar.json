@@ -186,49 +186,53 @@
       "name": "_chunk"
     },
     "_expression": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "nil"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "boolean"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "number"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "string"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "ellipsis"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "function"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "prefix_exp"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "tableconstructor"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "binary_operation"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "unary_operation"
-        }
-      ]
+      "type": "PREC_LEFT",
+      "value": 0,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "nil"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "boolean"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "number"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "string"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "ellipsis"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "function"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "prefix_exp"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "tableconstructor"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "binary_operation"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "unary_operation"
+          }
+        ]
+      }
     },
     "nil": {
       "type": "STRING",
