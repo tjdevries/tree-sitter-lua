@@ -250,7 +250,7 @@ help.format_function_metadata = function(function_metadata, config)
   local doc = ""
   doc = string.format("%s%s\n", doc, header)
 
-  local description = render(function_metadata.description, space_prefix, 79)
+  local description = render(function_metadata.description or {}, space_prefix, 79)
   doc = string.format("%s%s\n", doc, description)
 
   -- TODO(conni2461): CLASS

@@ -229,6 +229,11 @@
     "fields": {}
   },
   {
+    "type": "dot",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "emmy_class",
     "named": true,
     "fields": {
@@ -310,6 +315,10 @@
         },
         {
           "type": "emmy_todo",
+          "named": true
+        },
+        {
+          "type": "emmy_typedecl",
           "named": true
         },
         {
@@ -483,7 +492,7 @@
     "fields": {
       "description": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "emmy_return_description",
@@ -527,9 +536,13 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "dot",
+          "named": true
+        },
         {
           "type": "emmy_type_list",
           "named": true
@@ -586,6 +599,11 @@
         ]
       }
     }
+  },
+  {
+    "type": "emmy_typedecl",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "emmy_usage",
@@ -2430,6 +2448,10 @@
     "named": false
   },
   {
+    "type": ":",
+    "named": false
+  },
+  {
     "type": ";",
     "named": false
   },
@@ -2463,6 +2485,10 @@
   },
   {
     "type": ">>",
+    "named": false
+  },
+  {
+    "type": "@comment",
     "named": false
   },
   {

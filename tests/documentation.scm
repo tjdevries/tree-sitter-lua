@@ -37,7 +37,7 @@
 
 ;;; Return documentation with text
 ; --- With Text
-; ---@return bool Explanation of bool
+; ---@return bool: Explanation of bool
 ; function with_text()
 ;   return false
 ; end
@@ -94,11 +94,47 @@
     (function_body (return_statement (boolean)))
     (function_end)))
 
-;;; Full documentation
+;;; Full documentation, no return description
 ; --- A function description
 ; ---@param p string: param value
 ; ---@param x table: another value
 ; ---@return true
+; function cool_function(p, x)
+;   return true
+; end
+(program
+  (function_statement
+    documentation: (emmy_documentation
+                     (emmy_header)
+
+                     (emmy_parameter
+                       name: (identifier)
+                       type: (emmy_type (identifier))
+                       description: (parameter_description))
+
+                     (emmy_parameter
+                       name: (identifier)
+                       type: (emmy_type (identifier))
+                       description: (parameter_description))
+
+                     (emmy_return
+                       type: (emmy_type (identifier))))
+
+    (function_start)
+    name: (function_name (identifier))
+
+    (function_body_paren)
+    (parameter_list (identifier) (identifier))
+    (function_body_paren)
+
+    (function_body (return_statement (boolean)))
+    (function_end)))
+
+;;; Full documentation, return description
+; --- A function description
+; ---@param p string: param value
+; ---@param x table: another value
+; ---@return true @comment A description
 ; function cool_function(p, x)
 ;   return true
 ; end
@@ -220,8 +256,7 @@
                      (emmy_return
                        type: (emmy_type (emmy_type_map
                                           key: (emmy_type (identifier))
-                                          value: (emmy_type (emmy_type_list type: (emmy_type (identifier))))))
-                       description: (emmy_return_description)))
+                                          value: (emmy_type (emmy_type_list type: (emmy_type (identifier))))))))
 
     (local)
     name: (variable_declarator (identifier))
@@ -352,7 +387,7 @@
 ;;; Field
 ; --- This function has documentation
 ; ---@param t table: Some table
-; ---@field public name string: name
+; ---@field public name x.y: name
 ; function M.hello(t)
 ;   return t.name
 ; end
@@ -361,7 +396,7 @@
   (emmy_documentation
    (emmy_header)
    (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description))
-   (emmy_field (emmy_visibility) (identifier) (emmy_type (identifier)) (field_description)))
+   (emmy_field (emmy_visibility) (identifier) (emmy_type (identifier) (dot) (identifier)) (field_description)))
   (function_start)
   (function_name (identifier) (table_dot) (identifier))
   (function_body_paren)
@@ -474,3 +509,51 @@
 ; --- "a string"
 ; ---@brief ]]
 (program (documentation_brief))
+
+;;; Can do dotted for return
+; ---@return cmp.ConfigSchema
+; config.get = function()
+; end
+(program
+ (variable_declaration
+  (emmy_documentation (emmy_return (emmy_type (identifier) (dot) (identifier))))
+   (variable_declarator (identifier) (identifier))
+   (function (function_start) (function_body_paren) (function_body_paren) (function_end))
+  ))
+
+;;; Should work with return from test:
+; --- This function has documentation
+; ---@param abc string: Docs for abc
+; ---@param def string: Other docs for def
+; ---@param bxy string: Final docs
+; ---@return string: concat
+; function x.hello(abc, def, bxy)
+;   return abc .. def .. bxy
+; end
+(program
+  (function_statement
+    (emmy_documentation
+      (emmy_header)
+
+      (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description))
+      (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description))
+      (emmy_parameter (identifier) (emmy_type (identifier)) (parameter_description))
+      (emmy_return (emmy_type (identifier)) (emmy_return_description)))
+
+    (function_start)
+    (function_name
+      (identifier) (table_dot) (identifier))
+    (function_body_paren)
+    (parameter_list
+      (identifier)
+      (identifier)
+      (identifier))
+    (function_body_paren)
+    (function_body
+      (return_statement
+        (binary_operation
+          (binary_operation
+            (identifier)
+            (identifier))
+          (identifier))))
+    (function_end)))

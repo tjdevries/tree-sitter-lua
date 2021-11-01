@@ -187,22 +187,25 @@ transformers.emmy_class = function(accumulator, str, node)
 end
 
 transformers.emmy_field = function(accumulator, str, node)
-  local name_node = node:named_child(0)
+  local name_node = node:field("name")[1]
   assert(name_node, "Field must have a name")
 
   local types = {}
   local desc
-  for i = 1, node:named_child_count() - 1 do
-    if node:named_child(i):type() == "emmy_type" then
-      table.insert(types, get_node_text(node:named_child(i), str))
-    elseif node:named_child(i):type() == "field_description" then
-      if desc ~= nil then
-        print "[docgen] [Error]: We should not be here"
-      else
-        desc = get_node_text(node:named_child(i), str)
-      end
+  for _, child in ipairs(node:field "type") do
+    local child_type = child:type()
+    if child_type == "emmy_type" or child_type == "identifier" then
+      table.insert(types, get_node_text(child, str))
     else
-      print "[docgen] [Error]: We should not be here"
+      print("[docgen] [Error]: We should not be here // emmy_field #2" .. child:type())
+    end
+  end
+
+  for _, child in ipairs(node:field "description") do
+    if desc ~= nil then
+      print "[docgen] [Error]: We should not be here // emmy_field #1"
+    else
+      desc = get_node_text(child, str)
     end
   end
 
@@ -230,12 +233,12 @@ transformers.emmy_parameter = function(accumulator, str, node)
       table.insert(types, get_node_text(node:named_child(i), str))
     elseif node:named_child(i):type() == "parameter_description" then
       if desc ~= nil then
-        print "[docgen] [Error]: We should not be here"
+        print "[docgen] [Error]: We should not be here // emmy_parameter #1"
       else
         desc = get_node_text(node:named_child(i), str)
       end
     else
-      print "[docgen] [Error]: We should not be here"
+      print "[docgen] [Error]: We should not be here // emmy_parazn #2"
     end
   end
 

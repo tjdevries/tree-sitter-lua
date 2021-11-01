@@ -120,6 +120,13 @@ describe("functions", function()
 
         return x
       ]]
+
+      eq({
+        ["abc"] = { description = { "Docs for abc" }, name = "abc", type = { "string" } },
+        ["def"] = { description = { "Other docs for def" }, name = "def", type = { "string" } },
+        ["bxy"] = { description = { "Final docs" }, name = "bxy", type = { "number" } },
+      }, nodes.functions["x.hello"].parameters)
+
       eq({
         ["function_list"] = { "x.hello" },
         functions = {

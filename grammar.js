@@ -371,17 +371,24 @@ module.exports = grammar({
         function_start: () => "function",
 
         function_statement: ($) =>
-            seq(
-                field("documentation", optional($.emmy_documentation)),
-                choice(
-                    seq(
-                        alias("local", $.local),
-                        $.function_start,
-                        field("name", $.identifier)
+            prec.right(
+                PREC.DEFAULT,
+                seq(
+                    field("documentation", optional($.emmy_documentation)),
+                    choice(
+                        seq(
+                            alias("local", $.local),
+                            $.function_start,
+                            field("name", $.identifier)
+                        ),
+                        seq(
+                            $.function_start,
+                            /\s*/,
+                            field("name", $.function_name)
+                        )
                     ),
-                    seq($.function_start, /\s*/, field("name", $.function_name))
-                ),
-                $.function_impl
+                    $.function_impl
+                )
             ),
 
         // }}}
@@ -493,6 +500,7 @@ module.exports = grammar({
         right_bracket: (_) => "]",
 
         _comma: (_) => ",",
+        dot: () => ".",
         // }}}
 
         // Documentation {{{
@@ -533,7 +541,10 @@ module.exports = grammar({
             ),
 
         emmy_type: ($) =>
-            choice($.emmy_type_map, $.emmy_type_list, $.identifier),
+            choice($.emmy_type_map, $.emmy_type_list, $._emmy_identifier),
+
+        _emmy_identifier: ($) =>
+            prec.right(PREC.COMMA, list_of($.identifier, $.dot, false)),
 
         // Definition:
         // ---@class MY_TYPE[:PARENT_TYPE] [@comment]
@@ -572,6 +583,7 @@ module.exports = grammar({
             seq(
                 /\s*---@param\s+/,
                 field("name", choice($.identifier, $.ellipsis)),
+                /\s+/,
                 field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
                 // TODO: How closely should we be to emmy...
@@ -594,8 +606,9 @@ module.exports = grammar({
         emmy_field: ($) =>
             seq(
                 /\s*---@field\s+/,
-                optional(field("visibility", $.emmy_visibility)),
+                optional(seq(field("visibility", $.emmy_visibility), /\s+/)),
                 field("name", $.identifier),
+                /\s+/,
                 field("type", list_of($.emmy_type, /\s*\|\s*/)),
 
                 // TODO: How closely should we be to emmy...
@@ -620,21 +633,34 @@ module.exports = grammar({
         // TODO(conni2461): Pretty sure that doesn't work as expected
         parameter_description: ($) => $._multiline_emmy_string,
 
-        emmy_return_description: ($) => $._multiline_emmy_string,
+        // emmy_return_description: ($) => $._multiline_emmy_string,
         emmy_return_description: ($) => /[^\n]*/,
 
         emmy_return: ($) =>
             seq(
-                /---@return/,
+                /---@return\s*/,
                 field("type", list_of($.emmy_type, "|")),
-                // field("description", optional($.emmy_return_description))
-                // field("description", optional(/[^\n]+/))
-                field("description", $.emmy_return_description)
+
+                optional(
+                    seq(
+                        choice(":", "@comment"),
+                        field("description", $.emmy_return_description)
+                    )
+                )
+
+                // TODO: This feels a bit weird, because it seems like maybe whitespace
+                // could break this, but I will leave it for now because it makes me happy.
+                // choice(
+                //     prec.right(
+                //     ),
+                //     "\n"
+                // )
             ),
 
         emmy_eval: ($) => $._expression,
         _emmy_eval_container: ($) => seq(/---@eval\s+/, $.emmy_eval),
 
+        emmy_typedecl: (_) => seq(/---@type.+/, /[^\n]*/),
         emmy_note: (_) => seq(/---@note.+/, /[^\n]*/),
         emmy_see: (_) => seq(/---@see.+/, /[^\n]*/),
         emmy_todo: (_) => seq(/---@todo.+/, /[^\n]*/),
@@ -645,7 +671,11 @@ module.exports = grammar({
             prec.left(
                 PREC.DEFAULT,
                 seq(
-                    alias($.emmy_comment, $.emmy_header),
+                    choice(
+                        alias($.emmy_comment, $.emmy_header),
+                        $.emmy_typedecl,
+                        $.emmy_return
+                    ),
                     any_amount_of(
                         choice(
                             $.emmy_ignore,
@@ -653,6 +683,7 @@ module.exports = grammar({
                             $.emmy_class,
                             $.emmy_parameter,
                             $.emmy_field,
+                            $.emmy_typedecl,
                             $.emmy_note,
                             $.emmy_see,
                             $.emmy_todo,

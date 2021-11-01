@@ -289,7 +289,9 @@ end
 
 m.render = function(input, prefix, width)
   assert(#prefix < width, "Please don't play games with me.")
-  assert(type(input) == "table", "Input has to be a table")
+  if type(input) ~= "table" then
+    error(debug.traceback(string.format("Input has to be a table: %s", vim.inspect(input))))
+  end
 
   local text = get_text_from_input(input)
 
