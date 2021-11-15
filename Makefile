@@ -1,14 +1,9 @@
-ts := "./node_modules/tree-sitter-cli/tree-sitter"
+ts := ./node_modules/tree-sitter-cli/tree-sitter
 
-ifeq (, ${ts})
-	ts := $(shell which tree-sitter 2> /dev/null)
-endif
+$(ts):
+	npm ci
 
-ifeq (, ${ts})
-	ts := $(shell which tree-sitter-cli 2> /dev/null)
-endif
-
-generate:
+generate: | $(ts)
 	${ts} generate
 
 test: generate
@@ -27,8 +22,9 @@ test_docgen: generate
 		-c "PlenaryBustedDirectory lua/tests/ {minimal_init = 'tests/minimal_init.vim'}"
 
 build_parser: generate
-	mkdir -p build
+	mkdir -p build parser
 	cc -o ./build/parser.so -I./src src/parser.c src/scanner.cc -shared -Os -lstdc++ -fPIC
+	cp ./build/parser.so ./parser/lua.so
 
 gen_howto:
 	nvim --headless --noplugin -u tests/minimal_init.vim -c "luafile ./scratch/gen_howto.lua" -c 'qa'
