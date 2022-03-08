@@ -41,7 +41,7 @@ module.exports = grammar({
         $.prefix_exp,
 
         $.function_impl,
-        $._multi_comment,
+        $.comment,
     ],
 
     conflicts: ($) => [

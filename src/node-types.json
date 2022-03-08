@@ -73,11 +73,6 @@
     "fields": {}
   },
   {
-    "type": "comment",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "do_statement",
     "named": true,
     "fields": {},
