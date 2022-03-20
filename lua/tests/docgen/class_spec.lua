@@ -184,6 +184,7 @@ describe("class", function()
             },
           },
         },
+        return_module = "Job",
       }, nodes)
     end)
   end)
