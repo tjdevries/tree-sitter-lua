@@ -22,4 +22,5 @@
 
  (#eq? @_prefix_1 "vim")
  (#eq? @_prefix_2 "cmd")
+ (#offset! @vim 0 2 0 -2)
 )

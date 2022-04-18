@@ -45,6 +45,7 @@ describe("functions", function()
             parameters = {},
           },
         },
+        return_module = "x",
       }, nodes)
     end)
 
@@ -103,6 +104,7 @@ describe("functions", function()
             parameters = {},
           },
         },
+        return_module = "x",
       }, nodes)
     end)
 
@@ -145,6 +147,7 @@ describe("functions", function()
             },
           },
         },
+        return_module = "x",
       }, nodes)
     end)
 
@@ -176,6 +179,7 @@ describe("functions", function()
             },
           },
         },
+        return_module = "x",
       }, nodes)
     end)
   end)
