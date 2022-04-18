@@ -703,5 +703,35 @@ describe("functions", function()
                                 utils.buffer_dir() to search relative to open buffer)]]
       )
     end)
+
+    it("should be able to add a module prefix", function()
+      check_function_output(
+        [[
+        local builtin = {}
+
+        ---@config { ['field_heading'] = "Options", ['module'] = "telescope.builtin" }
+
+        --- Search for a string and get results live as you type (respecting .gitignore)
+        ---@param opts table: options to pass to the picker
+        ---@field cwd string: root dir to search from (default: cwd, use utils.buffer_dir() to search relative to open buffer)
+        builtin.live_grep = function()
+          return 5
+        end
+
+        return builtin]],
+        [[
+        builtin.live_grep({opts})                      *telescope.builtin.live_grep()*
+            Search for a string and get results live as you type (respecting
+            .gitignore)
+
+
+            Parameters: ~
+                {opts} (table)  options to pass to the picker
+
+            Options: ~
+                {cwd} (string)  root dir to search from (default: cwd, use
+                                utils.buffer_dir() to search relative to open buffer)]]
+      )
+    end)
   end)
 end)
