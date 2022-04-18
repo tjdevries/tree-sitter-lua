@@ -8,14 +8,14 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions-rs/install@v0.1
         with:
-          node-version: '14'
-      - run: npm install
+          crate: tree-sitter-cli
+          version: latest
       - name: Generate grammar
         run: make generate
       - name: Run tests
-        run: ./node_modules/tree-sitter-cli/tree-sitter test
+        run: tree-sitter test
 
   docgen:
     name: X64-ubuntu
