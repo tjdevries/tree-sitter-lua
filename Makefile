@@ -28,6 +28,10 @@ gen_howto:
 lualint:
 	luacheck lua/docgen
 
+dist:
+	mkdir -p parser
+	cc -o ./parser/lua.so -I./src src/parser.c src/scanner.c -shared -Os -lstdc++ -fPIC
+
 wasm: build_parser
 	${ts} build-wasm
 
