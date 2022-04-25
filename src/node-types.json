@@ -2018,6 +2018,78 @@
     }
   },
   {
+    "type": "string",
+    "named": true,
+    "fields": {
+      "content": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string_content",
+            "named": false
+          }
+        ]
+      },
+      "end": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_end",
+            "named": false
+          }
+        ]
+      },
+      "start": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_start",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "string_argument",
+    "named": true,
+    "fields": {
+      "content": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string_content",
+            "named": false
+          }
+        ]
+      },
+      "end": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_end",
+            "named": false
+          }
+        ]
+      },
+      "start": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_start",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "table_argument",
     "named": true,
     "fields": {},
@@ -2423,10 +2495,6 @@
     "named": false
   },
   {
-    "type": "--",
-    "named": false
-  },
-  {
     "type": ".",
     "named": false
   },
@@ -2509,6 +2577,18 @@
   {
     "type": "break_statement",
     "named": true
+  },
+  {
+    "type": "comment_content",
+    "named": false
+  },
+  {
+    "type": "comment_end",
+    "named": false
+  },
+  {
+    "type": "comment_start",
+    "named": false
   },
   {
     "type": "do_end",
@@ -2647,12 +2727,16 @@
     "named": true
   },
   {
-    "type": "string",
-    "named": true
+    "type": "string_content",
+    "named": false
   },
   {
-    "type": "string_argument",
-    "named": true
+    "type": "string_end",
+    "named": false
+  },
+  {
+    "type": "string_start",
+    "named": false
   },
   {
     "type": "table<",

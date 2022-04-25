@@ -30,7 +30,15 @@ EQUALS_LEVELS = 5;
 module.exports = grammar({
     name: "lua",
 
-    externals: ($) => [$._multi_comment, $.string],
+    externals: ($) => [
+        $._block_comment_start,
+        $._block_comment_content,
+        $._block_comment_end,
+
+        $._string_start,
+        $._string_content,
+        $._string_end,
+    ],
 
     extras: ($) => [/[\n]/, /\s/, $.comment],
 
@@ -68,6 +76,16 @@ module.exports = grammar({
                     ),
                     optional("\0")
                 )
+            ),
+
+        string: ($) =>
+            seq(
+                field("start", alias($._string_start, "string_start")),
+                field(
+                    "content",
+                    optional(alias($._string_content, "string_content"))
+                ),
+                field("end", alias($._string_end, "string_end"))
             ),
 
         _statement: ($) =>
@@ -697,7 +715,27 @@ module.exports = grammar({
         // }}}
 
         // Comments {{{
-        comment: ($) => choice(seq("--", /[^-].*\r?\n/), $._multi_comment),
+        // comment: ($) => choice(seq("--", /[^-].*\r?\n/), $._multi_comment),
+        comment: ($) =>
+            choice(
+                seq(
+                    field("start", alias("--", "comment_start")),
+                    field("content", alias(/[^\r\n]*/, "comment_content"))
+                ),
+                seq(
+                    field(
+                        "start",
+                        alias($._block_comment_start, "comment_start")
+                    ),
+                    field(
+                        "content",
+                        optional(
+                            alias($._block_comment_content, "comment_content")
+                        )
+                    ),
+                    field("end", alias($._block_comment_end, "comment_end"))
+                )
+            ),
         // }}}
     },
 });

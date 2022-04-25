@@ -20,7 +20,7 @@ test_docgen: generate
 
 build_parser: generate
 	mkdir -p build
-	cc -o ./build/parser.so -I./src src/parser.c src/scanner.cc -shared -Os -lstdc++ -fPIC
+	cc -o ./build/parser.so -I./src src/parser.c src/scanner.c -shared -Os -lstdc++ -fPIC
 
 gen_howto:
 	nvim --headless --noplugin -u tests/minimal_init.vim -c "luafile ./scratch/gen_howto.lua" -c 'qa'
