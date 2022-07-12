@@ -48,7 +48,7 @@ describe("tag", function()
         [=[
         ---@tag hello
         ]=],
-        [[*hello*]]
+        [[HELLO                                                                    *hello*]]
       )
     end)
 
@@ -57,7 +57,7 @@ describe("tag", function()
         [=[
         ---@tag hello world
         ]=],
-        [[*hello* *world*]]
+        [[HELLO                                                            *hello* *world*]]
       )
     end)
 
@@ -66,7 +66,26 @@ describe("tag", function()
         [=[
         ---@tag hello  world      people
         ]=],
-        [[*hello* *world* *people*]]
+        [[HELLO                                                   *hello* *world* *people*]]
+      )
+    end)
+
+    it("works with module names as tags", function()
+      check_tag_output(
+        [=[
+        ---@tag telescope.command
+        ]=],
+        [[COMMAND                                                      *telescope.command*]]
+      )
+    end)
+
+    it("works with module names as tags and different name in config", function()
+      check_tag_output(
+        [=[
+        ---@tag telescope.nvim
+        ---@config { ["name"] = "INTRODUCTION" }
+        ]=],
+        [[INTRODUCTION                                                    *telescope.nvim*]]
       )
     end)
   end)

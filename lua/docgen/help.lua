@@ -44,7 +44,19 @@ help.format = function(metadata)
       return string.format("*%s*", x)
     end, vim.split(metadata.tag, "%s+"))
 
-    add(align_text(nil, table.concat(tags, " "), 80))
+    local left = (function()
+      if metadata.config and metadata.config.name and type(metadata.config.name) == "string" then
+        return metadata.config.name:upper()
+      else
+        local ret = vim.split(metadata.tag, "%s+")
+        if ret and ret[1] then
+          ret = vim.split(ret[1], "%.")
+          ret = ret[#ret]
+        end
+        return ret:upper()
+      end
+    end)()
+    add(align_text(left, table.concat(tags, " "), 80))
     add()
   end
 
@@ -190,11 +202,8 @@ help.iter_parameter_field = function(input, list, name, space_prefix)
     end
 
     for _, e in ipairs(list) do
-      output = string.format(
-        "%s%s",
-        output,
-        help.format_parameter_field(input[e], space_prefix, max_name_width, left_width)
-      )
+      output =
+        string.format("%s%s", output, help.format_parameter_field(input[e], space_prefix, max_name_width, left_width))
     end
   end
   return output
