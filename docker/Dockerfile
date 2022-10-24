@@ -8,7 +8,7 @@ RUN git clone --depth 1 https://github.com/tjdevries/tree-sitter-lua /tree-sitte
 
 WORKDIR /tree-sitter-lua
 RUN mkdir -p parser
-RUN cc -o ./parser/lua.so -I./src src/parser.c src/scanner.cc -shared -Os -lstdc++ -fPIC
+RUN cc -o ./parser/lua.so -I./src src/parser.c src/scanner.c -shared -Os -lstdc++ -fPIC
 
 FROM alpine:edge AS app
 
