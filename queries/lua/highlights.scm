@@ -140,15 +140,15 @@
 
 (function_call
   [
-    ((identifier)+ @identifier . (identifier) @function.call . (function_call_paren))
-    ((identifier) @function.call . (function_call_paren))])
+    ((identifier)+ @identifier . (identifier) @function.call.lua . (function_call_paren))
+    ((identifier) @function.call.lua . (function_call_paren))])
 
 (function_call
-  prefix: (identifier) @function.call
+  prefix: (identifier) @function.call.lua
   args: (string_argument) @string)
 
 (function_call
- prefix: (identifier) @function.call
+ prefix: (identifier) @function.call.lua
  args: (table_argument) )
 
 ; (function [(function_name) (identifier)] @function)
