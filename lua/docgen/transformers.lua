@@ -196,8 +196,10 @@ transformers.emmy_field = function(accumulator, str, node)
     local child_type = child:type()
     if child_type == "emmy_type" or child_type == "identifier" then
       table.insert(types, get_node_text(child, str))
+    elseif child_type == "|" then
+      -- do nothing
     else
-      print("[docgen] [Error]: We should not be here // emmy_field #2" .. child:type())
+      print(string.format("[docgen] [Error]: We should not be here // emmy_field #2 (%s)", child:type()))
     end
   end
 

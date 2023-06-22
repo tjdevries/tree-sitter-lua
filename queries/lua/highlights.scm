@@ -27,13 +27,13 @@
 [
   (repeat_start)
   (repeat_until)
-] @repeat
+ @repeat]
 
 [
   (return_statement)
   (module_return_statement)
   (break_statement)
-] @keyword
+ @keyword]
 
 
 ; [
@@ -81,7 +81,7 @@
 [
   ","
   "."
-] @punctuation.delimiter
+ @punctuation.delimiter]
 
 ;; Brackets
 [
@@ -97,8 +97,8 @@
 (identifier) @variable
 (
   (identifier) @variable.builtin
-  (eq? @variable.builtin "self")
-)
+  (#match? @variable.builtin "self"))
+
 ; (preproc_call
 ;   directive: (preproc_directive) @_u
 ;   argument: (_) @constant
@@ -118,10 +118,16 @@
   (function_end)]
 @keyword.function
 
-(emmy_type (identifier) @type)
+(emmy_type) @type
+(emmy_literal) @string
 (emmy_parameter
  (identifier) @parameter
  description: (_)? @comment) @comment
+
+(emmy_class) @comment
+(emmy_field name: (_) @property) @comment
+(emmy_function_parameter
+  name: (_) @parameter) 
 
 (emmy_note) @comment
 (emmy_see) @comment
@@ -149,7 +155,7 @@
 
 (function_call
  prefix: (identifier) @function.call.lua
- args: (table_argument) )
+ args: (table_argument))
 
 ; (function [(function_name) (identifier)] @function)
 ; (function ["function" "end"] @keyword.function)

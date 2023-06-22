@@ -79,6 +79,7 @@ describe("class", function()
         ---@field begin function|table|nil: It even has a begin()?! Is this cpp?
         ---@field end function: It even has an end()?! Get out of here cpp!
       ]=]
+
       eq({
         classes = {
           ["Array"] = {

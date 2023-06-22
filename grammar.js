@@ -464,7 +464,8 @@ module.exports = grammar({
 
     // }}}
 
-    identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
+    _identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
+    identifier: ($) => $._identifier,
 
     // Dummy Fields {{{
     left_paren: (_) => "(",
@@ -474,7 +475,6 @@ module.exports = grammar({
     right_bracket: (_) => "]",
 
     _comma: (_) => ",",
-    dot: () => ".",
     // }}}
 
     // Documentation {{{
@@ -501,13 +501,13 @@ module.exports = grammar({
     emmy_comment: ($) =>
       token(prec.right(repeat1(choice(/---[^@\n]*\n/, /---\n/)))),
 
-    emmy_type_list: ($) => seq(field("type", $.emmy_type), "[]"),
+    emmy_type_list: ($) => seq(field("type", $._emmy_type), "[]"),
     emmy_type_map: ($) =>
       seq(
         "table<",
-        field("key", $.emmy_type),
+        field("key", $._emmy_type),
         ",",
-        field("value", $.emmy_type),
+        field("value", $._emmy_type),
         ">"
       ),
 
@@ -517,31 +517,41 @@ module.exports = grammar({
           $.emmy_type_map,
           $.emmy_type_list,
           $.emmy_function,
-          $.emmy_literal,
-          $._emmy_identifier
+          alias($.string, $.emmy_literal),
+          $.emmy_identifier
         ),
         field("nullable", optional("?"))
       ),
 
-    emmy_literal: ($) => $.string,
+    _bar: (_) => "|",
+
+    // Union Type           TYPE_1 | TYPE_2
+    // Array                VALUE_TYPE[]
+    // Dictionary           { [string]: VALUE_TYPE }
+    // Key-Value Table      table<KEY_TYPE, VALUE_TYPE>
+    // Table Literal        { key1: VALUE_TYPE, key2: VALUE_TYPE }
+    // Function             fun(PARAM: TYPE): RETURN_TYPE
+    _emmy_type: ($) =>
+      prec.right(PREC.COMMA, list_of($.emmy_type, $._bar, false)),
 
     emmy_function: ($) =>
       prec.right(
-        PREC.COMMA,
+        PREC.FUNCTION,
         seq(
           "function(",
-          list_of(
-            seq($.identifier, optional(seq(":", $.emmy_type))),
-            ",",
-            false
-          ),
+          list_of($.emmy_function_parameter, ",", false),
           ")",
-          optional(seq(":", $._emmy_identifier))
+          optional(seq(":", $.emmy_identifier))
         )
       ),
 
-    _emmy_identifier: ($) =>
-      prec.right(PREC.COMMA, list_of($.identifier, $.dot, false)),
+    emmy_function_parameter: ($) =>
+      seq(
+        field("name", $.identifier),
+        optional(seq(":", field("type", $._emmy_type)))
+      ),
+
+    emmy_identifier: ($) => list_of($._identifier, ".", false),
 
     // Definition:
     // ---@class MY_TYPE[:PARENT_TYPE] [@comment]
@@ -551,12 +561,14 @@ module.exports = grammar({
     // ---@class transport @super class
     // ---@class car : transport @car class
     emmy_class: ($) =>
-      seq(
-        /\s*---@class\s+/,
-        field("type", $.emmy_type),
-        optional(seq(/\s*:\s*/, field("parent", $.emmy_type))),
-        optional(seq(/\s*@\s*/, field("description", $.class_description))),
-        /\n\s*/
+      prec.left(
+        seq(
+          /\s*---@class\s+/,
+          field("type", $._emmy_type),
+          optional(seq(/\s*:\s*/, field("parent", $._emmy_type))),
+          optional(seq(/\s*@\s*/, field("description", $.class_description))),
+          /\n\s*/
+        )
       ),
 
     documentation_class: ($) =>
@@ -576,7 +588,7 @@ module.exports = grammar({
         /\s*---@param\s+/,
         field("name", choice($.identifier, $.ellipsis)),
         /\s+/,
-        field("type", list_of($.emmy_type, /\s*\|\s*/)),
+        field("type", $._emmy_type),
 
         // TODO: How closely should we be to emmy...
         optional(seq(/\s*:\s*/, field("description", $.parameter_description))),
@@ -596,7 +608,7 @@ module.exports = grammar({
         optional(seq(field("visibility", $.emmy_visibility), /\s+/)),
         field("name", $.identifier),
         /\s+/,
-        field("type", list_of($.emmy_type, /\s*\|\s*/)),
+        field("type", $._emmy_type),
 
         // TODO: How closely should we be to emmy...
         optional(seq(/\s*:\s*/, field("description", $.field_description))),
@@ -624,7 +636,7 @@ module.exports = grammar({
     emmy_return: ($) =>
       seq(
         /---@return\s*/,
-        field("type", list_of($.emmy_type, "|")),
+        field("type", $._emmy_type),
 
         optional(
           seq(

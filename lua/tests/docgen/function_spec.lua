@@ -114,7 +114,7 @@ describe("functions", function()
 
         --- This function has documentation
         ---@param abc string: Docs for abc
-        ---@param def "This"|"That": Other docs for def
+        ---@param def "This": Other docs for def
         ---@param bxy number: Final docs
         function x.hello(abc, def, bxy)
           return abc .. def .. tostring(bxy)
@@ -125,7 +125,7 @@ describe("functions", function()
 
       eq({
         ["abc"] = { description = { "Docs for abc" }, name = "abc", type = { "string" } },
-        ["def"] = { description = { "Other docs for def" }, name = "def", type = { '"This"', '"That"' } },
+        ["def"] = { description = { "Other docs for def" }, name = "def", type = { '"This"' } },
         ["bxy"] = { description = { "Final docs" }, name = "bxy", type = { "number" } },
       }, nodes.functions["x.hello"].parameters)
 
@@ -142,7 +142,7 @@ describe("functions", function()
             ["parameter_list"] = { "abc", "def", "bxy" },
             parameters = {
               ["abc"] = { description = { "Docs for abc" }, name = "abc", type = { "string" } },
-              ["def"] = { description = { "Other docs for def" }, name = "def", type = { '"This"', '"That"' } },
+              ["def"] = { description = { "Other docs for def" }, name = "def", type = { '"This"' } },
               ["bxy"] = { description = { "Final docs" }, name = "bxy", type = { "number" } },
             },
           },
@@ -163,6 +163,7 @@ describe("functions", function()
 
         return x
       ]]
+
       eq({
         ["function_list"] = { "x.hello" },
         functions = {

@@ -1,5 +1,8 @@
 # tree-sitter-(n)lua
 
+TODO: Document how you can use `make build_parser` to automatically install
+this for lua.
+
 Tree sitter grammar for Lua built to be used inside of Neovim.
 
 Goal: Make a super great Lua grammar and tailor it to usage for Neovim.

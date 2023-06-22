@@ -224,11 +224,6 @@
     "fields": {}
   },
   {
-    "type": "dot",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "emmy_class",
     "named": true,
     "fields": {
@@ -243,22 +238,30 @@
         ]
       },
       "parent": {
-        "multiple": false,
+        "multiple": true,
         "required": false,
         "types": [
           {
             "type": "emmy_type",
             "named": true
+          },
+          {
+            "type": "|",
+            "named": false
           }
         ]
       },
       "type": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
             "type": "emmy_type",
             "named": true
+          },
+          {
+            "type": "|",
+            "named": false
           }
         ]
       }
@@ -421,6 +424,10 @@
           {
             "type": "emmy_type",
             "named": true
+          },
+          {
+            "type": "|",
+            "named": false
           }
         ]
       },
@@ -445,33 +452,85 @@
       "required": true,
       "types": [
         {
-          "type": "dot",
+          "type": "emmy_function_parameter",
           "named": true
         },
         {
-          "type": "emmy_type",
-          "named": true
-        },
-        {
-          "type": "identifier",
+          "type": "emmy_identifier",
           "named": true
         }
       ]
     }
   },
   {
+    "type": "emmy_function_parameter",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "emmy_type",
+            "named": true
+          },
+          {
+            "type": "|",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "emmy_identifier",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "emmy_literal",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "string",
-          "named": true
-        }
-      ]
+    "fields": {
+      "content": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string_content",
+            "named": false
+          }
+        ]
+      },
+      "end": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_end",
+            "named": false
+          }
+        ]
+      },
+      "start": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string_start",
+            "named": false
+          }
+        ]
+      }
     }
   },
   {
@@ -514,6 +573,10 @@
           {
             "type": "emmy_type",
             "named": true
+          },
+          {
+            "type": "|",
+            "named": false
           }
         ]
       }
@@ -580,15 +643,15 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
-          "type": "dot",
+          "type": "emmy_function",
           "named": true
         },
         {
-          "type": "emmy_function",
+          "type": "emmy_identifier",
           "named": true
         },
         {
@@ -602,10 +665,6 @@
         {
           "type": "emmy_type_map",
           "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
         }
       ]
     }
@@ -615,12 +674,16 @@
     "named": true,
     "fields": {
       "type": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
             "type": "emmy_type",
             "named": true
+          },
+          {
+            "type": "|",
+            "named": false
           }
         ]
       }
@@ -631,22 +694,30 @@
     "named": true,
     "fields": {
       "key": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
             "type": "emmy_type",
             "named": true
+          },
+          {
+            "type": "|",
+            "named": false
           }
         ]
       },
       "value": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
             "type": "emmy_type",
             "named": true
+          },
+          {
+            "type": "|",
+            "named": false
           }
         ]
       }
@@ -1624,6 +1695,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "identifier",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "identifier_list",
@@ -2720,10 +2796,6 @@
   },
   {
     "type": "function_start",
-    "named": true
-  },
-  {
-    "type": "identifier",
     "named": true
   },
   {
