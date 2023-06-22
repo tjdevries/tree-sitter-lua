@@ -346,17 +346,17 @@ end
       (emmy_parameter
         name: (identifier)
         type: (emmy_type
-          (emmy_type_list
+          (emmy_type_array
             type: (emmy_type
               (emmy_identifier))))
         description: (parameter_description))
       (emmy_return
         type: (emmy_type
-          (emmy_type_map
+          (emmy_type_key_value
             key: (emmy_type
               (emmy_identifier))
             value: (emmy_type
-              (emmy_type_list
+              (emmy_type_array
                 type: (emmy_type
                   (emmy_identifier))))))))
     (local)
@@ -397,7 +397,7 @@ end
       (emmy_parameter
         (identifier)
         (emmy_type
-          (emmy_type_list
+          (emmy_type_array
             (emmy_type
               (emmy_identifier)))))
       (emmy_parameter
@@ -894,6 +894,41 @@ function Wow(first) end
           (emmy_literal))
         (emmy_type
           (emmy_literal))))
+    (function_start)
+    (function_name
+      (identifier))
+    (function_body_paren)
+    (parameter_list
+      (identifier))
+    (function_body_paren)
+    (function_end)))
+
+================================================================================
+Docgen table types
+================================================================================
+
+--- This function has a table
+---@param first { hello: string, [5]: boolean }
+function Wow(first) end
+
+--------------------------------------------------------------------------------
+
+(program
+  (function_statement
+    (emmy_documentation
+      (emmy_header)
+      (emmy_parameter
+        (identifier)
+        (emmy_type
+          (emmy_type_dictionary
+            (emmy_type_dictionary_value
+              (identifier)
+              (emmy_type
+                (emmy_identifier)))
+            (emmy_type_dictionary_value
+              (number)
+              (emmy_type
+                (emmy_identifier)))))))
     (function_start)
     (function_name
       (identifier))

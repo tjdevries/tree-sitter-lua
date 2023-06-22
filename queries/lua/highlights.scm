@@ -129,6 +129,8 @@
 (emmy_function_parameter
   name: (_) @parameter) 
 
+(emmy_type_dictionary_value key: (identifier) @property)
+
 (emmy_note) @comment
 (emmy_see) @comment
 

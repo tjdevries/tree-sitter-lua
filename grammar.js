@@ -501,8 +501,8 @@ module.exports = grammar({
     emmy_comment: ($) =>
       token(prec.right(repeat1(choice(/---[^@\n]*\n/, /---\n/)))),
 
-    emmy_type_list: ($) => seq(field("type", $._emmy_type), "[]"),
-    emmy_type_map: ($) =>
+    emmy_type_array: ($) => seq(field("type", $._emmy_type), "[]"),
+    emmy_type_key_value: ($) =>
       seq(
         "table<",
         field("key", $._emmy_type),
@@ -514,13 +514,24 @@ module.exports = grammar({
     emmy_type: ($) =>
       seq(
         choice(
-          $.emmy_type_map,
-          $.emmy_type_list,
+          $.emmy_type_array,
+          $.emmy_type_dictionary,
+          $.emmy_type_key_value,
           $.emmy_function,
-          alias($.string, $.emmy_literal),
-          $.emmy_identifier
+          $.emmy_identifier,
+          alias($.string, $.emmy_literal)
         ),
         field("nullable", optional("?"))
+      ),
+
+    emmy_type_dictionary: ($) =>
+      seq("{", list_of($.emmy_type_dictionary_value, ",", true), "}"),
+
+    emmy_type_dictionary_value: ($) =>
+      seq(
+        field("key", choice($.identifier, seq("[", $._expression, "]"))),
+        ":",
+        field("value", $._emmy_type)
       ),
 
     _bar: (_) => "|",

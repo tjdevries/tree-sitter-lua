@@ -2710,7 +2710,7 @@
         }
       }
     },
-    "emmy_type_list": {
+    "emmy_type_array": {
       "type": "SEQ",
       "members": [
         {
@@ -2727,7 +2727,7 @@
         }
       ]
     },
-    "emmy_type_map": {
+    "emmy_type_key_value": {
       "type": "SEQ",
       "members": [
         {
@@ -2768,15 +2768,23 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "emmy_type_map"
+              "name": "emmy_type_array"
             },
             {
               "type": "SYMBOL",
-              "name": "emmy_type_list"
+              "name": "emmy_type_dictionary"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "emmy_type_key_value"
             },
             {
               "type": "SYMBOL",
               "name": "emmy_function"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "emmy_identifier"
             },
             {
               "type": "ALIAS",
@@ -2786,10 +2794,6 @@
               },
               "named": true,
               "value": "emmy_literal"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "emmy_identifier"
             }
           ]
         },
@@ -2807,6 +2811,103 @@
                 "type": "BLANK"
               }
             ]
+          }
+        }
+      ]
+    },
+    "emmy_type_dictionary": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "emmy_type_dictionary_value"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": ","
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "emmy_type_dictionary_value"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": ","
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
+    "emmy_type_dictionary_value": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "key",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "["
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_expression"
+                  },
+                  {
+                    "type": "STRING",
+                    "value": "]"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "FIELD",
+          "name": "value",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_emmy_type"
           }
         }
       ]

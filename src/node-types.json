@@ -659,18 +659,22 @@
           "named": true
         },
         {
-          "type": "emmy_type_list",
+          "type": "emmy_type_array",
           "named": true
         },
         {
-          "type": "emmy_type_map",
+          "type": "emmy_type_dictionary",
+          "named": true
+        },
+        {
+          "type": "emmy_type_key_value",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "emmy_type_list",
+    "type": "emmy_type_array",
     "named": true,
     "fields": {
       "type": {
@@ -690,7 +694,112 @@
     }
   },
   {
-    "type": "emmy_type_map",
+    "type": "emmy_type_dictionary",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "emmy_type_dictionary_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "emmy_type_dictionary_value",
+    "named": true,
+    "fields": {
+      "key": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": ".",
+            "named": false
+          },
+          {
+            "type": "[",
+            "named": false
+          },
+          {
+            "type": "]",
+            "named": false
+          },
+          {
+            "type": "binary_operation",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "ellipsis",
+            "named": true
+          },
+          {
+            "type": "function",
+            "named": true
+          },
+          {
+            "type": "function_call",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "left_paren",
+            "named": true
+          },
+          {
+            "type": "nil",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "right_paren",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tableconstructor",
+            "named": true
+          },
+          {
+            "type": "unary_operation",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "emmy_type",
+            "named": true
+          },
+          {
+            "type": "|",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "emmy_type_key_value",
     "named": true,
     "fields": {
       "key": {
