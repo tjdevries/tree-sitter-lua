@@ -460,6 +460,21 @@
     }
   },
   {
+    "type": "emmy_literal",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "emmy_note",
     "named": true,
     "fields": {}
@@ -574,6 +589,10 @@
         },
         {
           "type": "emmy_function",
+          "named": true
+        },
+        {
+          "type": "emmy_literal",
           "named": true
         },
         {

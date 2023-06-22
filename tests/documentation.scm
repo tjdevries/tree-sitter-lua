@@ -44,17 +44,17 @@
 (program
   (function_statement
     documentation: (emmy_documentation
-      (emmy_header)
-      (emmy_return
-        type: (emmy_type (identifier))
-        description: (emmy_return_description)))
+                    (emmy_header)
+                    (emmy_return
+                      type: (emmy_type (identifier))
+                      description: (emmy_return_description)))
     (function_start)
     name: (function_name
-      (identifier))
+           (identifier))
     (function_body_paren)
     (function_body_paren)
     (function_body (return_statement
-      (boolean)))
+                    (boolean)))
     (function_end)))
 
 ;;; Return documentation with todo
@@ -66,15 +66,15 @@
 (program
   (function_statement
     documentation: (emmy_documentation
-      (emmy_header)
-      (emmy_todo))
+                    (emmy_header)
+                    (emmy_todo))
     (function_start)
     name: (function_name
-      (identifier))
+           (identifier))
     (function_body_paren)
     (function_body_paren)
     (function_body (return_statement
-      (boolean)))
+                    (boolean)))
     (function_end)))
 
 ;;; Two lines of top level documentation
@@ -310,28 +310,28 @@
       (identifier) (identifier) (identifier))
     (function_body_paren)
     (function_body (function_call
-      (identifier)
-      (table_argument
-        (fieldlist
-          (field
-            (identifier)
-            (tableconstructor
-              (fieldlist
-                (field (identifier))
-                (field (string)))))
-          (field
-            (identifier)
-            (tableconstructor
-              (fieldlist
-                (field (identifier))
-                (field (string)))))
-          (field
-            (identifier)
-            (tableconstructor
-              (fieldlist
-                (field (identifier))
-                (field (string))
-                (field (boolean)))))))))
+                    (identifier)
+                    (table_argument
+                      (fieldlist
+                        (field
+                          (identifier)
+                          (tableconstructor
+                            (fieldlist
+                              (field (identifier))
+                              (field (string)))))
+                        (field
+                          (identifier)
+                          (tableconstructor
+                            (fieldlist
+                              (field (identifier))
+                              (field (string)))))
+                        (field
+                          (identifier)
+                          (tableconstructor
+                            (fieldlist
+                              (field (identifier))
+                              (field (string))
+                              (field (boolean)))))))))
     (function_end)))
 
 ;;; Eval doc
@@ -380,7 +380,7 @@
   (parameter_list (identifier) (identifier) (identifier))
   (function_body_paren)
   (function_body (return_statement
-   (binary_operation (binary_operation (identifier) (identifier)) (identifier) )))
+                  (binary_operation (binary_operation (identifier) (identifier)) (identifier))))
   (function_end))
  (module_return_statement (identifier)))
 
@@ -408,16 +408,16 @@
 ;;; Class comment
 ; ---@class Array @Numeric table
 (program
-  (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
-)
+  (documentation_class (emmy_class (emmy_type (identifier)) (class_description))))
+
 
 ;;; Super class comment
 ; ---@class Map @table table
 ; ---@class Array : Map @Numeric table
 (program
   (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
-  (documentation_class (emmy_class (emmy_type (identifier)) (emmy_type (identifier)) (class_description)))
-)
+  (documentation_class (emmy_class (emmy_type (identifier)) (emmy_type (identifier)) (class_description))))
+
 
 
 ;;; Class with fields
@@ -429,9 +429,9 @@
   (documentation_class (emmy_class (emmy_type (identifier)) (class_description)))
   (documentation_class
     (emmy_class (emmy_type (identifier)) (class_description))
-    (emmy_field (identifier) (emmy_type (identifier)) (field_description))
-  )
-)
+    (emmy_field (identifier) (emmy_type (identifier)) (field_description))))
+  
+
 
 ;;; Real world class
 ; local Job = {}
@@ -456,11 +456,11 @@
    (parameter_list (identifier))
    (function_body_paren)
    (function_body (return_statement
-    (function_call (identifier) (function_call_paren)
-     (function_arguments (tableconstructor) (identifier))
-   (function_call_paren))))
-  (function_end))
-)
+                   (function_call (identifier) (function_call_paren)
+                    (function_arguments (tableconstructor) (identifier))
+                    (function_call_paren))))
+   (function_end)))
+
 
 ;;; Using classes as types
 ; local Job = {}
@@ -489,11 +489,11 @@
    (parameter_list (identifier))
    (function_body_paren)
    (function_body (return_statement
-    (function_call (identifier) (function_call_paren)
-     (function_arguments (identifier) (identifier))
-   (function_call_paren))))
-  (function_end))
-)
+                   (function_call (identifier) (function_call_paren)
+                    (function_arguments (identifier) (identifier))
+                    (function_call_paren))))
+   (function_end)))
+
 
 ;;; Multiline params
 ; --- Get the diagnostics by line
@@ -517,9 +517,9 @@
 (program
  (variable_declaration
   (emmy_documentation (emmy_return (emmy_type (identifier) (dot) (identifier))))
-   (variable_declarator (identifier) (identifier))
-   (function (function_start) (function_body_paren) (function_body_paren) (function_end))
-  ))
+  (variable_declarator (identifier) (identifier))
+  (function (function_start) (function_body_paren) (function_body_paren) (function_end))))
+  
 
 ;;; Should work with return from test:
 ; --- This function has documentation
@@ -556,4 +556,29 @@
             (identifier)
             (identifier))
           (identifier))))
+    (function_end)))
+
+;;; Docgen literal strings
+; --- This function has docs
+; ---@param first "This"|"That"
+; function Wow(first) end
+(program
+  (function_statement
+    (emmy_documentation
+      (emmy_header)
+      (emmy_parameter
+        (identifier)
+        (emmy_type
+          (emmy_literal
+            (string)))
+        (emmy_type
+          (emmy_literal
+            (string)))))
+    (function_start)
+    (function_name
+      (identifier))
+    (function_body_paren)
+    (parameter_list
+      (identifier))
+    (function_body_paren)
     (function_end)))

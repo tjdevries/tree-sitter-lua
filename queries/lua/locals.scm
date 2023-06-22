@@ -15,11 +15,7 @@
   (for_statement)
   (repeat_statement)
   (while_statement)
-  (do_statement)
-] @scope
+  (do_statement)] @scope
 
 ;; References
-[
-  (identifier)
-  ; (property_identifier)
-] @reference
+[(identifier)] @reference

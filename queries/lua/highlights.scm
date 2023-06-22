@@ -140,7 +140,7 @@
 
 (function_call
   [
-    ((identifier)+ @identifier . (identifier) @function.call.lua . (function_call_paren))
+    ((identifier)+ @identifier . (identifier) @function.call . (function_call_paren))
     ((identifier) @function.call.lua . (function_call_paren))])
 
 (function_call

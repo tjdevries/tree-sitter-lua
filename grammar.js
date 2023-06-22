@@ -517,10 +517,13 @@ module.exports = grammar({
           $.emmy_type_map,
           $.emmy_type_list,
           $.emmy_function,
+          $.emmy_literal,
           $._emmy_identifier
         ),
         field("nullable", optional("?"))
       ),
+
+    emmy_literal: ($) => $.string,
 
     emmy_function: ($) =>
       prec.right(

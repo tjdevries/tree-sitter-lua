@@ -2780,6 +2780,10 @@
             },
             {
               "type": "SYMBOL",
+              "name": "emmy_literal"
+            },
+            {
+              "type": "SYMBOL",
               "name": "_emmy_identifier"
             }
           ]
@@ -2801,6 +2805,10 @@
           }
         }
       ]
+    },
+    "emmy_literal": {
+      "type": "SYMBOL",
+      "name": "string"
     },
     "emmy_function": {
       "type": "PREC_RIGHT",
