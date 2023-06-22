@@ -1,3 +1,5 @@
+vim.cmd [[runtime plugin/ts_lua.lua]]
+
 local call_transformer = require "docgen.transformers"
 local log = require "docgen.log"
 local utils = require "docgen.utils"
@@ -21,7 +23,6 @@ local read = utils.read
 ---@tag docgen
 
 -- Load up our build parser.
-vim.treesitter.require_language("lua", "./build/parser.so", true)
 
 local docgen = {}
 
@@ -34,7 +35,7 @@ end
 --- Get the query for a tree sitter query, loaded from query directory.
 ---@param query_name string: The name of the query file (without .scm)
 function docgen.get_ts_query(query_name)
-  return vim.treesitter.parse_query("lua", docgen._get_query_text(query_name))
+  return vim.treesitter.query.parse("lua", docgen._get_query_text(query_name))
 end
 
 --- Get the string parser for some contents
@@ -81,12 +82,11 @@ local function find_return_module(contents)
   -- Its better to just have one query here. That way i know as soon as i found the
   -- module return statement i am done. Its bad for performance that i am parsing the
   -- file twice now but its no performance critical thing, so nvm
-  local query = vim.treesitter.parse_query("lua", "(module_return_statement (identifier) @exported)")
-
+  local query = vim.treesitter.query.parse("lua", "(module_return_statement (identifier) @exported)")
   local tree = parser:parse()[1]
 
   for _, node in query:iter_captures(tree:root(), contents, 0, -1) do -- luacheck: ignore
-    return require("vim.treesitter.query").get_node_text(node, contents)
+    return vim.treesitter.get_node_text(node, contents)
   end
 end
 

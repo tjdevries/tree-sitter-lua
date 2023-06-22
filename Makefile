@@ -15,15 +15,17 @@ test_docgen: generate
 	nvim \
 		--headless \
 		--noplugin \
-		-u tests/minimal_init.vim \
-		-c "PlenaryBustedDirectory lua/tests/ {minimal_init = 'tests/minimal_init.vim'}"
+		-u tests/init.lua \
+		-c "PlenaryBustedDirectory lua/tests/ {minimal_init = 'tests/init.lua'}"
 
 build_parser: generate
 	mkdir -p build
 	cc -o ./build/parser.so -I./src src/parser.c src/scanner.c -shared -Os -fPIC
+	mkdir -p parser
+	cp ./build/parser.so ./parser/lua.so
 
 gen_howto:
-	nvim --headless --noplugin -u tests/minimal_init.vim -c "luafile ./scratch/gen_howto.lua" -c 'qa'
+	nvim --headless --noplugin -u tests/init.lua -c "luafile ./scratch/gen_howto.lua" -c 'qa'
 
 lualint:
 	luacheck lua/docgen

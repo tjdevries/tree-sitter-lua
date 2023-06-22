@@ -39,7 +39,7 @@ function M.get_definition_at_position(uri, position)
   local start_row, _, end_row, _ = root:range()
 
   for k, v in query:iter_captures(root, text, start_row, end_row + 1) do
-    print(k, v, require("vim.treesitter.query").get_node_text(v, text))
+    print(k, v, vim.treesitter.get_node_text(v, text))
   end
 
   -- vim.treesitter.parse_query({lang}, {query})

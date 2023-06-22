@@ -10,7 +10,7 @@ function M.get(name, lang)
 
   local filepath = QUERY_PATH / (name .. ".scm")
 
-  return vim.treesitter.parse_query(lang, filepath:read())
+  return vim.treesitter.query.parse(lang, filepath:read())
 end
 
 --[[

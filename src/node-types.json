@@ -437,6 +437,29 @@
     }
   },
   {
+    "type": "emmy_function",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "dot",
+          "named": true
+        },
+        {
+          "type": "emmy_type",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "emmy_note",
     "named": true,
     "fields": {}
@@ -529,13 +552,28 @@
   {
     "type": "emmy_type",
     "named": true,
-    "fields": {},
+    "fields": {
+      "nullable": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "?",
+            "named": false
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
       "types": [
         {
           "type": "dot",
+          "named": true
+        },
+        {
+          "type": "emmy_function",
           "named": true
         },
         {
@@ -1364,6 +1402,11 @@
     }
   },
   {
+    "type": "function_body_paren",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "function_call",
     "named": true,
     "fields": {
@@ -1474,6 +1517,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "function_call_paren",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "function_name",
@@ -2018,6 +2066,11 @@
     }
   },
   {
+    "type": "right_paren",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "string",
     "named": true,
     "fields": {
@@ -2479,6 +2532,10 @@
     "named": false
   },
   {
+    "type": ")",
+    "named": false
+  },
+  {
     "type": "*",
     "named": false
   },
@@ -2548,6 +2605,10 @@
   },
   {
     "type": ">>",
+    "named": false
+  },
+  {
+    "type": "?",
     "named": false
   },
   {
@@ -2631,12 +2692,8 @@
     "named": true
   },
   {
-    "type": "function_body_paren",
-    "named": true
-  },
-  {
-    "type": "function_call_paren",
-    "named": true
+    "type": "function(",
+    "named": false
   },
   {
     "type": "function_end",
@@ -2717,10 +2774,6 @@
   {
     "type": "return",
     "named": false
-  },
-  {
-    "type": "right_paren",
-    "named": true
   },
   {
     "type": "self_call_colon",

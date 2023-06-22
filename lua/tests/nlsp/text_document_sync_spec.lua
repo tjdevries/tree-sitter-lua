@@ -147,7 +147,7 @@ describe("text_document_sync", function()
 
       parser = parser:parse()[1]
       local root = parser:root()
-      assert.are.same(query.get_node_text(root, item.text), item.text)
+      assert.are.same(vim.treesitter.get_node_text(root, item.text), item.text)
       assert.are.same(root:type(), "program")
     end)
   end)
