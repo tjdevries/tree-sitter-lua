@@ -21,3 +21,4 @@
  (#eq? @_prefix_2 "cmd")
  (#offset! @vim 0 2 0 -2))
 
+(documentation_command usage: (_) @vim)

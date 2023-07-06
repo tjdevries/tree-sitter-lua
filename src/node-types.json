@@ -156,6 +156,32 @@
     }
   },
   {
+    "type": "documentation_command",
+    "named": true,
+    "fields": {
+      "documentation": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "documentation_command_content",
+            "named": true
+          }
+        ]
+      },
+      "usage": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "documentation_usage",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "documentation_config",
     "named": true,
     "fields": {},
@@ -2057,6 +2083,10 @@
           "named": true
         },
         {
+          "type": "documentation_command",
+          "named": true
+        },
+        {
           "type": "documentation_config",
           "named": true
         },
@@ -2861,6 +2891,14 @@
   },
   {
     "type": "do_start",
+    "named": true
+  },
+  {
+    "type": "documentation_command_content",
+    "named": true
+  },
+  {
+    "type": "documentation_usage",
     "named": true
   },
   {

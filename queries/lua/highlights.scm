@@ -8,32 +8,28 @@
   (if_then)
   (if_elseif)
   (if_else)
-  (if_end)]
-@conditional
+  (if_end)] @conditional
 
 [
   (for_start)
   (for_in)
   (for_do)
-  (for_end)]
-@repeat
+  (for_end)] @repeat
 
 [
   (while_start)
   (while_do)
-  (while_end)]
-@repeat
+  (while_end)] @repeat
 
 [
   (repeat_start)
-  (repeat_until)
- @repeat]
+  (repeat_until)] @repeat
 
 [
   (return_statement)
   (module_return_statement)
-  (break_statement)
- @keyword]
+  (break_statement)] @keyword
+ 
 
 
 ; [
@@ -48,8 +44,7 @@
 [
  "not"
  "and"
- "or"]
-@keyword.operator
+ "or"] @keyword.operator
 
 [
  "="
@@ -80,8 +75,7 @@
 ;; Punctuation
 [
   ","
-  "."
- @punctuation.delimiter]
+  "." ] @punctuation.delimiter
 
 ;; Brackets
 [
@@ -90,8 +84,7 @@
  "["
  "]"
  "{"
- "}"]
-@punctuation.bracket
+ "}"] @punctuation.bracket
 
 ;; Variables
 (identifier) @variable
@@ -115,8 +108,7 @@
 
 [
   (function_start)
-  (function_end)]
-@keyword.function
+  (function_end)] @keyword.function
 
 (emmy_type) @type
 (emmy_literal) @string
@@ -145,6 +137,8 @@
 (emmy_header) @comment
 (emmy_ignore) @comment
 (documentation_brief) @comment
+
+(documentation_command) @comment
 
 (function_call
   [

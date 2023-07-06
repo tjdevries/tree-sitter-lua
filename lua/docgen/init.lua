@@ -99,6 +99,7 @@ function docgen.get_nodes(contents)
     documentation_tag = true,
     documentation_config = true,
     documentation_class = true,
+    documentation_command = true,
   }
 
   -- Can be nil here. That way it still works if the file only has a brief.

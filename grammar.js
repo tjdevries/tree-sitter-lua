@@ -66,6 +66,7 @@ module.exports = grammar({
             choice(
               $._statement,
               $._documentation_brief_container,
+              $.documentation_command,
               $._documentation_tag_container,
               $._documentation_config_container,
               $.documentation_class
@@ -494,6 +495,27 @@ module.exports = grammar({
           /\s*---@brief \[\[/,
           any_amount_of(/\s*---/, $.documentation_brief),
           /\s*---@brief \]\]/
+        )
+      ),
+
+    documentation_command_content: ($) => /[^\n\[]*/,
+    documentation_command: ($) =>
+      prec.right(
+        PREC.PROGRAM,
+        seq(
+          /\s*---@command/,
+          field(
+            "usage",
+            alias($.documentation_command_content, $.documentation_usage)
+          ),
+          /\[\[/,
+          repeat1(
+            seq(
+              /\s*---/,
+              field("documentation", $.documentation_command_content)
+            )
+          ),
+          /\s*---@command \]\]/
         )
       ),
 

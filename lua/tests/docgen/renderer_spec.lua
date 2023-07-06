@@ -587,6 +587,13 @@ describe("renderer", function()
       eq(">\nSteps\n Hello\n  World\n<", renderer.render({ "<code>", "Steps", " Hello", "  World", "</code>" }, "", 80))
     end)
 
+    it("works with language", function()
+      eq(
+        ">lua\nSteps\n Hello\n  World\n<",
+        renderer.render({ "<code=lua>", "Steps", " Hello", "  World", "</code>" }, "", 80)
+      )
+    end)
+
     it("combination with Paragraph", function()
       eq(
         dedent [[

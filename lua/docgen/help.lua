@@ -72,6 +72,13 @@ help.format = function(metadata)
     add()
   end
 
+  -- Make commands
+  local commands = metadata.commands or {}
+  if not vim.tbl_isempty(commands) then
+    add(help.format_commands(commands, metadata.config))
+    add()
+  end
+
   -- Make classes
   local metadata_classes = vim.deepcopy(metadata.class_list or {})
 
@@ -240,6 +247,32 @@ help.format_class_metadata = function(class, config)
     doc,
     help.iter_parameter_field(class.fields, class.field_list, config.field_heading or "Fields", space_prefix)
   )
+
+  return doc
+end
+
+---@class DocgenCommand
+---@field name string
+---@field usage string
+---@field documentation string[]
+
+--- Format commands
+---@param command_metadata DocgenCommand[]
+---@param config any
+help.format_commands = function(command_metadata, config)
+  local doc = ""
+
+  for _, command in ipairs(command_metadata) do
+    config = config or {}
+
+    local right_side = string.format("*:%s*", command.name)
+    local header = align_text("", right_side, 78)
+
+    doc = doc .. header .. "\n"
+    doc = doc .. command.usage .. " ~\n"
+    doc = doc .. render(command.documentation, "    ", 79)
+    doc = doc .. "\n\n"
+  end
 
   return doc
 end

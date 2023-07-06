@@ -25,6 +25,10 @@
                     },
                     {
                       "type": "SYMBOL",
+                      "name": "documentation_command"
+                    },
+                    {
+                      "type": "SYMBOL",
                       "name": "_documentation_tag_container"
                     },
                     {
@@ -2679,6 +2683,64 @@
           {
             "type": "PATTERN",
             "value": "\\s*---@brief \\]\\]"
+          }
+        ]
+      }
+    },
+    "documentation_command_content": {
+      "type": "PATTERN",
+      "value": "[^\\n\\[]*"
+    },
+    "documentation_command": {
+      "type": "PREC_RIGHT",
+      "value": 16,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "\\s*---@command"
+          },
+          {
+            "type": "FIELD",
+            "name": "usage",
+            "content": {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "documentation_command_content"
+              },
+              "named": true,
+              "value": "documentation_usage"
+            }
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\[\\["
+          },
+          {
+            "type": "REPEAT1",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "\\s*---"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "documentation",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "documentation_command_content"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\s*---@command \\]\\]"
           }
         ]
       }

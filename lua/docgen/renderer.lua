@@ -32,6 +32,8 @@ local states = setmetatable({
 })
 
 local interpret_state = function(line)
+  line = vim.trim(line)
+
   if line == "" then
     return states.NEWLINE
   elseif vim.startswith(vim.trim(line), "-") then
@@ -40,6 +42,9 @@ local interpret_state = function(line)
     return states.ENUMERATE
   elseif line == "<code>" then
     return states.CODE
+  elseif vim.trim(line):match "<code=(.*)>" then
+    local lang = vim.trim(line):match "<code=(.*)>"
+    return states.CODE, vim.trim(lang)
   elseif line == "<pre>" then
     return states.IGNORE
   elseif line == "</pre>" or line == "</code>" then
@@ -107,14 +112,14 @@ function Text:error()
 end
 
 function Text:handle_line(line)
-  local new_state = interpret_state(line)
+  local new_state, ctx = interpret_state(line)
 
   if new_state == self.state then
     -- Happens when we didn't have a change in state
     dispatch_state[new_state](self, line)
   elseif new_state == states.CODE then
     -- Start new Ignore block
-    self:start_new_ignore(true)
+    self:start_new_ignore(true, ctx)
     self.state = states.IGNORE
   elseif new_state == states.IGNORE then
     -- Start new Ignore block
@@ -221,9 +226,13 @@ function Text:start_new_enumerate(line)
   end
 end
 
-function Text:start_new_ignore(code)
+function Text:start_new_ignore(code, ctx)
   if code then
-    table.insert(self.ignores, { ">" })
+    if ctx then
+      table.insert(self.ignores, { ">" .. ctx })
+    else
+      table.insert(self.ignores, { ">" })
+    end
   else
     table.insert(self.ignores, {})
   end
@@ -390,7 +399,7 @@ m.render = function(input, prefix, width)
         local construct = trim_trailing(prefix .. str)
         table.insert(output, construct)
       end
-      if paragraph[1] == ">" then
+      if paragraph[1] and vim.trim(paragraph[1]):match "^>" then
         table.insert(output, "<")
       end
     else

@@ -11,12 +11,10 @@
 ; Get the briefs for the module
 ((documentation_brief) @brief)
 
-
 ((documentation_tag) @tag)
-
 
 ((documentation_config) @config)
 
-
 ((documentation_class) @class)
 
+((documentation_command) @command)

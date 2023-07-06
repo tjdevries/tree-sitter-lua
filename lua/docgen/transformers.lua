@@ -123,6 +123,22 @@ end
 transformers.function_statement = transformers._function
 transformers.variable_declaration = transformers._function
 
+transformers.documentation_command = function(accumulator, str, node)
+  accumulator.commands = accumulator.commands or {}
+
+  local usage = vim.trim(get_node_text(node:field("usage")[1], str))
+  usage = usage:gsub("^:", "")
+
+  local name = vim.split(usage, " ")[1]
+  table.insert(accumulator.commands, {
+    name = name,
+    usage = ":" .. usage,
+    documentation = vim.tbl_map(function(child)
+      return get_node_text(child, str)
+    end, node:field "documentation"),
+  })
+end
+
 transformers.emmy_documentation = function(accumulator, str, node)
   accumulator.class = {}
 

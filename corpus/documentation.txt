@@ -937,3 +937,21 @@ function Wow(first) end
       (identifier))
     (function_body_paren)
     (function_end)))
+
+================================================================================
+Documentation command
+================================================================================
+
+---@command CodyExplain [[
+--- Something cool goes here
+--- Another thing goes here
+---@command ]]
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (documentation_command
+    (documentation_usage)
+    (documentation_command_content)
+    (documentation_command_content)))
