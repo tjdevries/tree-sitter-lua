@@ -209,8 +209,11 @@ help.iter_parameter_field = function(input, list, name, space_prefix)
     end
 
     for _, e in ipairs(list) do
-      output =
-        string.format("%s%s", output, help.format_parameter_field(input[e], space_prefix, max_name_width, left_width))
+      output = string.format(
+        "%s%s",
+        output,
+        help.format_parameter_field(input[e], space_prefix, max_name_width, left_width)
+      )
     end
   end
   return output
@@ -218,7 +221,7 @@ end
 
 help.format_class_metadata = function(class, config)
   config = config or {}
-  local space_prefix = string.rep(" ", 4)
+  local space_prefix = string.rep(" ", config.space_prefix or 4)
 
   local doc = ""
   local left_side = class.parent and string.format("%s : %s", class.name, class.parent) or class.name
