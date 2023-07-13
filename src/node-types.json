@@ -2119,6 +2119,10 @@
           "named": true
         },
         {
+          "type": "shebang",
+          "named": true
+        },
+        {
           "type": "variable_declaration",
           "named": true
         },
@@ -3015,6 +3019,10 @@
   },
   {
     "type": "self_call_colon",
+    "named": true
+  },
+  {
+    "type": "shebang",
     "named": true
   },
   {

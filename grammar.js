@@ -62,6 +62,7 @@ module.exports = grammar({
       prec(
         PREC.PROGRAM,
         seq(
+          optional($.shebang),
           any_amount_of(
             choice(
               $._statement,
@@ -102,6 +103,8 @@ module.exports = grammar({
           optional(";")
         )
       ),
+
+    shebang: _ => /#![^\n]*/,
 
     _last_statement: ($) => choice($.return_statement, $.break_statement),
 

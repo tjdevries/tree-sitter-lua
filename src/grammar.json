@@ -8,6 +8,18 @@
         "type": "SEQ",
         "members": [
           {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "shebang"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
             "type": "REPEAT",
             "content": {
               "type": "SEQ",
@@ -185,6 +197,10 @@
           }
         ]
       }
+    },
+    "shebang": {
+      "type": "PATTERN",
+      "value": "#![^\\n]*"
     },
     "_last_statement": {
       "type": "CHOICE",
