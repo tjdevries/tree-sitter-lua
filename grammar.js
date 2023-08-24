@@ -484,20 +484,20 @@ module.exports = grammar({
     // Documentation {{{
     documentation_tag: () => /[^\n]*/,
     _documentation_tag_container: ($) =>
-      prec.right(PREC.PROGRAM, seq(/\s*---@tag\s+/, $.documentation_tag)),
+      prec.right(PREC.PROGRAM, seq(/---@tag\s+/, $.documentation_tag)),
 
     documentation_config: ($) => $._expression,
     _documentation_config_container: ($) =>
-      prec.right(PREC.PROGRAM, seq(/\s*---@config\s+/, $.documentation_config)),
+      prec.right(PREC.PROGRAM, seq(/---@config\s+/, $.documentation_config)),
 
     documentation_brief: () => /[^\n]*/,
     _documentation_brief_container: ($) =>
       prec.right(
         PREC.PROGRAM,
         seq(
-          /\s*---@brief \[\[/,
-          any_amount_of(/\s*---/, $.documentation_brief),
-          /\s*---@brief \]\]/
+          /---@brief \[\[/,
+          any_amount_of(/---/, $.documentation_brief),
+          /---@brief \]\]/
         )
       ),
 
@@ -506,7 +506,7 @@ module.exports = grammar({
       prec.right(
         PREC.PROGRAM,
         seq(
-          /\s*---@command/,
+          /---@command/,
           field(
             "usage",
             alias($.documentation_command_content, $.documentation_usage)
@@ -514,11 +514,11 @@ module.exports = grammar({
           /\[\[/,
           repeat1(
             seq(
-              /\s*---/,
+              /---/,
               field("documentation", $.documentation_command_content)
             )
           ),
-          /\s*---@command \]\]/
+          /---@command \]\]/
         )
       ),
 
@@ -599,10 +599,10 @@ module.exports = grammar({
     emmy_class: ($) =>
       prec.left(
         seq(
-          /\s*---@class\s+/,
+          /---@class\s+/,
           field("type", $._emmy_type),
-          optional(seq(/\s*:\s*/, field("parent", $._emmy_type))),
-          optional(seq(/\s*@\s*/, field("description", $.class_description))),
+          optional(seq(/:\s*/, field("parent", $._emmy_type))),
+          optional(seq(/@\s*/, field("description", $.class_description))),
           /\n\s*/
         )
       ),
@@ -621,7 +621,7 @@ module.exports = grammar({
     // ---@param ... vararg: hello
     emmy_parameter: ($) =>
       seq(
-        /\s*---@param\s+/,
+        /---@param\s+/,
         field("name", choice($.identifier, $.ellipsis)),
         /\s+/,
         field("type", $._emmy_type),
@@ -640,7 +640,7 @@ module.exports = grammar({
     // ---@field example (table): hello
     emmy_field: ($) =>
       seq(
-        /\s*---@field\s+/,
+        /---@field\s+/,
         optional(seq(field("visibility", $.emmy_visibility), /\s+/)),
         field("name", $.identifier),
         /\s+/,
@@ -656,7 +656,7 @@ module.exports = grammar({
     _multiline_emmy_string: ($) =>
       prec.right(
         PREC.PRIORITY,
-        seq(/[^\n]+/, any_amount_of(/\s*---[^\n]*/))
+        seq(/[^\n]+/, any_amount_of(/---[^\n]*/))
         // seq(/[^\n]*/, any_amount_of(/\n\s*---[^\n]*/))
       ),
 
