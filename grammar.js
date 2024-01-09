@@ -104,7 +104,7 @@ module.exports = grammar({
         )
       ),
 
-    shebang: _ => /#![^\n]*/,
+    shebang: (_) => /#![^\n]*/,
 
     _last_statement: ($) => choice($.return_statement, $.break_statement),
 
@@ -574,7 +574,7 @@ module.exports = grammar({
       prec.right(
         PREC.FUNCTION,
         seq(
-          "function(",
+          choice("function(", "fun("),
           list_of($.emmy_function_parameter, ",", false),
           ")",
           optional(seq(":", $.emmy_identifier))
@@ -643,6 +643,7 @@ module.exports = grammar({
         /\s*---@field\s+/,
         optional(seq(field("visibility", $.emmy_visibility), /\s+/)),
         field("name", $.identifier),
+        optional("?"),
         /\s+/,
         field("type", $._emmy_type),
 

@@ -2938,6 +2938,10 @@
     "named": true
   },
   {
+    "type": "fun(",
+    "named": false
+  },
+  {
     "type": "function(",
     "named": false
   },
