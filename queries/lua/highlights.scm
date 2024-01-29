@@ -3,34 +3,31 @@
 ;;; Builtins
 ;; Keywords
 
-[
-  (if_start)
-  (if_then)
-  (if_elseif)
-  (if_else)
-  (if_end)] @conditional
+[(if_start)
+ (if_then)
+ (if_elseif)
+ (if_else)
+ (if_end)] @keyword.conditional
 
-[
-  (for_start)
-  (for_in)
-  (for_do)
-  (for_end)] @repeat
+[(for_start)
+ (for_in)
+ (for_do)
+ (for_end)] @keyword.repeat
 
-[
-  (while_start)
-  (while_do)
-  (while_end)] @repeat
+[(while_start)
+ (while_do)
+ (while_end)] @keyword.repeat
 
-[
-  (repeat_start)
-  (repeat_until)] @repeat
+[(repeat_start)
+ (repeat_until)] @keyword.repeat
 
-[
-  (return_statement)
-  (module_return_statement)
-  (break_statement)] @keyword
- 
+(break_statement) @keyword.repeat
 
+[(return_statement)
+ (module_return_statement)] @keyword.return
+
+[(do_start)
+ (do_end)] @keyword
 
 ; [
 ;  "goto"
@@ -46,8 +43,7 @@
  "and"
  "or"] @keyword.operator
 
-[
- "="
+["="
  "~="
  "=="
  "<="
@@ -67,19 +63,15 @@
  ">>"
  "<<"
  ".."
- "#"]
-@operator
+ "#"] @operator
 
 
 
 ;; Punctuation
-[
-  ","
-  "." ] @punctuation.delimiter
+["," "."] @punctuation.delimiter
 
 ;; Brackets
-[
- (left_paren)
+[(left_paren)
  (right_paren)
  "["
  "]"
