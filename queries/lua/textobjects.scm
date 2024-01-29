@@ -1,4 +1,6 @@
 (function) @function.outer
+(function_statement) @function.outer
+
 ; TODO: Need to make this work, might want to change grammar
 ;       to have entire body be one node, rather than fields.
 (function_body) @function.inner
