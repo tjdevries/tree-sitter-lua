@@ -297,7 +297,7 @@ local get_text_from_input = function(input)
 end
 
 m.render = function(input, prefix, width)
-  assert(#prefix < width, "Please don't play games with me.")
+  assert(#prefix < width, string.format("Please don't play games with me: %s | %s", prefix, width))
   if type(input) ~= "table" then
     error(debug.traceback(string.format("Input has to be a table: %s", vim.inspect(input))))
   end
@@ -414,7 +414,10 @@ end
 ---
 --- Used for parameters and field description
 m.render_without_first_line_prefix = function(input, prefix, width)
-  assert(#prefix < width, "Please don't play games with me.")
+  assert(
+    #prefix <= width,
+    string.format("Please don't play games with me: %s | %s | %s", vim.inspect(prefix), #prefix, width)
+  )
   assert(type(input) == "table", "Input has to be a table")
 
   local text = get_text_from_input(input)

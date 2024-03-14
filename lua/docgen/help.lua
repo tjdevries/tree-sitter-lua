@@ -177,7 +177,9 @@ end
 
 help.format_parameter_field = function(input, space_prefix, max_name_width, align_width)
   local left_side = help.__left_side_parameter_field(input, max_name_width, space_prefix)
-  local right_side = render_without_first_line_prefix(input.description, string.rep(" ", align_width), 78)
+
+  local width = math.max(align_width, 78)
+  local right_side = render_without_first_line_prefix(input.description, string.rep(" ", align_width), width)
   if right_side == "" then
     return string.format("%s\n", trim_trailing(left_side))
   end
@@ -209,11 +211,8 @@ help.iter_parameter_field = function(input, list, name, space_prefix)
     end
 
     for _, e in ipairs(list) do
-      output = string.format(
-        "%s%s",
-        output,
-        help.format_parameter_field(input[e], space_prefix, max_name_width, left_width)
-      )
+      output =
+        string.format("%s%s", output, help.format_parameter_field(input[e], space_prefix, max_name_width, left_width))
     end
   end
   return output
