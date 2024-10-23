@@ -539,7 +539,7 @@
       },
       "end": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "string_end",
@@ -549,7 +549,7 @@
       },
       "start": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "string_start",
@@ -1971,6 +1971,11 @@
     }
   },
   {
+    "type": "left_paren",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "local",
     "named": true,
     "fields": {}
@@ -2770,6 +2775,10 @@
     "named": false
   },
   {
+    "type": "(",
+    "named": false
+  },
+  {
     "type": ")",
     "named": false
   },
@@ -2971,10 +2980,6 @@
   },
   {
     "type": "if_then",
-    "named": true
-  },
-  {
-    "type": "left_paren",
     "named": true
   },
   {

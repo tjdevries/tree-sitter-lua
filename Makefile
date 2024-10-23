@@ -25,7 +25,7 @@ build_parser: generate
 	mkdir -p build
 	cc -o ./build/parser.so -I./src src/parser.c src/scanner.c -shared -Os -fPIC
 	mkdir -p parser
-	cp -u ./build/parser.so ./parser/lua.so || exit 0
+	cp ./build/parser.so ./parser/lua.so || exit 0
 
 gen_howto:
 	nvim --headless --noplugin -u tests/init.lua -c "luafile ./scratch/gen_howto.lua" -c 'qa'

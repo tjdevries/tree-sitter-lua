@@ -2872,6 +2872,15 @@
               },
               "named": true,
               "value": "emmy_literal"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "number"
+              },
+              "named": true,
+              "value": "emmy_literal"
             }
           ]
         },
@@ -3287,6 +3296,18 @@
           "value": "\\s+"
         },
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "("
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "FIELD",
           "name": "type",
           "content": {
@@ -3298,11 +3319,23 @@
           "type": "CHOICE",
           "members": [
             {
+              "type": "STRING",
+              "value": ")"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
               "type": "SEQ",
               "members": [
                 {
                   "type": "PATTERN",
-                  "value": "\\s*:\\s*"
+                  "value": "\\s*:?\\s*"
                 },
                 {
                   "type": "FIELD",
@@ -3450,13 +3483,8 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "\\s*---[^\\n]*"
-                }
-              ]
+              "type": "PATTERN",
+              "value": "\\s*---[^\\n]*"
             }
           }
         ]
@@ -3823,10 +3851,6 @@
     [
       "variable_declarator",
       "_prefix_exp"
-    ],
-    [
-      "emmy_ignore",
-      "emmy_comment"
     ]
   ],
   "precedences": [],
@@ -3866,4 +3890,3 @@
   ],
   "supertypes": []
 }
-

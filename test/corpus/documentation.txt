@@ -284,8 +284,6 @@ function cool_function(p) end
         name: (identifier)
         type: (emmy_type
           (emmy_identifier))
-        type: (emmy_type
-          (emmy_identifier))
         description: (parameter_description)))
     (function_start)
     name: (function_name
@@ -346,9 +344,7 @@ end
       (emmy_parameter
         name: (identifier)
         type: (emmy_type
-          (emmy_type_array
-            type: (emmy_type
-              (emmy_identifier))))
+          (emmy_identifier))
         description: (parameter_description))
       (emmy_return
         type: (emmy_type
@@ -397,9 +393,8 @@ end
       (emmy_parameter
         (identifier)
         (emmy_type
-          (emmy_type_array
-            (emmy_type
-              (emmy_identifier)))))
+          (emmy_identifier))
+        (parameter_description))
       (emmy_parameter
         (identifier)
         (emmy_type
@@ -892,8 +887,7 @@ function Wow(first) end
         (identifier)
         (emmy_type
           (emmy_literal))
-        (emmy_type
-          (emmy_literal))))
+        (parameter_description)))
     (function_start)
     (function_name
       (identifier))
@@ -955,3 +949,96 @@ Documentation command
     (documentation_usage)
     (documentation_command_content)
     (documentation_command_content)))
+
+================================================================================
+Various docs
+================================================================================
+
+---@class telescope_popup_options
+---@field border table<1|2|3|4, integer>
+
+--- Returns the buffer number for the given {bufnr}.
+---
+---@param bufnr (integer|nil) Buffer number to resolve. Defaults to current buffer
+---@return integer bufnr
+local function resolve_bufnr(bufnr)
+  validate('bufnr', bufnr, 'number', true)
+  if bufnr == nil or bufnr == 0 then
+    return api.nvim_get_current_buf()
+  end
+  return bufnr
+end
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (documentation_class
+    (emmy_class
+      (emmy_type
+        (emmy_identifier)))
+    (emmy_field
+      (identifier)
+      (emmy_type
+        (emmy_type_key_value
+          (emmy_type
+            (emmy_literal))
+          (emmy_type
+            (emmy_literal))
+          (emmy_type
+            (emmy_literal))
+          (emmy_type
+            (emmy_literal))
+          (emmy_type
+            (emmy_identifier))))))
+  (variable_declaration
+    (emmy_documentation
+      (emmy_header)
+      (emmy_parameter
+        (identifier)
+        (emmy_type
+          (emmy_identifier))
+        (parameter_description))
+      (emmy_return
+        (emmy_type
+          (emmy_identifier))))
+    (variable_declarator
+      (identifier)))
+  (function_statement
+    (local)
+    (function_start)
+    (identifier)
+    (function_body_paren)
+    (parameter_list
+      (identifier))
+    (function_body_paren)
+    (function_body
+      (function_call
+        (identifier)
+        (function_call_paren)
+        (function_arguments
+          (string)
+          (identifier)
+          (string)
+          (boolean))
+        (function_call_paren))
+      (if_statement
+        (if_start)
+        (binary_operation
+          (binary_operation
+            (binary_operation
+              (identifier)
+              (nil))
+            (identifier))
+          (number))
+        (if_then)
+        (return_statement
+          (function_call
+            (identifier)
+            (identifier)
+            (function_call_paren)
+            (function_call_paren)))
+        (if_end))
+      (return_statement
+        (identifier)))
+    (function_end)))
